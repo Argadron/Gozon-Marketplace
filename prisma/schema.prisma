@@ -1,0 +1,110 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id Int @id @unique @default(autoincrement())
+  username String @unique
+  email String? 
+  phone String? 
+  password String
+  isBanned Boolean @default(false) @map("is_banned")
+  role RoleEnum @default(USER)
+  profilePhoto String @map("profile_photo")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  products Product[] 
+  reviews Review[]
+  userProducts UserProducts[]
+  sellerRequirement SellerRequirement?
+
+  @@map("user")
+}
+
+model Product {
+  id Int @id @unique @default(autoincrement())
+  name String 
+  description String 
+  price Float 
+  rate Float @default(0)
+  reports Int @default(0)
+  count Int @default(1)
+  tags String[] @default(["none"])
+  productPhoto String @map("product_photo")
+  isSold Boolean @default(false) @map("is_sold")
+  users User[]
+  reviews Review[]
+  userProducts UserProducts[] 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  @@map("product")
+}
+
+model Review {
+  id Int @id @default(autoincrement())
+  name String 
+  description String 
+  rate Float @default(0)
+  productId Int @map("product_id")
+  product Product @relation(fields: [productId], references: [id])
+  authorId Int @map("author_id")
+  author User @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  @@map("review")
+}
+
+model UserProducts {
+  id Int @default(autoincrement())
+  userId Int @map("user_id")
+  user User @relation(fields: [userId], references: [id])
+  productId Int @map("product_id")
+  product Product @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  @@map("user_products")
+  @@id([productId, userId])
+}
+
+model SellerRequirement {
+  id Int @id @default(autoincrement())
+  userId Int @unique @map("user_id")
+  user User @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  @@map("seller_requirement")
+}
+
+model Telegram {
+  id Int @id @default(autoincrement())
+  userId Int @unique
+  telegramId Int @unique @map("telegram_id")
+  telegramUsername String? @map("telegram_username")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  @@map("telegram")
+}
+
+enum RoleEnum {
+  ADMIN
+  SELLER
+  USER
+}
