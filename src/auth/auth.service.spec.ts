@@ -12,7 +12,7 @@ describe('AuthService', () => {
     username: "Васек2",
     password: "123123123",
     email: "test2@mail.ru",
-    phone: "+7800500101"
+    phone: "+7820560101"
   }
 
   beforeEach(async () => {
@@ -29,4 +29,8 @@ describe('AuthService', () => {
   it('Проверка регистрации юзера', async () => {
     expect((await service.register(response, testNewUser)).access).toBeDefined();
   });
+
+  it("Проверка логина юзера", async () => {
+    expect((await service.login(response, testNewUser)).access).toBeDefined()
+  })
 });

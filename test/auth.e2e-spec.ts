@@ -12,8 +12,8 @@ describe("AuthController (E2E)", () => {
     const testNewUser = {
         username: "Васек",
         password: "123123123",
-        email: "test@mail.ru",
-        phone: "+78005001001"
+        email: "test2424242@mail.ru",
+        phone: "+78005121001"
       }
 
     beforeEach(async () => {
@@ -36,5 +36,12 @@ describe("AuthController (E2E)", () => {
         .post("/api/auth/register")
         .send(testNewUser)
         .expect(201)
+    })
+
+    it("/api/auth/login (POST) (Проверка логина юзера)", async () => {
+        return request(app.getHttpServer())
+        .post("/api/auth/login")
+        .send(testNewUser)
+        .expect(200)
     })
 })

@@ -12,7 +12,7 @@ describe('AuthController', () => {
   const testNewUser = {
     username: "Васек",
     password: "123123123",
-    email: "test@mail.ru",
+    email: "testfgdgdfgdgd@mail.ru",
     phone: "+7800500100"
   }
 
@@ -31,4 +31,8 @@ describe('AuthController', () => {
   it('Проверка регистрации юзера', async () => {
     expect((await controller.register(response, testNewUser)).access).toBeDefined();
   });
+
+  it("Проверка логина юзера", async () => {
+    expect((await controller.login(response, testNewUser)).access).toBeDefined()
+  })
 });
