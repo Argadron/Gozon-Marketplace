@@ -35,6 +35,8 @@ class Logger {
 
         const status = response.statusCode
         
+        typeof(data) === "object" ? data = JSON.stringify(data) : null
+        
         const log = `[DEBUG] [${status}] [${hours}:${mins}] response body: ${data}`
 
         console.log(log)
