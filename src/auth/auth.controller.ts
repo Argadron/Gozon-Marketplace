@@ -1,6 +1,8 @@
-import { Controller, Post, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Header, Post, Res, UploadedFile, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
+import { Response } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('auth')
 export class AuthController {
@@ -8,7 +10,8 @@ export class AuthController {
 
   @UsePipes(new ValidationPipe())
   @Post("/register")
-  async register(dto: AuthDto) {
-    return await this.authService.register(dto)
+  @UseInterceptors(FileInterceptor(`file`))
+  async register(@Res({ passthrough: true }) res: Response, @Body() dto: AuthDto, @UploadedFile() file: Express.Multer.File) {
+    return await this.authService.register(res, dto, file)
   }
 }
