@@ -10,7 +10,7 @@ export class FileService {
 
     downolad(file: Express.Multer.File): string {
         const fileName = v4()
-        const filePath = path.join(process.cwd(), `uploads`, `${fileName}.${file.originalname.split(".")[1]}`)
+        const filePath = path.join(process.cwd(), `uploads`, `${fileName + path.extname(file.originalname)}`)
 
         fs.writeFileSync(filePath, file.buffer, { encoding: `utf-8` })
 
