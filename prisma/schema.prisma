@@ -17,19 +17,20 @@ datasource db {
 model User {
   id Int @id @unique @default(autoincrement())
   username String @unique
-  email String? 
-  phone String? 
+  email String? @unique
+  phone String? @unique
   password String
   isBanned Boolean @default(false) @map("is_banned")
   role RoleEnum @default(USER)
   profilePhoto String @map("profile_photo")
   createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @map("updated_at")
+  updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
 
   products Product[] 
   reviews Review[]
   userProducts UserProducts[]
   sellerRequirement SellerRequirement?
+  refreshToken Tokens?
 
   @@map("user")
 }
@@ -48,8 +49,8 @@ model Product {
   users User[]
   reviews Review[]
   userProducts UserProducts[] 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at") 
+  updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
 
   @@map("product")
 }
@@ -64,7 +65,7 @@ model Review {
   authorId Int @map("author_id")
   author User @relation(fields: [authorId], references: [id])
   createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @map("updated_at")
+  updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
 
   @@map("review")
 }
@@ -76,7 +77,7 @@ model UserProducts {
   productId Int @map("product_id")
   product Product @relation(fields: [productId], references: [id])
   createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @map("updated_at")
+  updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
 
   @@map("user_products")
   @@id([productId, userId])
@@ -87,8 +88,7 @@ model SellerRequirement {
   userId Int @unique @map("user_id")
   user User @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @map("updated_at")
-
+  updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
   @@map("seller_requirement")
 }
 
@@ -98,9 +98,20 @@ model Telegram {
   telegramId Int @unique @map("telegram_id")
   telegramUsername String? @map("telegram_username")
   createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @map("updated_at")
+  updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
 
   @@map("telegram")
+}
+
+model Tokens {
+  id Int @id @default(autoincrement())
+  userId Int @unique @map("user_id")
+  user User @relation(fields: [userId], references: [id])
+  token String 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
+
+  @@map("tokens")
 }
 
 enum RoleEnum {
