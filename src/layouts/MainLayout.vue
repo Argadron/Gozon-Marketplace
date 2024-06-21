@@ -1,116 +1,114 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
-
-        <q-toolbar-title>
-          Quasar App
-        </q-toolbar-title>
-
-        <div>Quasar v{{ $q.version }}</div>
-      </q-toolbar>
-    </q-header>
-
-    <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      bordered
-    >
-      <q-list>
-        <q-item-label
-          header
-        >
-          Essential Links
-        </q-item-label>
-
-        <EssentialLink
-          v-for="link in linksList"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
-    </q-drawer>
-
-    <q-page-container>
-      <router-view />
-    </q-page-container>
+  <q-layout view="lHr LpR lFr">
+      
+      <q-header elevated class="bg-primary text-white">
+          <q-toolbar>
+              <q-toolbar-title class="flex items-center" :class="{'justify-between': $q.screen.lt.sm}">
+                  <img src="../assets/logo.png"/>
+                  
+                  <p v-if="!$q.screen.lt.sm">
+                    GOZON
+                  </p>
+                  <q-btn round dense flat icon="person_outline" class="text-white cursor-pointer" @click="goToProfile()"></q-btn>
+              </q-toolbar-title>
+              
+          </q-toolbar>
+          
+      </q-header>
+      
+      
+      <q-page-container>
+          <router-view />
+      </q-page-container>
+  
   </q-layout>
 </template>
 
-<script>
-import { defineComponent, ref } from 'vue'
-import EssentialLink from 'components/EssentialLink.vue'
+<script setup>
+import {ref, onMounted, watch} from 'vue'
+import {useRouter} from "vue-router";
 
-const linksList = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
+import { useQuasar } from 'quasar'
+const $q = useQuasar()
+
+const isMiniDrawer = ref($q.screen.lt.md);
+
+const isDrawerOpen = ref(true);
+const toggleLeftDrawer = () => {
+  
+  if ($q.screen.lt.sm) {
+      isDrawerOpen.value = false
+      return
   }
-]
+  
+  isMiniDrawer.value = !isMiniDrawer.value
+};
 
-export default defineComponent({
-  name: 'MainLayout',
-
-  components: {
-    EssentialLink
+const menuList = [
+{
+      icon: 'fa-solid fa-calendar-days',
+      label: 'Расписание',
+      to: '/schedule'
   },
+  {
+      icon: 'done',
+      label: 'Посещения',
+      to: '/visits'
+  },
+  {
+      icon: 'fas fa-user',
+      label: 'Ученики',
+      to: '/students'
+  },
+  {
+      icon: 'send',
+      label: 'Педагоги',
+      to: '/teachers'
+  },
+  {
+      icon: 'business_center',
+      label: 'Занятия',
+      to: '/lessons'
+  },
+];
 
-  setup () {
-    const leftDrawerOpen = ref(false)
+const router = useRouter()
 
-    return {
-      linksList,
-      leftDrawerOpen,
-      toggleLeftDrawer () {
-        leftDrawerOpen.value = !leftDrawerOpen.value
+watch(() => $q.screen.width, newValue => {
+  if ($q.screen.gt.xs) {
+      isDrawerOpen.value = true
+  }
+  else {
+      isMiniDrawer.value = true
+  }
+});
+
+onMounted(() => {
+  isDrawerOpen.value = $q.screen.gt.xs
+  try {
+      const routeName = localStorage.getItem('prevRoute')
+      console.log(routeName)
+      if (routeName) {
+          router.push({
+              name: routeName,
+          });
       }
-    }
+  }
+  catch (e) {
+      router.push({
+          name: RouterPages.SCHEDULE,
+      });
   }
 })
+
 </script>
+
+<style>
+p{
+  margin: 0;
+  margin-left: 15px;
+}
+.q-toolbar{
+  padding: 0;
+}
+</style>
