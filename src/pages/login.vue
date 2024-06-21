@@ -41,5 +41,8 @@
     padding: 5px;
     border-color: var(--q-dark);
 }
-
+.q-input:focus{
+    padding: 5px;
+    border-color: var(--q-dark);
+}
 </style>

@@ -4,9 +4,8 @@
       <q-header elevated class="bg-primary text-white">
           <q-toolbar>
               <q-toolbar-title class="flex items-center" :class="{'justify-between': $q.screen.lt.sm}">
-                    <img src="../assets/logo.png"/>
-
-                    <p v-if="!$q.screen.lt.sm">
+                    <img class="cursor-pointer" @click="toMain" src="../assets/logo.png"/>
+                    <p class="cursor-pointer" @click="toMain" v-if="!$q.screen.lt.sm">
                       GOZON
                     </p>
                     <div @click="toUser" class=" cursor-pointer" style="flex: 1 1 0%; text-align: right;">
@@ -31,6 +30,9 @@ export default{
     methods:{
         toUser(){
             window.location.href = "user"
+        },
+        toMain(){
+            window.location.href = "/"
         }
     }
 }
