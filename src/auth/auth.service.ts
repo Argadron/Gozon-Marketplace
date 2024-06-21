@@ -40,7 +40,7 @@ export class AuthService {
         })
     }
 
-    async register(res: Response, dto: AuthDto, file: Express.Multer.File): Promise<Tokens> {
+    async register(res: Response, dto: AuthDto, file: Express.Multer.File=null): Promise<Tokens> {
         const User = await this.prismaService.user.findUnique({
             where: {
                 username: dto.username
@@ -64,8 +64,10 @@ export class AuthService {
 
         const { access, refresh } = await this.generateTokens(id)
 
-        this.sendRefreshToCookie(res, refresh)
+        const NODE_ENV = this.configService.get("NODE_ENV")
 
-        return this.configService.get("NODE_ENV") === "development" ? { access, refresh } : { access }
+        NODE_ENV === "development" || "test" ? null : this.sendRefreshToCookie(res, refresh)
+
+        return NODE_ENV === "development" ? { access, refresh } : { access }
     }
 }

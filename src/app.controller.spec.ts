@@ -16,7 +16,7 @@ describe('AppController', () => {
 
   describe('AppService', () => {
     it('Проверка работы сервера (Server work test)', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+      expect(appController.getHello()).toBe('Server worked!');
     });
   });
 });
