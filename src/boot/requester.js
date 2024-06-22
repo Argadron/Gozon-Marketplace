@@ -1,12 +1,12 @@
-require('dotenv').config();
-import axios from './axios';
+const API  = 'http://localhost:3000/api/'
+import axios from 'axios';
 export default{
-    async requester(url,method, body){
+    async requester(method, url,body){
         switch(method){
           case "GET":
             try{
 
-              const request = await axios.get(url,{headers:{
+              const request = await axios.get(API+url,{headers:{
                   "Content-Type": "application/json",
                   'Authorization': `Bearer ${localStorage.getItem('accessToken')}`          
                 }
@@ -24,11 +24,10 @@ export default{
             }
           case "POST":
           try{
-            const request = await axios.post(url,{
-              body:body,
+            const request = await axios.post(API+url,body,{
               headers:{
                 "Content-Type": "application/json",
-                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`          
+                //'Authorization': `Bearer ${localStorage.getItem('accessToken')}`          
               }
             })       
             return request.data
@@ -42,7 +41,7 @@ export default{
         }
     },
     async refresh(){
-        const res = await axios.get(`${process.env.API}auth/refresh`,{  
+        const res = await axios.get(`${API}auth/refresh`,{  
           headers:{
             "Content-Type":"application/json",
             "Authorization":"Bearer "+localStorage.refreshToken
