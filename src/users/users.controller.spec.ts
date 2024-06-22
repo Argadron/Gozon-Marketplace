@@ -8,11 +8,13 @@ import { AuthModule } from '../auth/auth.module';
 import { PrismaService } from '../prisma.service';
 import { FileService } from '../file.service'
 import { ConfigService } from '@nestjs/config';
+import { RoleEnum } from '@prisma/client';
 
 describe('UsersController', () => {
   let controller: UsersController;
   const jwtUserTest = {
-    id: 3
+    id: 3,
+    role: RoleEnum.USER
   }
 
   beforeEach(async () => {

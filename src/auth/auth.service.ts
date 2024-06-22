@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { JwtUser, Tokens } from './interfaces';
 import { FileService } from '../file.service';
+import { RoleEnum } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -16,9 +17,9 @@ export class AuthService {
                 private readonly fileService: FileService
     ) {}
 
-    private async generateTokens(id: number) {
+    private async generateTokens(id: number, role: RoleEnum) {
         const access = await this.jwtService.signAsync({
-            id
+            id, role
         }, {
             expiresIn: this.configService.get("JWT_ACCESS_EXPIRES")
         })
@@ -88,7 +89,7 @@ export class AuthService {
 
         delete dto.file
         const { password, ...addInfo } = dto
-        const { id } = await this.prismaService.user.create({
+        const { id, role } = await this.prismaService.user.create({
             data: {
                 password: await bcrypt.hash(password, 3),
                 ...addInfo,
@@ -96,7 +97,7 @@ export class AuthService {
             }
         })
 
-        const { access, refresh } = await this.generateTokens(id)
+        const { access, refresh } = await this.generateTokens(id, role)
 
         await this.prismaService.tokens.create({
             data: {
@@ -139,7 +140,7 @@ export class AuthService {
             }
         })) throw new BadRequestException("Refresh Token not found")
 
-        const { access, refresh } = await this.generateTokens(User.id)
+        const { access, refresh } = await this.generateTokens(User.id, User.role)
 
         await this.prismaService.tokens.update({
             where: {
@@ -164,7 +165,13 @@ export class AuthService {
 
         await this.verifyJwt(token)
 
-        const { access, refresh } = await this.generateTokens(tokensObject.userId)
+        const User = await this.prismaService.user.findUnique({
+            where: {
+                id: tokensObject.userId
+            }
+        })
+
+        const { access, refresh } = await this.generateTokens(User.id, User.role)
 
         await this.prismaService.tokens.update({
             where: {
