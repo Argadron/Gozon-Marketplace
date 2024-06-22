@@ -1,11 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { JwtUser } from '../auth/interfaces';
-import { User } from '@prisma/client';
+import { FileService } from '../file.service';
+import { Response } from 'express';
 
 @Injectable()
 export class UsersService {
-    constructor(private readonly prismaService: PrismaService) {}
+    constructor(private readonly prismaService: PrismaService,
+                private readonly fileService: FileService
+    ) {}
 
     async getProfile(user: JwtUser) {
         const User = await this.prismaService.user.findUnique({
@@ -24,5 +27,13 @@ export class UsersService {
         delete User.password
 
         return User
+    }
+
+    async getProfilePhoto(user: JwtUser, res: Response) {
+        const { profilePhoto } = await this.getProfile(user)
+
+        const file = this.fileService.get(res, profilePhoto)
+
+        return file
     }
 }

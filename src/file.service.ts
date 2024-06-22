@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { v4 } from 'uuid'
 import * as fs from 'fs'
 import * as path from 'path'
@@ -19,7 +19,12 @@ export class FileService {
 
     get(res: Response, filePath: string) {
         const realPath = path.join(process.cwd(), `uploads`, `${filePath}`)
+
+        if (!fs.existsSync(realPath)) throw new NotFoundException("Profile photo not found")
+
         const file = fs.createReadStream(realPath)
+
+        res.header("Content-Type", `Image/${path.extname(filePath).replace(".", "")}`)
 
         return file.pipe(res)
     }
