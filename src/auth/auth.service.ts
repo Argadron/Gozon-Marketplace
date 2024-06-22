@@ -1,11 +1,11 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException} from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
 import { PrismaService } from '../prisma.service'
 import { AuthDto } from './dto/auth.dto';
 import * as bcrypt from 'bcrypt'
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
-import { Tokens } from './interfaces';
+import { JwtUser, Tokens } from './interfaces';
 import { FileService } from '../file.service';
 
 @Injectable()
@@ -38,6 +38,29 @@ export class AuthService {
             maxAge: 30 * 24 * 60 * 60 * 1000,
             sameSite: this.configService.get("NODE_ENV") === "development" ? "none" : "lax"
         })
+    }
+
+    private async verifyJwt(token: string): Promise<JwtUser> {
+        try {
+            return await this.jwtService.verifyAsync(token)
+        } catch(e) {
+            throw new UnauthorizedException("Refresh token invalid")
+        }
+    }
+
+    /**
+     * This method check NODE_ENV variable and send refresh to cookie or return if mode equal development
+     * @param access - Access token
+     * @param refresh - Refresh token
+     * @param res - Response from Express
+     * @returns - Access and refresh tokens (or only access)
+     */
+    private async checkNodeEnvAndReturn(access: string, refresh: string, res: Response): Promise<Tokens> {
+        const NODE_ENV = this.configService.get("NODE_ENV")
+
+        NODE_ENV === "development" || "test" ? null : this.sendRefreshToCookie(res, refresh)
+
+        return NODE_ENV === "development" || "test" ? { access, refresh } : { access }
     }
 
     async register(res: Response, dto: AuthDto, file: Express.Multer.File=null): Promise<Tokens> {
@@ -75,10 +98,6 @@ export class AuthService {
 
         const { access, refresh } = await this.generateTokens(id)
 
-        const NODE_ENV = this.configService.get("NODE_ENV")
-
-        NODE_ENV === "development" || "test" ? null : this.sendRefreshToCookie(res, refresh)
-
         await this.prismaService.tokens.create({
             data: {
                 userId: id, 
@@ -86,7 +105,7 @@ export class AuthService {
             }
         })
 
-        return NODE_ENV === "development" ? { access, refresh } : { access }
+        return await this.checkNodeEnvAndReturn(access, refresh, res)
     }
 
     async login(res: Response, dto: Partial<AuthDto>) {
@@ -122,10 +141,40 @@ export class AuthService {
 
         const { access, refresh } = await this.generateTokens(User.id)
 
-        const NODE_ENV = this.configService.get("NODE_ENV")
+        await this.prismaService.tokens.update({
+            where: {
+                userId: User.id
+            },
+            data: {
+                token: refresh
+            }
+        })
 
-        NODE_ENV === "development" || "test" ? null : this.sendRefreshToCookie(res, refresh)
+        return await this.checkNodeEnvAndReturn(access, refresh, res)
+    }
 
-        return NODE_ENV === "development" ? { access, refresh } : { access }
+    async refresh(token: string, res: Response) {
+        const tokensObject = await this.prismaService.tokens.findFirst({
+            where: {
+                token
+            }
+        })
+
+        if (!tokensObject) throw new UnauthorizedException("Refresh token not found")
+
+        await this.verifyJwt(token)
+
+        const { access, refresh } = await this.generateTokens(tokensObject.userId)
+
+        await this.prismaService.tokens.update({
+            where: {
+                userId: tokensObject.userId
+            },
+            data: {
+                token: refresh
+            }
+        })
+
+        return await this.checkNodeEnvAndReturn(access, refresh, res)
     }
 }

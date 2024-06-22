@@ -1,10 +1,11 @@
-import { Body, Controller, HttpCode, Post, Res, UploadedFile, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Res, UnauthorizedException, UploadedFile, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiResponse, ApiOperation } from '@nestjs/swagger';
-import { SwaggerBadRequest, SwaggerJwtUser, SwaggerConflictMessage } from '../swagger/apiResponse.interfaces';
+import { ApiBody, ApiResponse, ApiOperation, ApiBearerAuth, ApiHeader } from '@nestjs/swagger';
+import { SwaggerBadRequest, SwaggerJwtUser, SwaggerConflictMessage, SwaggerOK } from '../swagger/apiResponse.interfaces';
+import { Token } from './decorators/get-token.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -32,5 +33,17 @@ export class AuthController {
   @HttpCode(200)
   async login(@Res({ passthrough: true }) res: Response, @Body() dto: Partial<AuthDto>) {
     return await this.authService.login(res, dto)
+  }
+
+  @Get("/refresh")
+  @HttpCode(200)
+  @ApiResponse({ status: 200, description: "This method check refresh token and return new tokens", type: SwaggerOK })
+  @ApiResponse({ status: 401, description: "Refresh token invalid", type: SwaggerBadRequest })
+  @ApiOperation({ summary: "Refresh access and refresh tokens" })
+  @ApiBearerAuth()
+  async refresh(@Token() token: string, @Res({ passthrough: true }) res: Response) {
+    if (!token) throw new UnauthorizedException("No refresh token")
+
+    return await this.authService.refresh(token, res)
   }
 }
