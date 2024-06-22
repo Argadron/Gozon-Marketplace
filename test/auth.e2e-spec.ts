@@ -6,6 +6,8 @@ import { PrismaService } from '../src/prisma.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FileService } from  '../src/file.service'
 import * as request from 'supertest';
+import { PrismaClient } from '@prisma/client';
+import { Request, Response } from 'express';
 
 describe("AuthController (E2E)", () => {
     let app: INestApplication;
@@ -15,6 +17,12 @@ describe("AuthController (E2E)", () => {
         email: "test2424242@mail.ru",
         phone: "+78005121001"
       }
+
+    function setAuthorizationRefresh(req: Request, res: Response, next: Function) {
+        req.headers.authorization = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzE5MDQyMDgyLCJleHAiOjE3MjE2MzQwODJ9.9CscTdrQLqZswjoDzvoFD2oxASELaluIteOoT7TaKLU"
+
+        next()
+    }
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -27,6 +35,7 @@ describe("AuthController (E2E)", () => {
         app = moduleFixture.createNestApplication()
 
         app.setGlobalPrefix("/api")
+        app.use(setAuthorizationRefresh)
 
         await app.init()
     })
@@ -43,5 +52,43 @@ describe("AuthController (E2E)", () => {
         .post("/api/auth/login")
         .send(testNewUser)
         .expect(200)
+    })
+
+    it("/api/auth/refresh (GET) (Проверка рефреша токенов)", async () => {
+        return request(app.getHttpServer())
+        .get("/api/auth/refresh")
+        
+        .expect(200)
+    })
+
+    afterAll(async () => {
+        const prisma = new PrismaClient()
+
+        await prisma.tokens.update({
+            where: {
+                userId: 3
+            },
+            data: {
+                token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzE5MDQyMDgyLCJleHAiOjE3MjE2MzQwODJ9.9CscTdrQLqZswjoDzvoFD2oxASELaluIteOoT7TaKLU"
+            }
+        })
+
+        const { id } = await prisma.user.findUnique({
+            where: {
+              username: "Васек"
+            }
+          })
+      
+          await prisma.tokens.delete({
+            where: {
+              userId: id
+            }
+          })
+
+        await prisma.user.delete({
+            where: {
+                username: "Васек"
+            }
+        })
     })
 })
