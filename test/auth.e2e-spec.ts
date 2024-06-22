@@ -57,7 +57,6 @@ describe("AuthController (E2E)", () => {
     it("/api/auth/refresh (GET) (Проверка рефреша токенов)", async () => {
         return request(app.getHttpServer())
         .get("/api/auth/refresh")
-        
         .expect(200)
     })
 
