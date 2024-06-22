@@ -16,7 +16,8 @@ export class UsersService {
                 id: user.id
             },
             include: {
-                products: true
+                userProducts: true,
+                reviews: true
             }
         })
 
