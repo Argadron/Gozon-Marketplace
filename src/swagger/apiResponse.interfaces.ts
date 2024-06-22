@@ -40,3 +40,25 @@ export class SwaggerConflictMessage {
     @ApiProperty({ description: "Error message", default: "Conflict Exception" })
     readonly error: string;
 }
+
+export class SwaggerNotFound {
+    @ApiProperty({ description: "Code from response", default: 404 })
+    readonly statusCode: number; 
+
+    @ApiProperty({ description: "Response message", default: "User not found" })
+    readonly message: string; 
+
+    @ApiProperty({ description: "Error message", default: "NotFound Exception" })
+    readonly error: string;
+}
+
+export class SwaggerUnauthorizedException {
+    @ApiProperty({ description: "Code from response", default: 401 })
+    readonly statusCode: number; 
+
+    @ApiProperty({ description: "Response message", default: "Token invalid" })
+    readonly message: string; 
+
+    @ApiProperty({ description: "Error message", default: "Unauthorized Exception" })
+    readonly error: string;
+}

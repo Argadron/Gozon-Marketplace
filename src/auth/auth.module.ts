@@ -6,6 +6,8 @@ import { JwtModule } from '@nestjs/jwt';
 import config from '../config/constants'
 import { ConfigService } from '@nestjs/config';
 import { FileService } from '../file.service'
+import { JwtGuard } from './guards/jwt.guard';
+import { LocalStrategy } from './strategies/jwt.strategy';
 
 const constants = config()
 
@@ -15,6 +17,7 @@ const constants = config()
       secret: constants.JWT_SECRET
   })],
   controllers: [AuthController],
-  providers: [AuthService, PrismaService, ConfigService, FileService]
+  providers: [AuthService, PrismaService, ConfigService, FileService, JwtGuard, LocalStrategy],
+  exports: [JwtGuard, LocalStrategy]
 })
 export class AuthModule {}
