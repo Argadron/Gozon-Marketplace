@@ -9,6 +9,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { JwtUser } from '../auth/interfaces';
 import { User } from '../auth/decorators/get-user.decorator';
 import { JwtGuard } from '../auth/guards/jwt.guard';
+import { StringFiltersToObject } from './pipes/string-filters-to-object.pipe';
 
 @Controller('products')
 export class ProductsController {
@@ -21,7 +22,14 @@ export class ProductsController {
   @ApiResponse({ status: 400, description: "Validation failed", type: SwaggerBadRequest })
   @ApiQuery({ name: "page"})
   @ApiQuery({ name: "productOnPage" })
-  async getAll(@Query(ObjectStringToIntPipe) query: AllProductsDto) {
+  @ApiQuery({ name: "filters", description: "Describe all filters. All filters must be writed on array.", example: "priceMin=5+priceMax=2", required: false })
+  @ApiQuery({ name: "priceMin", required: false, type: Number, description: "Min product price"})
+  @ApiQuery({ name: "priceMax", required: false, type: Number, description: "Max product price"})
+  @ApiQuery({ name: "category", required: false, description: "A string array of categories"})
+  @ApiQuery({ name: "createdAt", required: false, type: Date, description: "CreatedAt time"})
+  @ApiQuery({ name: "tags", required: false, description: "A string array of tags"})
+  @ApiQuery({ name: "UpOrDown", required: false, type: Boolean, description: "Price sort asc/desc type"})
+  async getAll(@Query(ObjectStringToIntPipe, StringFiltersToObject) query: AllProductsDto) {
     return await this.productsService.getAll(query)
   }
 

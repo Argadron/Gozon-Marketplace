@@ -50,6 +50,7 @@ model Product {
   users User[]
   reviews Review[]
   userProducts UserProducts[] 
+  categories ProductCategories[]
   createdAt DateTime @default(now()) @map("created_at") 
   updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
 
@@ -113,6 +114,29 @@ model Tokens {
   updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
 
   @@map("tokens")
+}
+
+model Category {
+  id Int @id @default(autoincrement())
+  name String 
+  products ProductCategories[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
+
+  @@map("category")
+}
+
+model ProductCategories {
+  id Int @default(autoincrement())
+  productId Int @map("product_id")
+  products Product @relation(fields: [productId], references: [id])
+  categoryId Int @map("category_id")
+  categories Category @relation(fields: [categoryId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
+
+  @@id([categoryId, productId])
+  @@map("product_categories")
 }
 
 enum RoleEnum {

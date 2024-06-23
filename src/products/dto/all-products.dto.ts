@@ -1,5 +1,6 @@
 import { Transform } from "class-transformer";
-import { IsNumber, Min } from "class-validator";
+import { IsNumber, IsOptional, IsString, Min } from "class-validator";
+import { Filters } from "../interfaces";
 
 export class AllProductsDto {
     @Transform(value => Number.parseInt(value.value))
@@ -11,4 +12,8 @@ export class AllProductsDto {
     @IsNumber()
     @Min(1)
     readonly page: number;
+
+    @IsString()
+    @IsOptional()
+    readonly filter?: Filters;
 }

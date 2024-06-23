@@ -4,6 +4,8 @@ import { AllProductsDto } from './dto/all-products.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { JwtUser } from '../auth/interfaces';
 import { FileService } from '../file.service';
+import { Filters } from './interfaces';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ProductsService {
@@ -11,10 +13,39 @@ export class ProductsService {
                 private readonly fileService: FileService
     ) {}
 
+    private filterCreator(filters: Filters) {
+        const result: Prisma.ProductWhereInput[] = []
+
+        if (filters.priceMin) result.push({ price: { gte: filters.priceMin } })
+
+        if (filters.priceMax) result.push({ price: { lte: filters.priceMax } })
+
+        if (filters.tags?.length > 0) result.push({ tags: { hasSome: filters.tags } })
+
+        if (filters.categories?.length > 0) result.push({ categories: {
+            some: {
+                categories: {
+                    name: {
+                        in: filters.categories
+                    }
+                }
+            }
+        } })
+
+        return result
+    }
+
     async getAll(query: AllProductsDto) {
+        const filters: Filters = query.filter
         const result = await this.prismaService.product.findMany({
             skip: (query.page - 1)*query.productOnPage,
-            take: query.productOnPage
+            take: query.productOnPage,
+            where: {
+                AND: filters ? this.filterCreator(filters) : []
+            },
+            orderBy: {
+                price: filters?.UpOrDown ? "asc" : "desc"
+            }
         })
         
         const pages = Math.floor(await this.prismaService.product.count()/50)
