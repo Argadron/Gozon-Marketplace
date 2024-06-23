@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FileService } from  '../file.service'
 import { JwtModule } from '@nestjs/jwt';
 import { PrismaClient } from '@prisma/client';
+import 'dotenv/config'
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -38,7 +39,7 @@ describe('AuthController', () => {
   })
 
   it("Проверка рефреша токенов", async () => {
-    expect((await controller.refresh("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzE5MDQyMDgyLCJleHAiOjE3MjE2MzQwODJ9.9CscTdrQLqZswjoDzvoFD2oxASELaluIteOoT7TaKLU", response)).access).toBeDefined()
+    expect((await controller.refresh(process.env.TOKEN, response)).access).toBeDefined()
   })
 
   afterAll(async () => {
@@ -49,7 +50,7 @@ describe('AuthController', () => {
         userId: 3
       },
       data: {
-        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzE5MDQyMDgyLCJleHAiOjE3MjE2MzQwODJ9.9CscTdrQLqZswjoDzvoFD2oxASELaluIteOoT7TaKLU"
+        token: process.env.TOKEN
       }
     })
 
