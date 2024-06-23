@@ -11,7 +11,11 @@ describe('UsersService', () => {
   let service: UsersService;
   const jwtUserTest = {
     id: 3,
-    role: RoleEnum.USER
+    role: RoleEnum.ADMIN
+  }
+  const testBan = {
+    username: "Argadron",
+    status: false
   }
 
   beforeEach(async () => {
@@ -29,5 +33,9 @@ describe('UsersService', () => {
 
   it("Проверка получения профиля пользователя", async () => {
     expect((await service.getProfilePhoto(jwtUserTest, response)).statusCode).toBe(200)
+  })
+
+  it("Проверка бана/разбана пользователя", async () => {
+    expect((await service.setUserBanStatus(testBan, jwtUserTest)).length).toBeDefined()
   })
 });

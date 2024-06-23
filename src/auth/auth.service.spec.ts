@@ -6,13 +6,14 @@ import { PrismaService } from '../prisma.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FileService } from  '../file.service'
 import { PrismaClient } from '@prisma/client';
+import 'dotenv/config'
 
 describe('AuthService', () => {
   let service: AuthService;
   const testNewUser = {
     username: "Васек2",
     password: "123123123",
-    email: "test2@mail.ru",
+    email: "test5464564565456546456456@mail.ru",
     phone: "+7820560101"
   }
 
@@ -36,7 +37,7 @@ describe('AuthService', () => {
   })
 
   it("Проверка рефреша токенов", async () => {
-    expect((await service.refresh("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzE5MDQyMDgyLCJleHAiOjE3MjE2MzQwODJ9.9CscTdrQLqZswjoDzvoFD2oxASELaluIteOoT7TaKLU", response)).access).toBeDefined()
+    expect((await service.refresh(process.env.TOKEN, response)).access).toBeDefined()
   })
 
   afterAll(async () => {
@@ -47,7 +48,7 @@ describe('AuthService', () => {
         userId: 3
       },
       data: {
-        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzE5MDQyMDgyLCJleHAiOjE3MjE2MzQwODJ9.9CscTdrQLqZswjoDzvoFD2oxASELaluIteOoT7TaKLU"
+        token: process.env.TOKEN
       }
     })
 

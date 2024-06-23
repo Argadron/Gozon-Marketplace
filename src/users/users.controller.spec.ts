@@ -9,12 +9,17 @@ import { PrismaService } from '../prisma.service';
 import { FileService } from '../file.service'
 import { ConfigService } from '@nestjs/config';
 import { RoleEnum } from '@prisma/client';
+import { AdminGuard } from '../auth/guards/admin.guard';
 
 describe('UsersController', () => {
   let controller: UsersController;
   const jwtUserTest = {
     id: 3,
-    role: RoleEnum.USER
+    role: RoleEnum.ADMIN
+  }
+  const testBan = {
+    username: "Argadron",
+    status: true
   }
 
   beforeEach(async () => {
@@ -32,6 +37,17 @@ describe('UsersController', () => {
 
         return true
       }
+    }).overrideGuard(AdminGuard).useValue({
+      canActivate: (ctx: ExecutionContext) => {
+        const req: Request = ctx.switchToHttp().getRequest()
+
+        req.user = {
+          id: 3,
+          role: RoleEnum.ADMIN
+        }
+
+        return true
+      }
     }).compile();
 
     controller = module.get<UsersController>(UsersController);
@@ -43,5 +59,9 @@ describe('UsersController', () => {
 
   it("Проверка получения фото профиля пользователя", async () => {
     expect((await controller.getProfilePhoto(jwtUserTest, response)).statusCode).toBe(200)
+  })
+
+  it("Проверка бана/разбана пользователя", async () => {
+    expect((await controller.setUserBanStatus(testBan, jwtUserTest)).length).toBeDefined()
   })
 });
