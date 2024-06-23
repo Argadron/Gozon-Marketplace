@@ -34,7 +34,7 @@ export class ProductsService {
         return product
     }
 
-    async create(dto: CreateProductDto, user: JwtUser, file: Express.Multer.File) {
+    async create(dto: CreateProductDto, user: JwtUser, file: Express.Multer.File=undefined) {
         let productPhoto = "";
 
         if (file) {

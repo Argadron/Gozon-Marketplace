@@ -1,7 +1,7 @@
 import { Controller, Get, Query, ValidationPipe, UsePipes, Param, ParseIntPipe, Post, UseGuards, Body, UploadedFile } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { ApiOperation, ApiResponse, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
-import { SwaggerBadRequest, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK } from '../swagger/apiResponse.interfaces';
+import { SwaggerBadRequest, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '../swagger/apiResponse.interfaces';
 import { AllProductsDto } from './dto/all-products.dto';
 import { ObjectStringToIntPipe } from './pipes/object-string-to-int.pipe';
 import { SellerGuard } from '../auth/guards/seller.guard';
@@ -38,11 +38,12 @@ export class ProductsController {
   @ApiOperation({ summary: "Create new product" })
   @ApiResponse({ status: 201, description: "Product created successfly", type: SwaggerCreated })
   @ApiResponse({ status: 400, description: "Validation failed", type: SwaggerBadRequest })
+  @ApiResponse({ status: 401, description: "Token invalid/Unauhorized", type: SwaggerUnauthorizedException })
   @ApiResponse({ status: 403, description: "Your role not allowed to this action", type: SwaggerForbiddenException })
   @ApiBearerAuth()
   @UseGuards(JwtGuard, SellerGuard)
   @UsePipes(new ValidationPipe())
-  async createProduct(@Body() dto: CreateProductDto, @User() user: JwtUser, @UploadedFile() file: Express.Multer.File) {
+  async createProduct(@Body() dto: CreateProductDto, @User() user: JwtUser, @UploadedFile() file: Express.Multer.File=undefined) {
     return await this.productsService.create(dto, user, file)
   }
 }

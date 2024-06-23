@@ -69,7 +69,7 @@ describe("AuthController (E2E)", () => {
                 userId: 3
             },
             data: {
-                token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzE5MDQyMDgyLCJleHAiOjE3MjE2MzQwODJ9.9CscTdrQLqZswjoDzvoFD2oxASELaluIteOoT7TaKLU"
+                token: process.env.TOKEN
             }
         })
 
