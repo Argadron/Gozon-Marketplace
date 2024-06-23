@@ -22,4 +22,8 @@ describe('ProductsService', () => {
   it('Проверка получения всех продуктов (страницы)', async () => {
     expect((await service.getAll(query))).toBeDefined();
   });
+
+  it("Проверка получения продукта по ID", async () => {
+    expect ((await service.getById(1))).toBeDefined()
+  })
 });

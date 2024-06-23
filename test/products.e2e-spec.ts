@@ -24,4 +24,10 @@ describe("ProductsController (E2E)", () => {
         .get("/api/products/all?page=1&count=1")
         .expect(200)
     })
+
+    it("Проверка получения продукта по ID", async () => {
+        return request(app.getHttpServer())
+        .get("/api/products/1")
+        .expect(404)
+    })
 })

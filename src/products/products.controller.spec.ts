@@ -24,4 +24,8 @@ describe('ProductsController', () => {
   it('Проверка получения всех продуктов (страницы)', async () => {
     expect((await controller.getAll(query))).toBeDefined();
   });
+
+  it("Проверка получения продукта по ID", async () => {
+    expect((await controller.getById(1))).toBeDefined()
+  })
 });
