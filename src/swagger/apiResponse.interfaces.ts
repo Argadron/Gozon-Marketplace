@@ -62,3 +62,14 @@ export class SwaggerUnauthorizedException {
     @ApiProperty({ description: "Error message", default: "Unauthorized Exception" })
     readonly error: string;
 }
+
+export class SwaggerForbiddenException {
+    @ApiProperty({ description: "Code from response", default: 403 })
+    readonly statusCode: number; 
+
+    @ApiProperty({ description: "Response message", default: "Forbidden resource" })
+    readonly message: string; 
+
+    @ApiProperty({ description: "Error message", default: "Forbidden Exception" })
+    readonly error: string;
+}

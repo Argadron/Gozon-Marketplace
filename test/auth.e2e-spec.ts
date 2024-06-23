@@ -8,6 +8,7 @@ import { FileService } from  '../src/file.service'
 import * as request from 'supertest';
 import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
+import 'dotenv/config'
 
 describe("AuthController (E2E)", () => {
     let app: INestApplication;
@@ -19,7 +20,7 @@ describe("AuthController (E2E)", () => {
       }
 
     function setAuthorizationRefresh(req: Request, res: Response, next: Function) {
-        req.headers.authorization = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzE5MDQyMDgyLCJleHAiOjE3MjE2MzQwODJ9.9CscTdrQLqZswjoDzvoFD2oxASELaluIteOoT7TaKLU"
+        req.headers.authorization = `Bearer ${process.env.TOKEN}`
 
         next()
     }
