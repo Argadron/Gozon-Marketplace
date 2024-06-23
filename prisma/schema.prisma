@@ -46,6 +46,7 @@ model Product {
   tags String[] @default(["none"])
   productPhoto String @map("product_photo")
   isSold Boolean @default(false) @map("is_sold")
+  sellerId Int @map("seller_id")
   users User[]
   reviews Review[]
   userProducts UserProducts[] 

@@ -5,10 +5,10 @@ export class AllProductsDto {
     @Transform(value => Number.parseInt(value.value))
     @IsNumber()
     @Min(0)
-    readonly count: number;
+    readonly productOnPage: number;
 
     @Transform(value => Number.parseInt(value.value))
     @IsNumber()
-    @Min(0)
+    @Min(1)
     readonly page: number;
 }

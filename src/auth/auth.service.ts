@@ -69,13 +69,13 @@ export class AuthService {
             where: {
                 OR: [
                     {
-                        username: dto.username
+                        username: dto.username ? dto.username : undefined
                     },
                     {
-                        email: dto.email
+                        email: dto.email ? dto.email : undefined
                     },
                     {
-                        phone: dto.phone
+                        phone: dto.phone ? dto.phone : undefined
                     }
                 ]
             }
