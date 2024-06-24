@@ -7,6 +7,7 @@ import { FileService } from '../file.service';
 import { Filters } from './interfaces';
 import { Prisma } from '@prisma/client';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { Response } from 'express';
 
 @Injectable()
 export class ProductsService {
@@ -93,6 +94,18 @@ export class ProductsService {
         if (!product) throw new NotFoundException("Product not found")
 
         return product
+    }
+
+    async getPhotoById(id: number, res: Response) {
+        const product = await this.prismaService.product.findUnique({
+            where: {
+                id
+            }
+        })
+
+        if (!product) throw new NotFoundException("Product not found")
+
+        return this.fileService.get(res, product.productPhoto)
     }
 
     async create(dto: CreateProductDto, user: JwtUser, file: Express.Multer.File=undefined) {

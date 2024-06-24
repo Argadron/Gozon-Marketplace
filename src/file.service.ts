@@ -23,11 +23,11 @@ export class FileService {
     get(res: Response, filePath: string) {
         const realPath = path.join(process.cwd(), `uploads`, `${filePath}`)
 
-        if (!fs.existsSync(realPath)) throw new NotFoundException("Profile photo not found")
+        if (!fs.existsSync(realPath)) throw new NotFoundException("File not found")
 
         const file = fs.createReadStream(realPath)
 
-        this.configService.get("NODE_ENV") ? null : res.header("Content-Type", `Image/${path.extname(filePath).replace(".", "")}`) 
+        this.configService.get("NODE_ENV") === "test" ? null : res.header("Content-Type", `Image/${path.extname(filePath).replace(".", "")}`) 
 
         return file.pipe(res)
     }

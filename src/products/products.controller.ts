@@ -1,4 +1,4 @@
-import { Controller, Get, Query, ValidationPipe, UsePipes, Param, ParseIntPipe, Post, UseGuards, Body, UploadedFile, Put } from '@nestjs/common';
+import { Controller, Get, Query, ValidationPipe, UsePipes, Param, ParseIntPipe, Post, UseGuards, Body, UploadedFile, Put, Res } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { ApiOperation, ApiResponse, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { SwaggerBadRequest, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '../swagger/apiResponse.interfaces';
@@ -11,6 +11,7 @@ import { User } from '../auth/decorators/get-user.decorator';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { StringFiltersToObject } from './pipes/string-filters-to-object.pipe';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { Response } from 'express';
 
 @Controller('products')
 export class ProductsController {
@@ -41,6 +42,14 @@ export class ProductsController {
   @ApiResponse({ status: 400, description: "Id of product not writed", type: SwaggerBadRequest })
   async getById(@Param("id", ParseIntPipe) id: number) {
     return await this.productsService.getById(id)
+  }
+
+  @Get(`/photo/:id`)
+  @ApiOperation({ summary: "Get product photo by id" })
+  @ApiResponse({ status: 200, description: "Return a product photo", type: SwaggerOK })
+  @ApiResponse({ status: 404, description: "Product/photo not found", type: SwaggerNotFound })
+  async getPhotoById(@Param("id", ParseIntPipe) id: number, @Res() res: Response) {
+    return await this.productsService.getPhotoById(id, res)
   }
 
   @Post("/newProduct")
