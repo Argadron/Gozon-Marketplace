@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { AllProductsDto } from './dto/all-products.dto';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -6,6 +6,7 @@ import { JwtUser } from '../auth/interfaces';
 import { FileService } from '../file.service';
 import { Filters } from './interfaces';
 import { Prisma } from '@prisma/client';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductsService {
@@ -31,6 +32,35 @@ export class ProductsService {
                 }
             }
         } })
+
+        return result
+    }
+
+    private photoDownloader(file: Express.Multer.File=undefined) {
+        let productPhoto = "";
+
+        if (file) {
+            if (!this.fileService.validateFileType(file.originalname)) throw new BadRequestException("Product photo has invalid type")
+        }
+
+        file ? productPhoto = this.fileService.downolad(file) : null 
+
+        return productPhoto ? productPhoto : undefined
+    }
+
+    private updateRequestFilter(dto: UpdateProductDto, productPhoto: string=undefined) {
+        const result: Prisma.ProductUpdateInput = {}
+
+        const { count, price, name, description, tags } = dto
+
+        if (!count && !price && !name && !description && !tags?.length) throw new BadRequestException("1 of 5 plants must be writed")
+
+        count ? result.count = count: null 
+        price ? result.price = price : null 
+        name ? result.name = name : null 
+        description ? result.description = description : null 
+        tags?.length ? result.tags = tags : null 
+        productPhoto ? result.productPhoto = productPhoto : null
 
         return result
     }
@@ -66,13 +96,7 @@ export class ProductsService {
     }
 
     async create(dto: CreateProductDto, user: JwtUser, file: Express.Multer.File=undefined) {
-        let productPhoto = "";
-
-        if (file) {
-            if (!this.fileService.validateFileType(file.originalname)) throw new BadRequestException("Product photo has invalid type")
-        }
-
-        file ? productPhoto = this.fileService.downolad(file) : null 
+        const productPhoto = this.photoDownloader(file)
 
         delete dto.productPhoto
 
@@ -82,6 +106,31 @@ export class ProductsService {
                 productPhoto: productPhoto ? productPhoto : "default.png",
                 sellerId: user.id
             }
+        })
+    }
+
+    async update(dto: UpdateProductDto, user: JwtUser, file: Express.Multer.File=undefined) {
+        const product = await this.prismaService.product.findUnique({
+            where: {
+                id: dto.id
+            }
+        })
+
+        if (!product) throw new NotFoundException("Product not found")
+
+        if (product.sellerId !== user.id) throw new ForbiddenException("This is not your product.")
+
+        const productPhoto = this.photoDownloader(file)
+
+        delete dto.productPhoto
+
+        const data = this.updateRequestFilter(dto, productPhoto)
+
+        return await this.prismaService.product.update({  
+            where: {
+                id: dto.id
+            },
+            data
         })
     }
 }

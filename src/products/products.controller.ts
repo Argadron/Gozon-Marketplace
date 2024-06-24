@@ -1,4 +1,4 @@
-import { Controller, Get, Query, ValidationPipe, UsePipes, Param, ParseIntPipe, Post, UseGuards, Body, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Query, ValidationPipe, UsePipes, Param, ParseIntPipe, Post, UseGuards, Body, UploadedFile, Put } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { ApiOperation, ApiResponse, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { SwaggerBadRequest, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '../swagger/apiResponse.interfaces';
@@ -10,6 +10,7 @@ import { JwtUser } from '../auth/interfaces';
 import { User } from '../auth/decorators/get-user.decorator';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { StringFiltersToObject } from './pipes/string-filters-to-object.pipe';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -53,5 +54,18 @@ export class ProductsController {
   @UsePipes(new ValidationPipe())
   async createProduct(@Body() dto: CreateProductDto, @User() user: JwtUser, @UploadedFile() file: Express.Multer.File=undefined) {
     return await this.productsService.create(dto, user, file)
+  }
+
+  @Put("/updateProduct")
+  @ApiOperation({ summary: "Update a product" })
+  @ApiResponse({ status: 200, description: "Product updated", type: SwaggerOK })
+  @ApiResponse({ status: 400, description: "Validation failed", type: SwaggerBadRequest })
+  @ApiResponse({ status: 401, description: "Token Invalid/Unauthorized", type: SwaggerUnauthorizedException })
+  @ApiResponse({ status: 403, description: "Your role not have access to this action", type: SwaggerForbiddenException })
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard, SellerGuard)
+  @UsePipes(new ValidationPipe())
+  async editProduct(@Body() dto: UpdateProductDto, @User() user: JwtUser, @UploadedFile() file: Express.Multer.File=undefined) {
+    return await this.productsService.update(dto, user, file)
   }
 }
