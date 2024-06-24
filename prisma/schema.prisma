@@ -31,6 +31,7 @@ model User {
   userProducts UserProducts[]
   sellerRequirement SellerRequirement?
   refreshToken Tokens?
+  reports Report[]
 
   @@map("user")
 }
@@ -41,7 +42,7 @@ model Product {
   description String 
   price Float 
   rate Float @default(0)
-  reports Int @default(0)
+  reportsCount Int @default(0)
   count Int @default(1)
   tags String[] @default(["none"])
   productPhoto String @map("product_photo")
@@ -51,6 +52,7 @@ model Product {
   reviews Review[]
   userProducts UserProducts[] 
   categories ProductCategories[]
+  reports Report[]
   createdAt DateTime @default(now()) @map("created_at") 
   updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
 
@@ -89,6 +91,11 @@ model SellerRequirement {
   id Int @id @default(autoincrement())
   userId Int @unique @map("user_id")
   user User @relation(fields: [userId], references: [id])
+  fio String 
+  phone String 
+  email String 
+  description String 
+  isCompany Boolean @map("is_company")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
   @@map("seller_requirement")
@@ -137,6 +144,18 @@ model ProductCategories {
 
   @@id([categoryId, productId])
   @@map("product_categories")
+}
+
+model Report {
+  id Int @id @default(autoincrement())
+  authorId Int @map("author_id")
+  author User @relation(fields: [authorId], references: [id])
+  productId Int @map("product_id")
+  product Product @relation(fields: [productId], references: [id])
+  name String
+  description String 
+
+  @@map("report")
 }
 
 enum RoleEnum {
