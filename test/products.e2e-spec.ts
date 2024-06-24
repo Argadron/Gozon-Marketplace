@@ -96,6 +96,12 @@ describe("ProductsController (E2E)", () => {
         .expect(200)
     })
 
+    it("Проверка удаления продукта", async () => {
+        return request(app.getHttpServer())
+        .delete("/api/products/delete/50")
+        .expect(404)
+    })
+
     afterAll(async () => {
         await prisma.product.deleteMany({
           where: {

@@ -10,6 +10,8 @@ export class StringToArrayPipe implements PipeTransform {
             if (this.ExecludePlants.includes(i)) continue
 
             if (this.IncludePlants.includes(i)) {
+                if (!value[i]?.split) continue
+
                 value[i] = value[i].split(",")
             }
         }

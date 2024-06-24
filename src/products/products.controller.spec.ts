@@ -8,6 +8,7 @@ import { FileService } from '../file.service';
 import { ConfigService } from '@nestjs/config';
 import { prisma } from '../prisma-client.forTest';
 import { response } from 'express';
+import { StringToArrayPipe } from '../common/pipes/string-to-array-pipe';
 
 describe('ProductsController', () => {
   let controller: ProductsController;
@@ -44,7 +45,7 @@ describe('ProductsController', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [AuthModule],
       controllers: [ProductsController],
-      providers: [ProductsService, PrismaService, FileService, ConfigService],
+      providers: [ProductsService, PrismaService, FileService, ConfigService, StringToArrayPipe],
     }).compile();
 
     controller = module.get<ProductsController>(ProductsController);
@@ -72,6 +73,10 @@ describe('ProductsController', () => {
 
   it("Проверка обновления продукта по ID", async () => {
     expect((await controller.editProduct(testUpdateProduct, testSeller)).count).toBeDefined()
+  })
+
+  it("Проверка удаления продута по ID", async () => {
+    expect((await controller.deleteProduct(56, testSeller))).toBeDefined()
   })
 
   afterAll(async () => {
