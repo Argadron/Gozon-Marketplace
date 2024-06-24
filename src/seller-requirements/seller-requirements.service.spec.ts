@@ -21,6 +21,10 @@ describe('SellerRequirementsService', () => {
     id: 32,
     role: RoleEnum.USER
   }
+  const testQuery = {
+    page: 1,
+    requirementsOnPage: 1
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -42,6 +46,10 @@ describe('SellerRequirementsService', () => {
   it('Проверка создания запроса на роль селлера', async () => {
     expect((await service.createSellerRequirement(testSellerRequirement, testJwtUser)).createdAt).toBeDefined();
   });
+
+  it("Проверка получения всех запросов на роль селлера", async () => {
+    expect((await service.getAll(testQuery)).pages).toBeDefined()
+  })
 
   beforeAll(async () => {
     if (await prisma.sellerRequirement.findUnique({ where: { userId: testJwtUser.id } })) {

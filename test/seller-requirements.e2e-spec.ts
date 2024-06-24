@@ -8,6 +8,7 @@ import { prisma } from '../src/prisma-client.forTest'
 import { JwtGuard } from '../src/auth/guards/jwt.guard';
 import { Request } from 'express';
 import { SellerRequirementsModule } from '../src/seller-requirements/seller-requirements.module';
+import { AdminGuard } from '../src/auth/guards/admin.guard';
 
 describe("Seller-requirementsController (E2E)", () => {
     let app: INestApplication;
@@ -35,6 +36,17 @@ describe("Seller-requirementsController (E2E)", () => {
 
                 return true
             }
+        }).overrideGuard(AdminGuard).useValue({
+            canActivate: (ctx: ExecutionContext) => {
+                const request: Request = ctx.switchToHttp().getRequest()
+
+                request.user = {
+                    id: 3,
+                    role: RoleEnum.ADMIN
+                }
+
+                return true
+            }
         }).compile()
 
         app = moduleFixture.createNestApplication()
@@ -48,6 +60,12 @@ describe("Seller-requirementsController (E2E)", () => {
         .post("/api/seller-requirements/createSellerRequirement")
         .send(testSellerRequirement)
         .expect(201)
+    })
+
+    it("Проверка получения всех запросов на роль селлера", async () => {
+        return request(app.getHttpServer())
+        .get("/api/seller-requirements/all?page=1&requirementsOnPage=1")
+        .expect(200)
     })
 
     afterAll(async () => {

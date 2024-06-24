@@ -33,9 +33,13 @@ export class SellerRequirementsService {
     }
 
     async getAll(query: GetAllRequirementsDto) {
-        return await this.prismaService.sellerRequirement.findMany({
+        const result = await this.prismaService.sellerRequirement.findMany({
             skip: (query.page - 1)*query.requirementsOnPage,
             take: query.requirementsOnPage
         })
+
+        const pages = Math.floor(await this.prismaService.sellerRequirement.count()/50)
+
+        return { result, pages: pages === 0 ? 1 : pages }
     }
 }
