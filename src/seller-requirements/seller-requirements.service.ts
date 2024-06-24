@@ -1,8 +1,9 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateSellerRequirementDto } from './dto/create-seller-requirement.dto';
 import { JwtUser } from '../auth/interfaces';
 import { RoleEnum } from '@prisma/client';
+import { GetAllRequirementsDto } from './dto/get-all-requirements-query.dto';
 
 @Injectable()
 export class SellerRequirementsService {
@@ -21,13 +22,20 @@ export class SellerRequirementsService {
             where: {
                 userId: User.id
             }
-        })) throw new BadRequestException("You already has seller requirement")
+        })) throw new ConflictException("You already has seller requirement")
 
         return await this.prismaService.sellerRequirement.create({
             data: {
                 userId: user.id,
                 ...dto
             }
+        })
+    }
+
+    async getAll(query: GetAllRequirementsDto) {
+        return await this.prismaService.sellerRequirement.findMany({
+            skip: (query.page - 1)*query.requirementsOnPage,
+            take: query.requirementsOnPage
         })
     }
 }
