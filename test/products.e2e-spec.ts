@@ -76,6 +76,12 @@ describe("ProductsController (E2E)", () => {
         .expect(200)
     })
 
+    it("Проверка получения фото продукта по ID", async () => {
+        return request(app.getHttpServer())
+        .get("/api/products/photo/1")
+        .expect(200)
+    })
+
     it("Проверка создания продукта", async () => {
         return request(app.getHttpServer())
         .post("/api/products/newProduct")

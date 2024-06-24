@@ -6,6 +6,7 @@ import { RoleEnum } from '@prisma/client';
 import { FileService } from '../file.service';
 import { ConfigService } from '@nestjs/config';
 import { prisma } from '../prisma-client.forTest';
+import { response } from 'express';
 
 describe('ProductsService', () => {
   let service: ProductsService;
@@ -58,6 +59,10 @@ describe('ProductsService', () => {
 
   it("Проверка получения продукта по ID", async () => {
     expect ((await service.getById(1))).toBeDefined()
+  })
+
+  it("Проверка получения фото продукта по ID", async () => {
+    expect((await service.getPhotoById(1, response))).toBeDefined()
   })
 
   it("Проверка создания продукта", async () => {
