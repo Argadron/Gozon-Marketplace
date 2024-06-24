@@ -66,6 +66,26 @@ export class ProductsService {
         return result
     }
 
+    /**
+     * This method validate product: his is exsists and seller id equal user id and returns product
+     * @param id - Product id
+     * @param user - User 
+     * @returns product
+     */
+    private async validateProduct(id: number, user: JwtUser) {
+        const product = await this.prismaService.product.findUnique({
+            where: {
+                id
+            }
+        })
+
+        if (!product) throw new NotFoundException("Product not found")
+
+        if (product.sellerId !== user.id) throw new ForbiddenException("This is not your product.")
+
+        return product
+    }
+
     async getAll(query: AllProductsDto) {
         const filters: Filters = query.filter
         const result = await this.prismaService.product.findMany({
@@ -123,15 +143,7 @@ export class ProductsService {
     }
 
     async update(dto: UpdateProductDto, user: JwtUser, file: Express.Multer.File=undefined) {
-        const product = await this.prismaService.product.findUnique({
-            where: {
-                id: dto.id
-            }
-        })
-
-        if (!product) throw new NotFoundException("Product not found")
-
-        if (product.sellerId !== user.id) throw new ForbiddenException("This is not your product.")
+        await this.validateProduct(dto.id, user)
 
         const productPhoto = this.photoDownloader(file)
 
@@ -144,6 +156,18 @@ export class ProductsService {
                 id: dto.id
             },
             data
+        })
+    }
+
+    async delete(id: number, user: JwtUser) {
+        const product = await this.validateProduct(id, user)
+
+        this.fileService.delete(product.productPhoto)
+
+        return await this.prismaService.product.delete({
+            where: {
+                id
+            }
         })
     }
 }

@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiResponse, ApiOperation, ApiBearerAuth, ApiHeader } from '@nestjs/swagger';
+import { ApiBody, ApiResponse, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { SwaggerBadRequest, SwaggerJwtUser, SwaggerConflictMessage, SwaggerOK } from '../swagger/apiResponse.interfaces';
 import { Token } from './decorators/get-token.decorator';
 

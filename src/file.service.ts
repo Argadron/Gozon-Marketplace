@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { v4 } from 'uuid'
 import * as fs from 'fs'
 import * as path from 'path'
@@ -34,5 +34,17 @@ export class FileService {
 
     validateFileType(type: string): boolean {
         return this.allowedMimeTypes.includes(path.extname(type)) ? true: false
+    }
+
+    delete(filePath: string) {
+        if (filePath === "default.png") return;
+
+        if (!this.validateFileType(filePath)) throw new BadRequestException("Cannot delete this file")
+
+        const realPath = path.join(process.cwd(), `uploads`, `${filePath}`)
+
+        if (!fs.existsSync(realPath)) throw new BadRequestException("File not exsists")
+
+        fs.unlinkSync(realPath)
     }
 }
