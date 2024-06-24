@@ -2,9 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ProductsService } from './products.service';
 import { PrismaService } from '../prisma.service';
 import { AuthModule } from '../auth/auth.module';
-import { PrismaClient, RoleEnum } from '@prisma/client';
+import { RoleEnum } from '@prisma/client';
 import { FileService } from '../file.service';
 import { ConfigService } from '@nestjs/config';
+import { prisma } from '../prisma-client.forTest';
 
 describe('ProductsService', () => {
   let service: ProductsService;
@@ -29,8 +30,12 @@ describe('ProductsService', () => {
     }
   }
   const testSeller = {
-    id: 66,
+    id: 64,
     role: RoleEnum.SELLER
+  }
+  const testUpdateProduct = {
+    id: 1,
+    count: 8
   }
   let id: number;
 
@@ -59,8 +64,12 @@ describe('ProductsService', () => {
     expect((await service.create(testNewProduct, testSeller)).name).toBeDefined()
   })
 
+  it("Проверка обновления продукта", async () => {
+    expect((await service.update(testUpdateProduct, testSeller)).count).toBeDefined()
+  })
+
   afterAll(async () => {
-    const prisma = new PrismaClient()
+
 
     await prisma.product.deleteMany({
       where: {

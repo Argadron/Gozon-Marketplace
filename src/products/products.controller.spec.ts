@@ -3,9 +3,10 @@ import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
 import { PrismaService } from '../prisma.service';
 import { AuthModule } from '../auth/auth.module';
-import { PrismaClient, RoleEnum } from '@prisma/client';
+import { RoleEnum } from '@prisma/client';
 import { FileService } from '../file.service';
 import { ConfigService } from '@nestjs/config';
+import { prisma } from '../prisma-client.forTest';
 
 describe('ProductsController', () => {
   let controller: ProductsController;
@@ -20,6 +21,10 @@ describe('ProductsController', () => {
     price: 2.25,
     count: 5,
   }
+  const testUpdateProduct = {
+    id: 1,
+    count: 8
+  }
   const queryFilter = {
     page: 1,
     productOnPage: 1,
@@ -30,7 +35,7 @@ describe('ProductsController', () => {
     }
   }
   const testSeller = {
-    id: 66,
+    id: 64,
     role: RoleEnum.SELLER
   }
 
@@ -60,9 +65,11 @@ describe('ProductsController', () => {
     expect((await controller.createProduct(testNewProduct, testSeller)).name).toBeDefined()
   })
 
-  afterAll(async () => {
-    const prisma = new PrismaClient()
+  it("Проверка обновления продукта по ID", async () => {
+    expect((await controller.editProduct(testUpdateProduct, testSeller)).count).toBeDefined()
+  })
 
+  afterAll(async () => {
     await prisma.product.deleteMany({
       where: {
         name: "продукт"

@@ -4,11 +4,12 @@ import { ProductsModule } from '../src/products/products.module';
 import { PrismaService } from '../src/prisma.service';
 import * as request from 'supertest'
 import { FileService } from '../src/file.service';
-import { PrismaClient, RoleEnum } from '@prisma/client';
+import { RoleEnum } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import { JwtGuard } from '../src/auth/guards/jwt.guard';
 import { Request } from 'express';
 import { SellerGuard } from '../src/auth/guards/seller.guard';
+import { prisma } from '../src/prisma-client.forTest';
 
 describe("ProductsController (E2E)", () => {
     let app: INestApplication;
@@ -18,6 +19,10 @@ describe("ProductsController (E2E)", () => {
         tags: ["продукт"],
         price: 5,
         count: 5,
+      }
+      const testUpdateProduct = {
+        id: 1,
+        count: 8
       }
 
     beforeEach(async () => {
@@ -39,7 +44,7 @@ describe("ProductsController (E2E)", () => {
                 const request: Request = ctx.switchToHttp().getRequest()
 
                 request.user = {
-                    id: 66,
+                    id: 64,
                     role: RoleEnum.SELLER
                 }
 
@@ -78,9 +83,14 @@ describe("ProductsController (E2E)", () => {
         .expect(201)
     })
 
+    it("Проверка обновления продукта", async () => {
+        return request(app.getHttpServer())
+        .put("/api/products/updateProduct")
+        .send(testUpdateProduct)
+        .expect(200)
+    })
+
     afterAll(async () => {
-        const prisma = new PrismaClient()
-    
         await prisma.product.deleteMany({
           where: {
             name: "продукт"

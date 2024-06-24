@@ -5,7 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PrismaService } from '../prisma.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FileService } from  '../file.service'
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../prisma-client.forTest';
 import 'dotenv/config'
 
 describe('AuthService', () => {
@@ -41,8 +41,6 @@ describe('AuthService', () => {
   })
 
   afterAll(async () => {
-    const prisma = new PrismaClient()
-
     await prisma.tokens.update({
       where: {
         userId: 3

@@ -6,7 +6,7 @@ import { PrismaService } from '../src/prisma.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FileService } from  '../src/file.service'
 import * as request from 'supertest';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../src/prisma-client.forTest';
 import { Request, Response } from 'express';
 import 'dotenv/config'
 
@@ -62,8 +62,6 @@ describe("AuthController (E2E)", () => {
     })
 
     afterAll(async () => {
-        const prisma = new PrismaClient()
-
         await prisma.tokens.update({
             where: {
                 userId: 3
