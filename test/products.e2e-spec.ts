@@ -59,6 +59,12 @@ describe("ProductsController (E2E)", () => {
         .expect(200)
     })
 
+    it("Проверка получения продуктов с фильтром", async () => {
+        return request(app.getHttpServer())
+        .get("/api/products/all?page=1&productOnPage=1&filters=priceMin=1+priceMax=5+tags=['test']")
+        .expect(200)
+    })
+
     it("Проверка получения продукта по ID", async () => {
         return request(app.getHttpServer())
         .get("/api/products/1")

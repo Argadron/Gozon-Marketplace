@@ -19,6 +19,15 @@ describe('ProductsService', () => {
     price: 2.25,
     count: 5,
   }
+  const queryFilter = {
+    page: 1,
+    productOnPage: 1,
+    filters: {
+      priceMin: 2,
+      priceMax: 100,
+      tags: ["test"]
+    }
+  }
   const testSeller = {
     id: 66,
     role: RoleEnum.SELLER
@@ -35,8 +44,12 @@ describe('ProductsService', () => {
   });
 
   it('Проверка получения всех продуктов (страницы)', async () => {
-    expect((await service.getAll(query))).toBeDefined();
+    expect((await service.getAll(query)).pages).toBeDefined();
   });
+
+  it("Проверка получения всех продуктов с фильтром", async () => {
+    expect((await service.getAll(queryFilter)).result[0]).toBeDefined()
+  })
 
   it("Проверка получения продукта по ID", async () => {
     expect ((await service.getById(1))).toBeDefined()
