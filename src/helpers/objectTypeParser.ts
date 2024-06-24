@@ -3,11 +3,11 @@ export function ObjectTypeParser(key: string, value: string) {
 
     if (key === "createdAt") return new Date(value)
 
-    if (key === "tags") return value.replaceAll("[", "").replaceAll("]", "").replaceAll("\"", "").split(",")
+    if (key === "tags") return value.replace(/[\[\]"]/g, "").split(",")
 
-    if (key === "categories") return value.replaceAll("[", "").replaceAll("]", "").replaceAll("\"", "").split(",")
+    if (key === "categories") return value.replace(/\[\]\"/g, "").split(",")
  
     if (key === "sortUp") {
         return value === "true" ? true : false
-    }
+    } 
 }
