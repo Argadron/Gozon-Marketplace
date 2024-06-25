@@ -19,7 +19,11 @@ export class CreateProductDto {
 
     @IsArray()
     @IsOptional()
-    readonly tags: string[];
+    readonly tags?: string[];
+
+    @IsArray()
+    @IsOptional()
+    readonly productCategories?: string[];
 
     @IsOptional()
     productPhoto?: string;
