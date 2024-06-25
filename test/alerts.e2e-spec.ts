@@ -14,6 +14,10 @@ describe("AlertsController (E2E)", () => {
         username: "ArgadronSeller!",
         description: "тебе уведомление!"
       }
+      const testJwtUser = {
+        id: 3,
+        role: RoleEnum.ADMIN
+      }
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -53,5 +57,11 @@ describe("AlertsController (E2E)", () => {
         .post("/api/alerts/send")
         .send(testAlert)
         .expect(201)
+    })
+
+    it("Проверка запроса на удаление уведомления", async () => {
+      return request(app.getHttpServer())
+      .delete("/api/alerts/delete/5")
+      .expect(404)
     })
 })

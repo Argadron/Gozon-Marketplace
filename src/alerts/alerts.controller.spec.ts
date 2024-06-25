@@ -16,6 +16,10 @@ describe('AlertsController', () => {
     username: "ArgadronSeller!",
     description: "тебе уведомление!"
   }
+  const testJwtUser = {
+    id: 3,
+    role: RoleEnum.ADMIN
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -52,4 +56,8 @@ describe('AlertsController', () => {
   it('Проверка запроса на создание уведомления', async () => {
     expect((await controller.send(testAlert)).userId).toBeDefined();
   });
+
+  it("Проверка запроса на удаление уведомления", async () => {
+    expect((await controller.deleteOne(4, testJwtUser)).description).toBeDefined()
+  })
 });
