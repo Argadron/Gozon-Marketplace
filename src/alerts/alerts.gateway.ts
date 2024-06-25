@@ -1,5 +1,5 @@
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { PrismaService } from "src/prisma.service";
+import { PrismaService } from "../prisma.service";
 import { Socket, Server } from 'socket.io'
 import config from '../config/constants'
 import { SendAlertDto } from "./dto/send-alert.dto";

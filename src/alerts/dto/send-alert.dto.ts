@@ -11,5 +11,5 @@ export class SendAlertDto {
 
     @IsString()
     @IsOptional()
-    readonly room: string;
+    readonly room?: string;
 }

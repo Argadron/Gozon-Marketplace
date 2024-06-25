@@ -1,21 +1,22 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BasketService } from './basket.service';
 import { RoleEnum } from '@prisma/client';
+import { PrismaService } from '../prisma.service';
 
 describe('BasketService', () => {
   let service: BasketService;
   const testAddProduct = {
     productId: 26,
-    productCount: 5
+    productCount: 1
   }
   const testJwtUser = {
-    id: 3,
+    id: 32,
     role: RoleEnum.ADMIN
   }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [BasketService],
+      providers: [BasketService, PrismaService],
     }).compile();
 
     service = module.get<BasketService>(BasketService);

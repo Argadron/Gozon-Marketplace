@@ -5,12 +5,13 @@ import { JwtGuard } from '../auth/guards/jwt.guard';
 import { ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
 import { RoleEnum } from '@prisma/client';
+import { PrismaService } from '../prisma.service';
 
 describe('BasketController', () => {
   let controller: BasketController;
   const testAddProduct = {
     productId: 26,
-    productCount: 5
+    productCount: 1
   }
   const testJwtUser = {
     id: 3,
@@ -20,7 +21,7 @@ describe('BasketController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [BasketController],
-      providers: [BasketService],
+      providers: [BasketService, PrismaService],
     }).overrideGuard(JwtGuard).useValue({
       canActivate: (ctx: ExecutionContext) => {
         const request: Request = ctx.switchToHttp().getRequest()
