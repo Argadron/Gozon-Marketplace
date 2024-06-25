@@ -34,9 +34,10 @@ export default {
         console.log(request)
         let res = await requester.requester("POST","auth/login",request)
         console.log(res)
-        
-        localStorage.accesToken = res.accesToken;
-        localStorage.refreshToken  = res.refreshToken;
+
+        localStorage.accessToken = res.access;
+        localStorage.refreshToken  = res.refresh;
+        window.href = "/"
       }
   }
 };

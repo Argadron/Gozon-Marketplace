@@ -5,10 +5,10 @@ export default{
         switch(method){
           case "GET":
             try{
-
+              console.log(localStorage.accessToken)
               const request = await axios.get(API+url,{headers:{
                   "Content-Type": "application/json",
-                  'Authorization': `Bearer ${localStorage.getItem('accessToken')}`          
+                  'Authorization': `Bearer `+localStorage.accessToken        
                 }
               })
 
@@ -22,6 +22,26 @@ export default{
                 break
               }
             }
+
+          case "GETnoToken":
+            try{
+              console.log(localStorage.accessToken)
+              const request = await axios.get(API+url,{headers:{
+                  "Content-Type": "application/json", 
+                }
+              })
+
+              return request.data
+
+            }catch(e){        
+              if (e.response?.data?.message === 'Access Token Invalid'){
+                await this.refresh()
+                this.requester(url,method,body)
+
+                break
+              }
+            }
+          
           case "POST":
           try{
             const request = await axios.post(API+url,body,{

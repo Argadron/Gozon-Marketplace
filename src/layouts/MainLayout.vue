@@ -42,7 +42,7 @@ export default{
 <style>
 p{
   margin: 0;
-  margin-left: 15px;
+ /* margin-left: 15px;*/
 }
 .q-toolbar{
   padding: 0;

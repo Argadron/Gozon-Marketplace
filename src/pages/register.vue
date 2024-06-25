@@ -5,6 +5,7 @@
         <q-card-section style="display: grid;">
             <div style="width: 100%;display: flex; flex-direction: column; justify-content: center; align-self: center;">
                 <q-input :rules="mainRules" v-model="username" label="Логин" />
+                <q-file :rules="mainRules" v-model="ava" label="Выберете фото для аватарки" type="file" />
                 <q-input :rules="rulesPhone" v-model="phone" label="Телефон" />
                 <q-input :rules="rulesEmail" v-model="email" label="Почта" />
                 <q-input :rules="mainRules" v-model="password" label="Пароль" type="password" />
@@ -20,7 +21,6 @@
   
   <script>
   import requester from 'src/boot/requester';
-  import axios from 'axios';
   export default {
     data() {
       return {
@@ -28,6 +28,7 @@
         email:'',
         username: '',
         password: '',
+        ava:null,
         rulesPhone:[
             value =>((/^[\d\+][\d\(\)\ -]{4,14}\d$/).test(value)||!value)||'Неверный телефон'
         ],
@@ -47,13 +48,14 @@
             password: this.password,
             email: this.email,
             phone: this.phone,
-            file: {},
+            file: this.ava,
         }
         console.log(request)
         let res = await requester.requester("POST","auth/register",request)
         console.log(res)
-        localStorage.accesToken = res.accesToken;
-        localStorage.refreshToken  = res.refreshToken;
+        localStorage.accessToken = res.access;
+        localStorage.refreshToken  = res.refresh;
+        window.href = "/"
       }
     }
   };
