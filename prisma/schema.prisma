@@ -80,6 +80,7 @@ model UserProducts {
   userId Int @map("user_id")
   user User @relation(fields: [userId], references: [id])
   productId Int @map("product_id")
+  productCount Int @default(1) @map("product_count")
   product Product @relation(fields: [productId], references: [id])
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @map("updated_at") @updatedAt

@@ -4,7 +4,6 @@ import { Socket, Server } from 'socket.io'
 import config from '../config/constants'
 import { SendAlertDto } from "./dto/send-alert.dto";
 import { BadRequestException, NotFoundException, UseFilters, UsePipes, ValidationPipe } from "@nestjs/common";
-import { AlertsService } from "./alerts.service";
 import { WebSocketExecption } from "../common/filters/websockets-execeptions.filter";
 import { RegisterGateWayDto } from "./dto/register-gateway.dto";
 
@@ -13,8 +12,7 @@ const constants = config()
 @WebSocketGateway({ cors: constants.API_CLIENT_URL })
 @UseFilters(WebSocketExecption)
 export class AlertsGateWay {
-    constructor(private readonly prismaService: PrismaService,
-                private readonly alertsService: AlertsService
+    constructor(private readonly prismaService: PrismaService
     ) {}
 
     @WebSocketServer() private readonly server: Server;

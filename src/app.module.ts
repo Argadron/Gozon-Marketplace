@@ -7,11 +7,12 @@ import { UsersModule } from './users/users.module';
 import { ProductsModule } from './products/products.module';
 import { SellerRequirementsModule } from './seller-requirements/seller-requirements.module';
 import { AlertsModule } from './alerts/alerts.module';
+import { BasketModule } from './basket/basket.module';
 
 @Module({
   imports: [AuthModule, ConfigModule.forRoot({
     isGlobal: true
-  }), UsersModule, ProductsModule, SellerRequirementsModule, AlertsModule],
+  }), UsersModule, ProductsModule, SellerRequirementsModule, AlertsModule, BasketModule],
   controllers: [AppController],
   providers: [AppService],
 })
