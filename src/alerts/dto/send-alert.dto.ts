@@ -1,4 +1,4 @@
-import { IsBoolean, IsString, MinLength } from "class-validator";
+import { IsBoolean, IsOptional, IsString, MinLength } from "class-validator";
 
 export class SendAlertDto {
     @IsString()
@@ -8,4 +8,8 @@ export class SendAlertDto {
     @IsString()
     @MinLength(5)
     readonly description: string;
+
+    @IsString()
+    @IsOptional()
+    readonly room: string;
 }
