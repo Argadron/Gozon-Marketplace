@@ -37,4 +37,13 @@ export class AlertsController {
   async deleteOne(@Param("id", ParseIntPipe) id: number, @User() user: JwtUser) {
     return await this.alertsService.deleteOne(id, user)
   }
+
+  @Delete("/deleteAll")
+  @ApiOperation({ summary: "Delete ALL alerts" })
+  @ApiResponse({ status: 200, description: "Alerts deleted", type: SwaggerOK })
+  @ApiResponse({ status: 401, description: "Token Invalid/Unauthorized", type: SwaggerUnauthorizedException })
+  @ApiBearerAuth()
+  async deleteAll(@User() user: JwtUser) {
+    return await this.alertsService.deleteAll(user)
+  }
 }

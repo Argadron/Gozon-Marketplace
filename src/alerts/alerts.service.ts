@@ -43,4 +43,12 @@ export class AlertsService {
             }
         })
     }
+
+    async deleteAll(user: JwtUser) {
+        return await this.prismaService.alert.deleteMany({
+            where: {
+                userId: user.id
+            }
+        })
+    }
 }
