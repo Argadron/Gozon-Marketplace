@@ -33,4 +33,8 @@ describe('AlertsService', () => {
   it("Проверка удаления уведомления", async () => {
     expect((await service.deleteOne(5, testJwtUser)).description).toBeDefined()
   })
+
+  it("Проверка удаления ВСЕХ уведомлений", async () => {
+    expect((await service.deleteAll(testJwtUser)).count).toBeDefined()
+  })
 });

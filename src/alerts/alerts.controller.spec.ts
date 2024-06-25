@@ -60,4 +60,8 @@ describe('AlertsController', () => {
   it("Проверка запроса на удаление уведомления", async () => {
     expect((await controller.deleteOne(4, testJwtUser)).description).toBeDefined()
   })
+
+  it("Проверка запроса на удаление ВСЕХ уведомлений", async () => {
+    expect((await controller.deleteAll(testJwtUser)).count).toBeDefined()
+  })
 });

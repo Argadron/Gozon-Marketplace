@@ -64,4 +64,10 @@ describe("AlertsController (E2E)", () => {
       .delete("/api/alerts/delete/5")
       .expect(404)
     })
+
+    it("Проверка запроса на удаление ВСЕХ уведомлений", async () => {
+      return request(app.getHttpServer())
+      .delete("/api/alerts/deleteAll")
+      .expect(200)
+    })
 })
