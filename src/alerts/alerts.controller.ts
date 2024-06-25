@@ -3,7 +3,7 @@ import { AlertsService } from './alerts.service';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { SwaggerBadRequest, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerUnauthorizedException } from 'src/swagger/apiResponse.interfaces';
+import { SwaggerBadRequest, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerUnauthorizedException } from '../swagger/apiResponse.interfaces';
 import { SendAlertDto } from './dto/send-alert.dto';
 
 @Controller('alerts')
