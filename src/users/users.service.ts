@@ -18,7 +18,9 @@ export class UsersService {
             },
             include: {
                 userProducts: true,
-                reviews: true
+                reviews: true,
+                alerts: true,
+                reports: true,
             }
         })
 

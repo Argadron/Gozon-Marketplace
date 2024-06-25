@@ -8,5 +8,6 @@ import { PrismaService } from '../prisma.service';
   imports: [AuthModule],
   controllers: [SellerRequirementsController],
   providers: [SellerRequirementsService, PrismaService],
+  exports: [SellerRequirementsService]
 })
 export class SellerRequirementsModule {}
