@@ -1,9 +1,10 @@
-import { BadRequestException, ConflictException, ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateSellerRequirementDto } from './dto/create-seller-requirement.dto';
 import { JwtUser } from '../auth/interfaces';
 import { RoleEnum } from '@prisma/client';
 import { GetAllRequirementsDto } from './dto/get-all-requirements-query.dto';
+import { CloseSellerRequirementDto } from './dto/close-seller-requirement.dto';
 
 @Injectable()
 export class SellerRequirementsService {
@@ -41,5 +42,36 @@ export class SellerRequirementsService {
         const pages = Math.floor(await this.prismaService.sellerRequirement.count()/50)
 
         return { result, pages: pages === 0 ? 1 : pages }
+    }
+
+    async close(dto: CloseSellerRequirementDto) {
+        const User = await this.prismaService.user.findUnique({
+            where: {
+                id: dto.userId
+            }
+        })
+
+        if (!User) throw new NotFoundException("User not found")
+
+        if (User.role === RoleEnum.SELLER) throw new ConflictException("User already has role")
+
+        if (!await this.prismaService.sellerRequirement.findUnique({ where: { userId: User.id } })) throw new BadRequestException("User not has a valid seller requirement")
+
+        if (dto.accepted) {
+            await this.prismaService.user.update({
+                where: {
+                    id: User.id
+                },
+                data: {
+                    role: RoleEnum.SELLER
+                }
+            })
+        }
+        
+        return await this.prismaService.sellerRequirement.delete({
+            where: {
+                userId: User.id
+            }
+        })
     }
 }

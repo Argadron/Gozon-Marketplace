@@ -32,6 +32,7 @@ model User {
   sellerRequirement SellerRequirement?
   refreshToken Tokens?
   reports Report[]
+  alerts Alert[]
 
   @@map("user")
 }
@@ -156,6 +157,15 @@ model Report {
   description String 
 
   @@map("report")
+}
+
+model Alert {
+  id Int @id @default(autoincrement())
+  userId Int @map("user_id")
+  user User @relation(fields: [userId], references: [id])
+  description String 
+
+  @@map("alert")
 }
 
 enum RoleEnum {

@@ -12,6 +12,8 @@ export class FileService {
     constructor(@Inject(ConfigService) private readonly configService: ConfigService) {}
 
     downolad(file: Express.Multer.File): string {
+        if (!fs.existsSync(path.join(process.cwd(), "uploads"))) fs.mkdirSync(path.join(process.cwd(), "uploads"))
+
         const fileName = v4()
         const filePath = path.join(process.cwd(), `uploads`, `${fileName + path.extname(file.originalname)}`)
 
