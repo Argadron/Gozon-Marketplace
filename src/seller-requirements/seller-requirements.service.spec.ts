@@ -7,6 +7,7 @@ import { RoleEnum } from '@prisma/client';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
+import { AdminGuard } from '../auth/guards/admin.guard';
 
 describe('SellerRequirementsService', () => {
   let service: SellerRequirementsService;
@@ -25,6 +26,11 @@ describe('SellerRequirementsService', () => {
     page: 1,
     requirementsOnPage: 1
   }
+  const testCloseRequirement = {
+    userId: 32,
+    accepted: false,
+    description: "закрыто"
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -35,6 +41,17 @@ describe('SellerRequirementsService', () => {
         const request: Request = ctx.switchToHttp().getRequest()
 
         request.user = testJwtUser
+
+        return true
+      }
+    }).overrideGuard(AdminGuard).useValue({
+      canActivate: (ctx: ExecutionContext) => {
+        const request: Request = ctx.switchToHttp().getRequest()
+
+        request.user = {
+          id: 3,
+          role: RoleEnum.ADMIN
+        }
 
         return true
       }
@@ -51,13 +68,7 @@ describe('SellerRequirementsService', () => {
     expect((await service.getAll(testQuery)).pages).toBeDefined()
   })
 
-  beforeAll(async () => {
-    if (await prisma.sellerRequirement.findUnique({ where: { userId: testJwtUser.id } })) {
-      await prisma.sellerRequirement.delete({
-        where: {
-          userId: testJwtUser.id
-        }
-      })
-    }
+  it("Проверка на закрытие запроса на роль селлера", async () => {
+    expect((await service.close(testCloseRequirement)).createdAt).toBeDefined()
   })
 });

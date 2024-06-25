@@ -23,6 +23,11 @@ describe("Seller-requirementsController (E2E)", () => {
         id: 32,
         role: RoleEnum.USER
       }
+      const testCloseRequirement = {
+        userId: 32,
+        accepted: false,
+        description: "закрыто"
+      }
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -68,11 +73,10 @@ describe("Seller-requirementsController (E2E)", () => {
         .expect(200)
     })
 
-    afterAll(async () => {
-        await prisma.sellerRequirement.delete({
-            where: {
-                userId: testJwtUser.id
-            }
-        })
+    it("Проверка закрытия запроса на роль селлера", async () => {
+        return request(app.getHttpServer())
+        .put("/api/seller-requirements/closeRequirement")
+        .send(testCloseRequirement)
+        .expect(200)
     })
 })
