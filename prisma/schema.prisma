@@ -162,9 +162,10 @@ model Report {
 
 model Alert {
   id Int @id @default(autoincrement())
-  userId Int @map("user_id")
-  user User @relation(fields: [userId], references: [id])
+  userId Int? @map("user_id")
+  user User? @relation(fields: [userId], references: [id])
   description String 
+  isGlobal Boolean @default(false) @map("is_global")
 
   @@map("alert")
 }

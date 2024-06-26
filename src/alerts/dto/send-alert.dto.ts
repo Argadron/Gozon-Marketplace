@@ -3,7 +3,8 @@ import { IsBoolean, IsOptional, IsString, MinLength } from "class-validator";
 export class SendAlertDto {
     @IsString()
     @MinLength(1)
-    readonly username: string;
+    @IsOptional()
+    readonly username?: string;
 
     @IsString()
     @MinLength(5)
@@ -12,4 +13,8 @@ export class SendAlertDto {
     @IsString()
     @IsOptional()
     readonly room?: string;
+
+    @IsBoolean()
+    @IsOptional()
+    readonly isGlobal?: boolean;
 }

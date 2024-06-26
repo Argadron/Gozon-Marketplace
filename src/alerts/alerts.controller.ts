@@ -7,6 +7,7 @@ import { SwaggerBadRequest, SwaggerCreated, SwaggerForbiddenException, SwaggerNo
 import { SendAlertDto } from './dto/send-alert.dto';
 import { User } from '../auth/decorators/get-user.decorator';
 import { JwtUser } from '../auth/interfaces';
+import { OptionalValidatorPipe } from 'src/common/pipes/optional-validator.pipe';
 
 @Controller('alerts')
 @UseGuards(JwtGuard)
@@ -22,7 +23,7 @@ export class AlertsController {
   @ApiResponse({ status: 403, description: "Your role not have access to this action", type: SwaggerForbiddenException })
   @ApiResponse({ status: 404, description: "User not found", type: SwaggerNotFound })
   @ApiBearerAuth()
-  @UsePipes(new ValidationPipe())
+  @UsePipes(new OptionalValidatorPipe().check(["username", "isGlobal"]),new ValidationPipe())
   async send(@Body() dto: SendAlertDto) {
     return await this.alertsService.send(dto)
   }
