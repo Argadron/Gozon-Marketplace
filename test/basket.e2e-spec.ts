@@ -12,7 +12,7 @@ import { Request } from 'express';
 describe("BasketController (E2E)", () => {
     let app: INestApplication;
     const testAddProduct = {
-        productId: 26,
+        productId: 1,
         productCount: 1
       }
 
@@ -43,6 +43,12 @@ describe("BasketController (E2E)", () => {
         return request(app.getHttpServer())
         .post("/api/basket/addProduct")
         .send(testAddProduct)
+        .expect(200)
+    })
+
+    it("Проверка удаления товара из корзины", async () => {
+        return request(app.getHttpServer())
+        .delete("/api/basket/deleteProduct/1")
         .expect(200)
     })
 })

@@ -41,4 +41,8 @@ describe('BasketController', () => {
   it('Проверка добавления товара в корзину', async () => {
     expect((await controller.addProduct(testAddProduct, testJwtUser)).createdAt).toBeDefined();
   });
+
+  it("Проверка удаленеия товара из корзины", async () => {
+    expect((await controller.deleteProduct(5, testJwtUser)).count).toBeDefined()
+  })
 });
