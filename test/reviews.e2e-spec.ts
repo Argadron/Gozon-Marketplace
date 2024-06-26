@@ -17,6 +17,13 @@ describe("ReviewsController (E2E)", () => {
         description: "отзыв",
         rate: 1
       }
+      const testEditReview = {
+        productId: 1,
+        name: "отзыв",
+        description: "отзыв",
+        rate: 1,
+        reviewId: 17
+      }
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -46,5 +53,12 @@ describe("ReviewsController (E2E)", () => {
         .post("/api/reviews/new")
         .send(testReview)
         .expect(201)
+    })
+
+    it("Проверка запроса на изменение отзыва", async () => {
+        return request(app.getHttpServer())
+        .put("/api/reviews/edit")
+        .send(testEditReview)
+        .expect(200)
     })
 })

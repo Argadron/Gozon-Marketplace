@@ -16,6 +16,13 @@ describe('ReviewsController', () => {
     description: "отзыв",
     rate: 1
   }
+  const testEditReview = {
+    productId: 1,
+    name: "отзыв",
+    description: "отзыв",
+    rate: 1,
+    reviewId: 17
+  }
   const testJwtUser = {
     id: 3,
     role: RoleEnum.ADMIN
@@ -45,4 +52,8 @@ describe('ReviewsController', () => {
   it('Проверка запроса на создание отзыва к товару', async () => {
     expect((await controller.newReview(testReview, testJwtUser)).createdAt).toBeDefined();
   });
+
+  it("Проверка изменения отзыва у товара", async () => {
+    expect((await controller.editReview(testEditReview, testJwtUser)).createdAt).toBeDefined()
+  })
 });

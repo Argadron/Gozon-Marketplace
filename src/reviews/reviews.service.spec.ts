@@ -12,6 +12,13 @@ describe('ReviewsService', () => {
     description: "отзыв",
     rate: 1
   }
+  const testEditReview = {
+    productId: 1,
+    name: "отзыв",
+    description: "отзыв",
+    rate: 1,
+    reviewId: 17
+  }
   const testJwtUser = {
     id: 3,
     role: RoleEnum.ADMIN
@@ -29,4 +36,8 @@ describe('ReviewsService', () => {
   it('Проверка создания отзыва к товару', async () => {
     expect((await service.newReview(testReview, testJwtUser)).createdAt).toBeDefined();
   });
+
+  it("Проверка изменения отзыва у товара", async () => [
+    expect((await service.edit(testEditReview, testJwtUser)).createdAt).toBeDefined()
+  ])
 });
