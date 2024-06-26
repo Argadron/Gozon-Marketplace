@@ -14,10 +14,6 @@ describe("AlertsController (E2E)", () => {
         username: "ArgadronSeller!",
         description: "тебе уведомление!"
       }
-      const testJwtUser = {
-        id: 3,
-        role: RoleEnum.ADMIN
-      }
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
