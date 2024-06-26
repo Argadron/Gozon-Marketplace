@@ -7,7 +7,7 @@ export class OptionalValidatorPipe implements PipeTransform {
     transform(value: any, metadata: ArgumentMetadata) {
         if (this.plants.length < 2) throw new Error("Optional Validator: Must 2 plants to use pipe")
 
-        let check = false; 
+        let check = false;
 
         for (let i in value) {
             if (value[i] === "") continue
@@ -15,7 +15,7 @@ export class OptionalValidatorPipe implements PipeTransform {
             if (this.plants.includes(i)) check = true
         }
 
-        if (!check) throw new BadRequestException("One of optional plants must be writed")
+        if (!check && !value["role"]) throw new BadRequestException("One of optional plants must be writed")
 
         return value
     }
