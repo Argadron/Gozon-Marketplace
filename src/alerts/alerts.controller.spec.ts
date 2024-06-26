@@ -58,7 +58,7 @@ describe('AlertsController', () => {
   });
 
   it("Проверка запроса на удаление уведомления", async () => {
-    expect((await controller.deleteOne(4, testJwtUser)).description).toBeDefined()
+    expect((await controller.deleteOne(4, testJwtUser))).toBeDefined()
   })
 
   it("Проверка запроса на удаление ВСЕХ уведомлений", async () => {

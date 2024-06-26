@@ -14,7 +14,7 @@ export class UsersService {
     async getProfile(user: JwtUser) {
         const User = await this.prismaService.user.findUnique({
             where: {
-                id: user.id
+                id: user.id,
             },
             include: {
                 userProducts: true,
@@ -25,6 +25,15 @@ export class UsersService {
         })
 
         if (!User) throw new NotFoundException("User not found")
+
+        const globalAlerts = await this.prismaService.alert.findMany({ where: { isGlobal: true, NOT: { deletedIds: { has: User.id } } } })
+        
+        for (let i in globalAlerts) {
+            delete globalAlerts[i].deletedIds
+            delete globalAlerts[i].userId
+
+            User.alerts.push(globalAlerts[i])
+        }
 
         delete User.updatedAt
         delete User.createdAt

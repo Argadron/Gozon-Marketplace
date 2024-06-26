@@ -2,12 +2,12 @@ import { Body, Controller, Delete, Param, ParseIntPipe, Post, UseGuards, UsePipe
 import { AlertsService } from './alerts.service';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { SwaggerBadRequest, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '../swagger/apiResponse.interfaces';
 import { SendAlertDto } from './dto/send-alert.dto';
 import { User } from '../auth/decorators/get-user.decorator';
 import { JwtUser } from '../auth/interfaces';
-import { OptionalValidatorPipe } from 'src/common/pipes/optional-validator.pipe';
+import { OptionalValidatorPipe } from '../common/pipes/optional-validator.pipe';
 
 @Controller('alerts')
 @UseGuards(JwtGuard)

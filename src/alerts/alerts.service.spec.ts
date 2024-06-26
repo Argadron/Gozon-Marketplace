@@ -31,7 +31,7 @@ describe('AlertsService', () => {
   });
 
   it("Проверка удаления уведомления", async () => {
-    expect((await service.deleteOne(5, testJwtUser)).description).toBeDefined()
+    expect((await service.deleteOne(5, testJwtUser))).toBeDefined()
   })
 
   it("Проверка удаления ВСЕХ уведомлений", async () => {

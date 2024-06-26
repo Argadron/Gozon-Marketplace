@@ -7,6 +7,28 @@ import { JwtUser } from '../auth/interfaces';
 export class AlertsService {
     constructor(private readonly prismaService: PrismaService) {}
 
+    private async addIdToGlobalRead(userId: number, alertId: number=null) {
+        const where = { userId, id: alertId ? alertId : null }
+
+        alertId ? null : delete where.id
+
+        return await this.prismaService.alert.updateMany({
+            where: {
+                OR: [ { id: where.id, userId }, { id: where.id } ],
+                NOT: {
+                    deletedIds: {
+                        has: userId
+                    }
+                }
+            },
+            data: {
+                deletedIds: {
+                    push: userId
+                }
+            }
+        })
+    }
+
     async send(dto: SendAlertDto) {
         if (dto.isGlobal) {
             return await this.prismaService.alert.create({
@@ -35,24 +57,30 @@ export class AlertsService {
     async deleteOne(id: number, user: JwtUser) {
         const alert = await this.prismaService.alert.findUnique({
             where: {
-                id, 
-                userId: user.id
+                id
             }
         })
 
         if (!alert) throw new NotFoundException("Alert not found")
 
-        if (alert.userId !== user.id) throw new ForbiddenException("This is not your alert")
+        if (!alert.isGlobal) {
+            if (alert.userId !== user.id) throw new ForbiddenException("This is not your alert")
 
-        return await this.prismaService.alert.delete({
-            where: {
-                id, 
-                userId: user.id
-            }
-        })
+            return await this.prismaService.alert.delete({
+                where: {
+                    id, 
+                    userId: user.id
+                }
+            })
+        }
+        else {
+            return await this.addIdToGlobalRead(user.id, id)
+        }
     }
 
     async deleteAll(user: JwtUser) {
+        await this.addIdToGlobalRead(user.id)
+
         return await this.prismaService.alert.deleteMany({
             where: {
                 userId: user.id

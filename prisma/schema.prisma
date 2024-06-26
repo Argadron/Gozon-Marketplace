@@ -156,6 +156,8 @@ model Report {
   product Product @relation(fields: [productId], references: [id])
   name String
   description String 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
 
   @@map("report")
 }
@@ -166,6 +168,9 @@ model Alert {
   user User? @relation(fields: [userId], references: [id])
   description String 
   isGlobal Boolean @default(false) @map("is_global")
+  deletedIds Int[] @default([]) @map("deleted_ids")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
 
   @@map("alert")
 }
