@@ -17,7 +17,7 @@ class Logger {
         const url = request.url
         const body = JSON.stringify(request.body) || null 
       
-        const log = `[LOG] [${hours}:${mins}] [${type}] [${url}] request Body: ${debugMode ? body : body ? true: false}\n` 
+        const log = `[LOG] [${hours}:${mins}] [${type}] [${url}] request Body: ${debugMode ? body : body.length > 2 ? true: false}\n` 
       
         console.log(log)
     }

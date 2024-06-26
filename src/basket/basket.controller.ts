@@ -1,8 +1,8 @@
-import { Body, Controller, HttpCode, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, HttpCode, Param, ParseIntPipe, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { BasketService } from './basket.service';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { SwaggerBadRequest, SwaggerConflictMessage, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '../swagger/apiResponse.interfaces';
+import { SwaggerBadRequest, SwaggerConflictMessage, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '../swagger/apiResponse.interfaces';
 import { AddProductDto } from './dto/add-product.dto';
 import { User } from '../auth/decorators/get-user.decorator';
 import { JwtUser } from '../auth/interfaces';
@@ -24,5 +24,16 @@ export class BasketController {
   @UsePipes(new ValidationPipe())
   async addProduct(@Body() dto: AddProductDto, @User() user: JwtUser) {
     return await this.basketService.addProduct(dto, user)
+  }
+
+  @Delete("/deleteProduct/:id")
+  @ApiOperation({ summary: "Delete a one product from basket" })
+  @ApiResponse({ status: 200, description: "Product deleted from basket", type: SwaggerOK })
+  @ApiResponse({ status: 401, description: "Token Invalid/Unauthorized", type: SwaggerUnauthorizedException })
+  @ApiResponse({ status: 403, description: "This is not your product", type: SwaggerForbiddenException })
+  @ApiResponse({ status: 404, description: "Product not found on basket", type: SwaggerNotFound })
+  @ApiBearerAuth()
+  async deleteProduct(@Param("id", ParseIntPipe) id: number, @User() user: JwtUser) {
+    return await this.basketService.deleteProduct(id, user)
   }
 }
