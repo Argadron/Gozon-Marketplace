@@ -94,6 +94,10 @@ export class ProductsService {
             where: {
                 AND: filters ? this.filterCreator(filters) : []
             },
+            include: {
+                reviews: true,
+                reports: true
+            },
             orderBy: {
                 price: filters?.UpOrDown ? "asc" : "desc"
             }
@@ -108,6 +112,10 @@ export class ProductsService {
         const product = await this.prismaService.product.findUnique({
             where: {
                 id
+            },
+            include: {
+                reports: true, 
+                reviews: true
             }
         })
 
