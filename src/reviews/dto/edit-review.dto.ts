@@ -5,20 +5,20 @@ export class EditReviewDto {
     @Min(1)
     reviewId: number;
 
+    @IsOptional()
     @IsString()
     @MinLength(1)
-    @IsOptional()
     readonly name?: string; 
 
+    @IsOptional()
     @IsString()
     @MinLength(5)
-    @IsOptional()
     readonly description?: string;
 
+    @IsOptional()
     @IsNumber()
     @Min(1)
     @Max(5)
-    @IsOptional()
     readonly rate?: number; 
 
     @IsNumber()

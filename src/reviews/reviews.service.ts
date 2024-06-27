@@ -31,8 +31,9 @@ export class ReviewsService {
     async newReview(dto: CreateReviewDto, user: JwtUser) {
         const product = await this.getProductOrThrow(dto.productId)
 
-        let newRate = product.rate + dto.rate;
-        newRate = newRate / (product.reviews.length + 1)
+        let newRate = dto.rate;
+        product.reviews.forEach((elem) => newRate += elem.rate)
+        newRate = +(newRate / (product.reviews.length + 1)).toFixed(1)
 
         await this.prismaService.product.update({
             where: {
@@ -57,11 +58,11 @@ export class ReviewsService {
 
         if (review.authorId !== user.id) throw new ForbiddenException("This is not your review")
 
-        let newRate = product.rate;
+        let newRate = dto.rate;
 
         if (dto.rate > 0) {
-            newRate += dto.rate 
-            newRate = newRate / (product.reviews.length + 1)
+            product.reviews.forEach((elem) => newRate += elem.rate)
+            newRate = +(newRate / (product.reviews.length + 1)).toFixed(1)
         }
 
         await this.prismaService.product.update({
@@ -82,6 +83,34 @@ export class ReviewsService {
                 authorId: user.id
             },
             data: dto
+        })
+    }
+
+    async delete(id: number, user: JwtUser) {
+        const review = await this.getReviewOrThrow(id)
+
+        if (review.authorId !== user.id) throw new ForbiddenException("This is not your review")
+
+        const product = await this.getProductOrThrow(review.productId)
+
+        let newRate = 0;
+        product.reviews.forEach((elem) => newRate += elem.rate)
+        newRate -= review.rate
+        newRate = +(newRate / (product.reviews.length - 1)).toFixed(1)
+
+        await this.prismaService.product.update({
+            where: {
+                id: product.id
+            },
+            data: {
+                rate: newRate
+            }
+        })
+
+        return await this.prismaService.review.delete({
+            where: {
+                id
+            }
         })
     }
 }

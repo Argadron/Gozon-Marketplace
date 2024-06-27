@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Put, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Param, ParseIntPipe, Post, Put, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -37,5 +37,16 @@ export class ReviewsController {
   @UsePipes(new OptionalValidatorPipe().check(["name", "description", "rate"]), new ValidationPipe())
   async editReview(@Body() dto: EditReviewDto, @User() user: JwtUser) {
     return await this.reviewsService.edit(dto, user)
+  }
+
+  @Delete("/delete/:id")
+  @ApiOperation({ summary: "Delete a review" })
+  @ApiResponse({ status: 200, description: "Review deleted", type: SwaggerOK })
+  @ApiResponse({ status: 401, description: "Token Invalid/Unauthorized", type: SwaggerUnauthorizedException })
+  @ApiResponse({ status: 403, description: "This is not your review", type: SwaggerForbiddenException })
+  @ApiResponse({ status: 404, description: "Review not found", type: SwaggerNotFound })
+  @ApiBearerAuth()
+  async deleteReview(@Param("id", ParseIntPipe) id: number, @User() user: JwtUser) {
+    return await this.reviewsService.delete(id, user)
   }
 }
