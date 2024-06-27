@@ -8,6 +8,7 @@ import { FileService } from  '../file.service'
 import { JwtModule } from '@nestjs/jwt';
 import { prisma } from '../prisma-client.forTest';
 import 'dotenv/config'
+import { UsersModule } from '../users/users.module';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -22,7 +23,7 @@ describe('AuthController', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [JwtModule.register({
         secret: "secret"
-    }), ConfigModule.forRoot()],
+    }), ConfigModule.forRoot(), UsersModule],
       controllers: [AuthController],
       providers: [AuthService, PrismaService, ConfigService, FileService],
     }).compile();

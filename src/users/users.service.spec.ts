@@ -6,6 +6,7 @@ import { PrismaService } from '../prisma.service';
 import { FileService } from '../file.service'
 import { ConfigService } from '@nestjs/config';
 import { RoleEnum } from '@prisma/client';
+import { AlertsModule } from '../alerts/alerts.module';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -20,7 +21,7 @@ describe('UsersService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [AuthModule],
+      imports: [AuthModule, AlertsModule],
       providers: [UsersService, PrismaService, FileService, ConfigService],
     }).compile();
 

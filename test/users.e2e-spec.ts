@@ -6,6 +6,7 @@ import * as request from 'supertest';
 import 'dotenv/config'
 import { AdminGuard } from '../src/auth/guards/admin.guard';
 import { RoleEnum } from '@prisma/client';
+import { AlertsModule } from '../src/alerts/alerts.module';
 
 describe("UsersController (E2E)", () => {
     let app: INestApplication;
@@ -22,7 +23,7 @@ describe("UsersController (E2E)", () => {
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [UsersModule],
+            imports: [UsersModule, AlertsModule],
         }).overrideGuard(AdminGuard).useValue({
             canActivate: (ctx: ExecutionContext) => {
                 const request: Request = ctx.switchToHttp().getRequest()

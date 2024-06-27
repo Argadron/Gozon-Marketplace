@@ -9,6 +9,7 @@ import { JwtGuard } from '../src/auth/guards/jwt.guard';
 import { Request } from 'express';
 import { SellerRequirementsModule } from '../src/seller-requirements/seller-requirements.module';
 import { AdminGuard } from '../src/auth/guards/admin.guard';
+import { UsersModule } from '../src/users/users.module';
 
 describe("Seller-requirementsController (E2E)", () => {
     let app: INestApplication;
@@ -31,7 +32,7 @@ describe("Seller-requirementsController (E2E)", () => {
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [AuthModule, SellerRequirementsModule],
+            imports: [AuthModule, SellerRequirementsModule, UsersModule],
             providers: [PrismaService]
         }).overrideGuard(JwtGuard).useValue({
             canActivate: (ctx: ExecutionContext) => {

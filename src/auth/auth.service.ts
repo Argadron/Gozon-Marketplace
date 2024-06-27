@@ -8,13 +8,15 @@ import { Response } from 'express';
 import { JwtUser, Tokens } from './interfaces';
 import { FileService } from '../file.service';
 import { RoleEnum } from '@prisma/client';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
     constructor(private readonly prismaService: PrismaService,
                 private readonly jwtService: JwtService,
                 private readonly configService: ConfigService,
-                private readonly fileService: FileService
+                private readonly fileService: FileService,
+                private readonly userService: UsersService
     ) {}
 
     private async generateTokens(id: number, role: RoleEnum) {
@@ -65,20 +67,18 @@ export class AuthService {
     }
 
     async register(res: Response, dto: AuthDto, file: Express.Multer.File=null): Promise<Tokens> {
-        const User = await this.prismaService.user.findFirst({
-            where: {
-                OR: [
-                    {
-                        username: dto.username ? dto.username : undefined
-                    },
-                    {
-                        email: dto.email ? dto.email : undefined
-                    },
-                    {
-                        phone: dto.phone ? dto.phone : undefined
-                    }
-                ]
-            }
+        const User = await this.userService.findBy({ 
+            OR: [
+                {
+                    username: dto.username ? dto.username : undefined
+                },
+                {
+                    email: dto.email ? dto.email : undefined
+                },
+                {
+                    phone: dto.phone ? dto.phone : undefined
+                }
+            ] 
         })
 
         if (User) throw new ConflictException("This username or email or phone already exsits!")
@@ -88,13 +88,12 @@ export class AuthService {
         }
 
         delete dto.file
+
         const { password, ...addInfo } = dto
-        const { id, role } = await this.prismaService.user.create({
-            data: {
-                password: await bcrypt.hash(password, 3),
-                ...addInfo,
-                profilePhoto: file ? this.fileService.downolad(file) : "default.png"
-            }
+        const { id, role } = await this.userService.create({ 
+            password: await bcrypt.hash(password, 3),
+            ...addInfo,
+            profilePhoto: file ? this.fileService.downolad(file) : "default.png" 
         })
 
         const { access, refresh } = await this.generateTokens(id, role)
@@ -114,20 +113,18 @@ export class AuthService {
 
         if (!type) throw new BadRequestException("Missing one of 3 login methods")
 
-        const User = await this.prismaService.user.findFirst({
-            where: {
-                OR: [
-                    {
-                        username: type
-                    },
-                    {
-                        email: type
-                    },
-                    {
-                        phone: type
-                    }
-                ]
-            }
+        const User = await this.userService.findBy({ 
+            OR: [
+                {
+                    username: type
+                },
+                {
+                    email: type
+                },
+                {
+                    phone: type
+                }
+            ]
         })
 
         if (!User) throw new NotFoundException("Bad password or username")
@@ -165,10 +162,8 @@ export class AuthService {
 
         await this.verifyJwt(token)
 
-        const User = await this.prismaService.user.findUnique({
-            where: {
-                id: tokensObject.userId
-            }
+        const User = await this.userService.findBy({ 
+            id: tokensObject.userId
         })
 
         const { access, refresh } = await this.generateTokens(User.id, User.role)

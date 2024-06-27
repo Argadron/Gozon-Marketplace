@@ -21,7 +21,7 @@ export class UsersController {
   @ApiResponse({ status: 401, description: "Token invalid / No token", type: SwaggerUnauthorizedException })
   @ApiBearerAuth()
   async getProfile(@User() user: JwtUser) {
-    return await this.usersService.getProfile(user)
+    return await this.usersService.getProfile(user.id)
   }
 
   @Get("/getProfilePhoto")

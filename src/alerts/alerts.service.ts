@@ -5,7 +5,8 @@ import { JwtUser } from '../auth/interfaces';
 
 @Injectable()
 export class AlertsService {
-    constructor(private readonly prismaService: PrismaService) {}
+    constructor(private readonly prismaService: PrismaService
+    ) {}
 
     private async addIdToGlobalRead(userId: number, alertId: number=null) {
         const where = { userId, id: alertId ? alertId : null }
@@ -29,6 +30,10 @@ export class AlertsService {
         })
     }
 
+    async getMany(found: any) {
+        return await this.prismaService.alert.findMany({ where: found })
+    }
+
     async send(dto: SendAlertDto) {
         if (dto.isGlobal) {
             return await this.prismaService.alert.create({
@@ -39,9 +44,10 @@ export class AlertsService {
             })
         }
         else {
+            // Circular dependencie with usersModule. Use prisma.
             const User = await this.prismaService.user.findUnique({
-                where: {
-                    username: dto.username
+                where: { 
+                    username: dto.username 
                 }
             })
 

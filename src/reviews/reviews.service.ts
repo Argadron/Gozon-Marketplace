@@ -3,18 +3,13 @@ import { PrismaService } from '../prisma.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { JwtUser } from '../auth/interfaces';
 import { EditReviewDto } from './dto/edit-review.dto';
+import { ProductsService } from '../products/products.service';
 
 @Injectable()
 export class ReviewsService {
-    constructor(private readonly prismaService: PrismaService) {}
-
-    private async getProductOrThrow(id: number) {
-        const product = await this.prismaService.product.findUnique({ where: { id }, include: { reviews: true } })
-
-        if (!product) throw new NotFoundException("Product not found")
-
-        return product
-    }
+    constructor(private readonly prismaService: PrismaService,
+                private readonly productService: ProductsService
+    ) {}
 
     private async getReviewOrThrow(id: number) {
         const review = await this.prismaService.review.findUnique({
@@ -29,20 +24,13 @@ export class ReviewsService {
     }
 
     async newReview(dto: CreateReviewDto, user: JwtUser) {
-        const product = await this.getProductOrThrow(dto.productId)
+        const product = await this.productService.getById(dto.productId)
 
         let newRate = dto.rate;
         product.reviews.forEach((elem) => newRate += elem.rate)
         newRate = +(newRate / (product.reviews.length + 1)).toFixed(1)
 
-        await this.prismaService.product.update({
-            where: {
-                id: dto.productId
-            },
-            data: {
-                rate: newRate
-            }
-        })
+        await this.productService.updateInertnal(product.id, { rate: newRate })
 
         return await this.prismaService.review.create({
             data: {
@@ -53,7 +41,7 @@ export class ReviewsService {
     }
 
     async edit(dto: EditReviewDto, user: JwtUser) {
-        const product = await this.getProductOrThrow(dto.productId)
+        const product = await this.productService.getById(dto.productId)
         const review = await this.getReviewOrThrow(dto.reviewId)
 
         if (review.authorId !== user.id) throw new ForbiddenException("This is not your review")
@@ -65,14 +53,7 @@ export class ReviewsService {
             newRate = +(newRate / (product.reviews.length + 1)).toFixed(1)
         }
 
-        await this.prismaService.product.update({
-            where: {
-                id: dto.productId
-            },
-            data: {
-                rate: newRate
-            }
-        })
+        await this.productService.updateInertnal(product.id, { rate: newRate })
 
         delete dto.productId
         delete dto.reviewId
@@ -91,21 +72,14 @@ export class ReviewsService {
 
         if (review.authorId !== user.id) throw new ForbiddenException("This is not your review")
 
-        const product = await this.getProductOrThrow(review.productId)
+        const product = await this.productService.getById(review.productId)
 
         let newRate = 0;
         product.reviews.forEach((elem) => newRate += elem.rate)
         newRate -= review.rate
         newRate = +(newRate / (product.reviews.length - 1)).toFixed(1)
 
-        await this.prismaService.product.update({
-            where: {
-                id: product.id
-            },
-            data: {
-                rate: newRate
-            }
-        })
+        await this.productService.updateInertnal(product.id, { rate: newRate })
 
         return await this.prismaService.review.delete({
             where: {

@@ -3,6 +3,7 @@ import { ReviewsService } from './reviews.service';
 import { AuthModule } from '../auth/auth.module';
 import { PrismaService } from '../prisma.service';
 import { RoleEnum } from '@prisma/client';
+import { ProductsModule } from '../products/products.module';
 
 describe('ReviewsService', () => {
   let service: ReviewsService;
@@ -26,7 +27,7 @@ describe('ReviewsService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [AuthModule],
+      imports: [AuthModule, ProductsModule],
       providers: [ReviewsService, PrismaService],
     }).compile();
 

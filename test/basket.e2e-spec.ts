@@ -8,6 +8,7 @@ import { RoleEnum } from '@prisma/client';
 import { AuthModule } from '../src/auth/auth.module';
 import { JwtGuard } from '../src/auth/guards/jwt.guard';
 import { Request } from 'express';
+import { ProductsModule } from '../src/products/products.module';
 
 describe("BasketController (E2E)", () => {
     let app: INestApplication;
@@ -18,7 +19,7 @@ describe("BasketController (E2E)", () => {
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [BasketModule, AuthModule],
+            imports: [BasketModule, AuthModule, ProductsModule],
             providers: [BasketService, PrismaService]
         }).overrideGuard(JwtGuard).useValue({
             canActivate: (ctx: ExecutionContext) => {

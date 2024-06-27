@@ -4,17 +4,20 @@ import { JwtUser } from '../auth/interfaces';
 import { FileService } from '../file.service';
 import { Response } from 'express';
 import { UpdateUserStatusDto } from './dto/update-user-status.dto';
+import { AlertsService } from '../alerts/alerts.service';
+import { CreateUser } from './interfaces';
 
 @Injectable()
 export class UsersService {
     constructor(private readonly prismaService: PrismaService,
-                private readonly fileService: FileService
+                private readonly fileService: FileService,
+                private readonly alertService: AlertsService
     ) {}
 
-    async getProfile(user: JwtUser) {
+    async getProfile(userId: number) {
         const User = await this.prismaService.user.findUnique({
             where: {
-                id: user.id,
+                id: userId,
             },
             include: {
                 userProducts: true,
@@ -26,7 +29,7 @@ export class UsersService {
 
         if (!User) throw new NotFoundException("User not found")
 
-        const globalAlerts = await this.prismaService.alert.findMany({ where: { isGlobal: true, NOT: { deletedIds: { has: User.id } } } })
+        const globalAlerts = await this.alertService.getMany({ isGlobal: true, NOT: { deletedIds: { has: User.id } } })
         
         for (let i in globalAlerts) {
             delete globalAlerts[i].deletedIds
@@ -42,8 +45,18 @@ export class UsersService {
         return User
     }
 
+    async create(data: CreateUser) {
+        return await this.prismaService.user.create({
+            data
+        })
+    }
+
+    async findBy(find: any) {
+        return await this.prismaService.user.findFirst({ where: find })
+    }
+
     async getProfilePhoto(user: JwtUser, res: Response) {
-        const { profilePhoto } = await this.getProfile(user)
+        const { profilePhoto } = await this.getProfile(user.id)
 
         const file = this.fileService.get(res, profilePhoto)
 

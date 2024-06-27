@@ -13,14 +13,7 @@ export class ReportsService {
     async create(dto: CreateReportDto, user: JwtUser) {
         const product = await this.productService.getById(dto.productId)
 
-        await this.prismaService.product.update({
-            where: {
-                id: product.id
-            },
-            data: {
-                reportsCount: product.reportsCount + 1
-            }
-        })
+        await this.productService.updateInertnal(product.id, { reportsCount: product.reportsCount + 1 })
 
         return await this.prismaService.report.create({
             data: {

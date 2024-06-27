@@ -25,3 +25,9 @@ export class Filters {
 
     readonly UpOrDown?: boolean;
 }
+
+export interface UpdateData {
+    readonly rate?: number;
+
+    readonly reportsCount?: number;
+}

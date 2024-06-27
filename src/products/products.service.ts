@@ -4,7 +4,7 @@ import { AllProductsDto } from './dto/all-products.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { JwtUser } from '../auth/interfaces';
 import { FileService } from '../file.service';
-import { Filters } from './interfaces';
+import { Filters, UpdateData } from './interfaces';
 import { Prisma } from '@prisma/client';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Response } from 'express';
@@ -70,6 +70,7 @@ export class ProductsService {
      * This method validate product: his is exsists and seller id equal user id and returns product
      * @param id - Product id
      * @param user - User 
+     * @param isInternal - Is product updated from inernal code
      * @returns product
      */
     private async validateProduct(id: number, user: JwtUser) {
@@ -176,6 +177,21 @@ export class ProductsService {
             where: {
                 id
             }
+        })
+    }
+
+    /**
+     * This method need to internal update product from code. No use on controller. (Method not check the product exsists)
+     * @param id - Product id
+     * @param updateData - Data to update product
+     * @return - Updated product
+     */
+    async updateInertnal(id: number, updateData: UpdateData) {
+        return await this.prismaService.product.update({
+            where: {
+                id
+            },
+            data: updateData
         })
     }
 }

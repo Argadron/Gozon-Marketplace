@@ -5,17 +5,16 @@ import { JwtUser } from '../auth/interfaces';
 import { RoleEnum } from '@prisma/client';
 import { GetAllRequirementsDto } from './dto/get-all-requirements-query.dto';
 import { CloseSellerRequirementDto } from './dto/close-seller-requirement.dto';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class SellerRequirementsService {
-    constructor(private readonly prismaService: PrismaService) {}
+    constructor(private readonly prismaService: PrismaService,
+                private readonly userService: UsersService
+    ) {}
 
     async createSellerRequirement(dto: CreateSellerRequirementDto, user: JwtUser) {
-        const User = await this.prismaService.user.findUnique({
-            where: {
-                id: user.id
-            }
-        })
+        const User = await this.userService.getProfile(user.id)
 
         if (User.role === RoleEnum.SELLER) throw new ForbiddenException("Already has seller role")
 
@@ -45,11 +44,7 @@ export class SellerRequirementsService {
     }
 
     async close(dto: CloseSellerRequirementDto) {
-        const User = await this.prismaService.user.findUnique({
-            where: {
-                id: dto.userId
-            }
-        })
+        const User = await this.userService.getProfile(dto.userId)
 
         if (!User) throw new NotFoundException("User not found")
 

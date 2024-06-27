@@ -9,11 +9,12 @@ import { SellerRequirementsModule } from './seller-requirements/seller-requireme
 import { AlertsModule } from './alerts/alerts.module';
 import { BasketModule } from './basket/basket.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
   imports: [AuthModule, ConfigModule.forRoot({
     isGlobal: true
-  }), UsersModule, ProductsModule, SellerRequirementsModule, AlertsModule, BasketModule, ReviewsModule],
+  }), UsersModule, ProductsModule, SellerRequirementsModule, AlertsModule, BasketModule, ReviewsModule, ReportsModule],
   controllers: [AppController],
   providers: [AppService],
 })

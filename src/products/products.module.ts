@@ -13,6 +13,6 @@ import { StringToArrayPipe } from '../common/pipes/string-to-array-pipe';
   imports: [AuthModule],
   controllers: [ProductsController],
   providers: [ProductsService, PrismaService, ObjectStringToIntPipe, FileService, ConfigService, StringFiltersToObject, StringToArrayPipe],
-  exports: [ObjectStringToIntPipe, StringFiltersToObject]
+  exports: [ObjectStringToIntPipe, StringFiltersToObject, ProductsService]
 })
 export class ProductsModule {}

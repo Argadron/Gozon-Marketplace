@@ -6,6 +6,7 @@ import { ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
 import { RoleEnum } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
+import { ProductsModule } from '../products/products.module';
 
 describe('BasketController', () => {
   let controller: BasketController;
@@ -20,7 +21,7 @@ describe('BasketController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [BasketController],
+      controllers: [BasketController, ProductsModule],
       providers: [BasketService, PrismaService],
     }).overrideGuard(JwtGuard).useValue({
       canActivate: (ctx: ExecutionContext) => {

@@ -2,19 +2,16 @@ import { BadRequestException, ConflictException, ForbiddenException, Injectable,
 import { PrismaService } from '../prisma.service';
 import { AddProductDto } from './dto/add-product.dto';
 import { JwtUser } from '../auth/interfaces';
+import { ProductsService } from '../products/products.service';
 
 @Injectable()
 export class BasketService {
-    constructor(private readonly prismaService: PrismaService) {}
+    constructor(private readonly prismaService: PrismaService,
+                private readonly productService: ProductsService
+    ) {}
 
     async addProduct(dto: AddProductDto, user: JwtUser) {
-        const product = await this.prismaService.product.findUnique({
-            where: {
-                id: dto.productId
-            }
-        })
-
-        if (!product) throw new NotFoundException("Product not found")
+        const product = await this.productService.getById(dto.productId)
 
         if (product.count < dto.productCount) throw new BadRequestException("Product count less than dto count")
 

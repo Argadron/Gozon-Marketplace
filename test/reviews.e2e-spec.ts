@@ -8,6 +8,7 @@ import { JwtGuard } from '../src/auth/guards/jwt.guard';
 import { RoleEnum } from '@prisma/client';
 import { Request } from 'express';
 import * as request from 'supertest'
+import { ProductsModule } from '../src/products/products.module';
 
 describe("ReviewsController (E2E)", () => {
     let app: INestApplication;
@@ -27,7 +28,7 @@ describe("ReviewsController (E2E)", () => {
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [AuthModule, ReviewsModule],
+            imports: [AuthModule, ReviewsModule, ProductsModule],
             providers: [ReviewsService, PrismaService]
         }).overrideGuard(JwtGuard).useValue({
             canActivate: (ctx: ExecutionContext) => {

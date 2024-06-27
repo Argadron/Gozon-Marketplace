@@ -8,6 +8,7 @@ import { JwtGuard } from '../auth/guards/jwt.guard';
 import { ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
 import { AdminGuard } from '../auth/guards/admin.guard';
+import { UsersModule } from '../users/users.module';
 
 describe('SellerRequirementsService', () => {
   let service: SellerRequirementsService;
@@ -34,7 +35,7 @@ describe('SellerRequirementsService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [AuthModule],
+      imports: [AuthModule, UsersModule],
       providers: [SellerRequirementsService, PrismaService],
     }).overrideGuard(JwtGuard).useValue({
       canActivate: (ctx: ExecutionContext) => {

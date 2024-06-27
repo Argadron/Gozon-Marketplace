@@ -10,6 +10,7 @@ import { FileService } from '../file.service'
 import { ConfigService } from '@nestjs/config';
 import { RoleEnum } from '@prisma/client';
 import { AdminGuard } from '../auth/guards/admin.guard';
+import { AlertsModule } from '../alerts/alerts.module';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -24,7 +25,7 @@ describe('UsersController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [AuthModule],
+      imports: [AuthModule, AlertsModule],
       controllers: [UsersController],
       providers: [UsersService, PrismaService, FileService, ConfigService],
     }).overrideGuard(JwtGuard).useValue({
