@@ -1,11 +1,14 @@
 <template>
-  <product v-for="product in products" v-bind:product="product">
-  </product>
+  <div class="flex">
+    <product v-for="product in products" v-bind:product="product">
+    </product>
+  </div>
+
 </template>
 
 <script>
 import { defineComponent, ref } from 'vue';
-import product from './components/indexPage/product.vue'
+import product from './components/indexPage/productCard.vue'
 import requester from 'src/boot/requester';
 
 export default {

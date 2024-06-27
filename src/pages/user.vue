@@ -1,8 +1,13 @@
 <template>
-    <div>
-    <q-avatar></q-avatar>
-    <h5 style="color: var(--q-text);">{{ username }}</h5>
+    <div style="padding: 15px;" class="flex">
+    <q-avatar size="5vw">
+        <img src="./components/assets/largelogo.png" alt="">
+    </q-avatar>
+    <p style="margin-left:5px;font-size:25px; color: var(--q-text);">{{ username }}</p>
     </div>
+
+    <h3 style="margin:0; text-align: center;">Корзина</h3>
+    <p>Напрягите воображение, и представьте,что тут корзина </p>
 </template>
 <script>
 import requester from 'src/boot/requester'

@@ -24,8 +24,8 @@
   export default {
     data() {
       return {
-        phone:'',
-        email:'',
+        phone:null,
+        email:null,
         username: '',
         password: '',
         ava:null,
@@ -46,10 +46,10 @@
         let request={
             username: this.username,
             password: this.password,
-            email: this.email,
-            phone: this.phone,
             file: this.ava,
         }
+        request.phone = this?.phone
+        request.email = this?.email
         console.log(request)
         let res = await requester.requester("POST","auth/register",request)
         console.log(res)

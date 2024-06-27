@@ -1,18 +1,19 @@
 <template>
-    <div class="product-container" style="text-align: center;" >
-        <div class="cursor-pointer toProduct" @click="console.log('vov')">
+    <div style="width: 240px;" class="product-container" >
+        <div style="text-align: center;" class="cursor-pointer toProduct" @click="toProduct">
             <img style="width: 15vw;" src="../assets/largelogo.png">
-            <p style="color: var(--q-accent); font-size: larger;" class="text-truncate">{{ product.name }}</p>
-            <p class="text-truncate">{{ product.description }}</p>
+            <p style="color: var(--q-accent); font-size: larger; text-align: center;" class="text-truncate">{{ formattedName() }}</p>
+            <p class="text-truncate">{{formattedDescription() }}</p>
         </div>
-        <q-btn @click="console.log('представьте, что я поместил это в корзину')">
-            <p style="margin-right: 5px ;">В корзину!</p>
-          <strong>{{formattedPrice(product.price)}}</strong> <!-- Цена продукта -->
-        </q-btn>
+        <div style="text-align: center; align-self: flex-end;">
+            <p style="margin-bottom:5px;"><strong>Цена: {{ formattedPrice(product.price) }}</strong></p>
+            <q-btn label="В корзину" style="max-height: 35px;" @click="saveProduct"/>
+        </div>
     </div>
 </template>
 
 <script>
+import formattedString from "src/boot/formatted.js"
 export default {
     props: {
         product: Object
@@ -44,10 +45,27 @@ export default {
         },
       }
     },
+    data(){
+        const formattedName = ()=>{
+            return formattedString(this.product.name,20)
+        }
+        const formattedDescription = ()=>{
+            return formattedString(this.product.description,45)
+        }
+        return{
+            formattedName,
+            formattedDescription
+        }
+    },
+    setup(){
+        return {
+            formattedString
+        }
+    },
     computed: {
         formattedPrice() {
+            console.log(formattedString)
             return price => {
-                console.log(this.product)
                 let res = "";
                 let reversedPrice = price.toString().split("").reverse().join("")
                 console.log(reversedPrice)
@@ -63,6 +81,19 @@ export default {
                 return res;
             };
         }
+    },
+    methods:{
+        saveProduct(){
+            if(localStorage.products){
+                localStorage.products =+ this.product.id.toString()
+                console.log('asd')
+            }else{
+                localStorage.products = this.product.id.toString()
+            }
+        },
+        toProduct(){
+            window.location.href = 'product?id='+this.product.id
+        }
     }
 };
 </script>
@@ -77,9 +108,11 @@ export default {
 .product-container{
     margin-top: 5px;
     margin-left: 5px;
+    margin-right: 2vw;
     max-width: 20vw;
    /* border: 0.5px solid var(--q-primary);*/
     padding: 10px;
+    display: grid;
 }
 
 .text-truncate {
