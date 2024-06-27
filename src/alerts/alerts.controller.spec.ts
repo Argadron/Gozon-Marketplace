@@ -4,7 +4,7 @@ import { AlertsService } from './alerts.service';
 import { AuthModule } from '../auth/auth.module';
 import { prisma } from '../prisma-client.forTest';
 import { JwtGuard } from '../auth/guards/jwt.guard';
-import { ExecutionContext } from '@nestjs/common';
+import { ExecutionContext, forwardRef } from '@nestjs/common';
 import { Request } from 'express';
 import { RoleEnum } from '@prisma/client';
 import { AdminGuard } from '../auth/guards/admin.guard';
@@ -23,7 +23,7 @@ describe('AlertsController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [AuthModule],
+      imports: [forwardRef(() => AuthModule)],
       controllers: [AlertsController],
       providers: [AlertsService, PrismaService],
     }).overrideGuard(JwtGuard).useValue({

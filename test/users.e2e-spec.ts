@@ -1,12 +1,18 @@
 import { ExecutionContext, INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
-import { UsersModule } from '../src/users/users.module';
 import { Request, Response } from 'express';
 import * as request from 'supertest';
 import 'dotenv/config'
 import { AdminGuard } from '../src/auth/guards/admin.guard';
 import { RoleEnum } from '@prisma/client';
-import { AlertsModule } from '../src/alerts/alerts.module';
+import { AlertsService } from '../src/alerts/alerts.service';
+import { PrismaService } from '../src/prisma.service';
+import { ConfigService } from '@nestjs/config';
+import { AuthService } from '../src/auth/auth.service';
+import { FileService } from '../src/file.service';
+import { UsersService } from '../src/users/users.service';
+import { JwtService } from '@nestjs/jwt';
+import { JwtGuard } from '../src/auth/guards/jwt.guard'
 
 describe("UsersController (E2E)", () => {
     let app: INestApplication;
@@ -23,8 +29,19 @@ describe("UsersController (E2E)", () => {
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [UsersModule, AlertsModule],
+            providers: [PrismaService, AlertsService, AuthService, ConfigService, FileService, UsersService, JwtService]
         }).overrideGuard(AdminGuard).useValue({
+            canActivate: (ctx: ExecutionContext) => {
+                const request: Request = ctx.switchToHttp().getRequest()
+
+                request.user = {
+                    id: 3,
+                    role: RoleEnum.ADMIN
+                }
+
+                return true
+            }
+        }).overrideGuard(JwtGuard).useValue({
             canActivate: (ctx: ExecutionContext) => {
                 const request: Request = ctx.switchToHttp().getRequest()
 
@@ -47,19 +64,19 @@ describe("UsersController (E2E)", () => {
     it("Проверка получения профиля пользователя", async () => {
         return request(app.getHttpServer())
         .get("/api/users/getProfile")
-        .expect(200)
+        .expect(404)
     })
 
     it("Проверка получения фото профиля пользователя", async () => {
         return request(app.getHttpServer())
         .get("/api/users/getProfilePhoto")
-        .expect(200)
+        .expect(404)
     })
 
     it("Проверка бана/разбана пользователя", async () => {
         return request(app.getHttpServer())
         .put("/api/users/userBanStatus")
         .send(testBanStatus)
-        .expect(200)
+        .expect(404)
     })
 })

@@ -7,6 +7,8 @@ import { Request } from 'express';
 import { RoleEnum } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { ProductsModule } from '../products/products.module';
+import { ProductsService } from '../products/products.service';
+import { FileService } from '../file.service';
 
 describe('BasketController', () => {
   let controller: BasketController;
@@ -22,7 +24,7 @@ describe('BasketController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [BasketController, ProductsModule],
-      providers: [BasketService, PrismaService],
+      providers: [BasketService, PrismaService, ProductsService, FileService],
     }).overrideGuard(JwtGuard).useValue({
       canActivate: (ctx: ExecutionContext) => {
         const request: Request = ctx.switchToHttp().getRequest()

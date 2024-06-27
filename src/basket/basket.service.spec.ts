@@ -3,6 +3,8 @@ import { BasketService } from './basket.service';
 import { RoleEnum } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { ProductsModule } from '../products/products.module';
+import { ProductsService } from '../products/products.service';
+import { FileService } from '../file.service';
 
 describe('BasketService', () => {
   let service: BasketService;
@@ -18,7 +20,7 @@ describe('BasketService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [ProductsModule],
-      providers: [BasketService, PrismaService],
+      providers: [BasketService, PrismaService, ProductsService, FileService],
     }).compile();
 
     service = module.get<BasketService>(BasketService);

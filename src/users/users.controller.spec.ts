@@ -3,7 +3,7 @@ import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { Request, response } from 'express';
 import { JwtGuard } from '../auth/guards/jwt.guard';
-import { ExecutionContext } from '@nestjs/common';
+import { ExecutionContext, forwardRef } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
 import { PrismaService } from '../prisma.service';
 import { FileService } from '../file.service'
@@ -25,7 +25,7 @@ describe('UsersController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [AuthModule, AlertsModule],
+      imports: [AuthModule, forwardRef(() => AlertsModule)],
       controllers: [UsersController],
       providers: [UsersService, PrismaService, FileService, ConfigService],
     }).overrideGuard(JwtGuard).useValue({

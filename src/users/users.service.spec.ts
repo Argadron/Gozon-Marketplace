@@ -7,6 +7,7 @@ import { FileService } from '../file.service'
 import { ConfigService } from '@nestjs/config';
 import { RoleEnum } from '@prisma/client';
 import { AlertsModule } from '../alerts/alerts.module';
+import { forwardRef } from '@nestjs/common';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -14,6 +15,7 @@ describe('UsersService', () => {
     id: 3,
     role: RoleEnum.ADMIN
   }
+  const jwtUserTestOnlyId = 3
   const testBan = {
     username: "Argadron",
     status: false
@@ -21,7 +23,7 @@ describe('UsersService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [AuthModule, AlertsModule],
+      imports: [AuthModule, forwardRef(() => AlertsModule)],
       providers: [UsersService, PrismaService, FileService, ConfigService],
     }).compile();
 
@@ -29,7 +31,7 @@ describe('UsersService', () => {
   });
 
   it('Проверка получения профиля пользователя', async () => {
-    expect((await service.getProfile(jwtUserTest)).role).toBeDefined();
+    expect((await service.getProfile(jwtUserTestOnlyId)).role).toBeDefined();
   });
 
   it("Проверка получения профиля пользователя", async () => {

@@ -5,6 +5,7 @@ import { AuthModule } from '../auth/auth.module';
 import { AlertsModule } from './alerts.module';
 import { PrismaService } from '../prisma.service';
 import { RoleEnum } from '@prisma/client';
+import { forwardRef } from '@nestjs/common';
 
 describe('AlertsService', () => {
   let service: AlertsService;
@@ -19,7 +20,7 @@ describe('AlertsService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [AuthModule, AlertsModule],
+      imports: [forwardRef(() => AuthModule), AlertsModule],
       providers: [AlertsService, PrismaService],
     }).compile();
 
