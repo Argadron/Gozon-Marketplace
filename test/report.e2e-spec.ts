@@ -20,6 +20,10 @@ describe("ReportsController (E2E)", () => {
         description: "отравился",
         productId: 1
       }
+      const testEditReport = {
+        name: "репортик",
+        reportId: 20
+      }
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -49,5 +53,12 @@ describe("ReportsController (E2E)", () => {
         .post("/api/reports/new")
         .send(testNewReport)
         .expect(201)
+    })
+
+    it("Проверка запрсоа на изменение жалобы на продукт", async () => {
+        return request(app.getHttpServer())
+        .put("/api/reports/edit")
+        .send(testEditReport)
+        .expect(200)
     })
 })

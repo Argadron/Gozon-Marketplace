@@ -20,6 +20,10 @@ describe('ReportsController', () => {
     description: "отравился",
     productId: 1
   }
+  const testEditReport = {
+    name: "репортик",
+    reportId: 20
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -44,4 +48,8 @@ describe('ReportsController', () => {
   it('Проверка запроса на создание жалобы на продукт', async () => {
     expect((await controller.newReport(testNewReport, testJwtUser)).createdAt).toBeDefined();
   });
+
+  it("Проверка запроса на изменение жалобы на продукт", async () => {
+    expect((await controller.editReport(testEditReport, testJwtUser)).updatedAt).toBeDefined()
+  })
 });

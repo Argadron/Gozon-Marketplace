@@ -16,6 +16,10 @@ describe('ReportsService', () => {
     description: "отравился",
     productId: 1
   }
+  const testEditReport = {
+    name: "репортик",
+    reportId: 20
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -29,4 +33,8 @@ describe('ReportsService', () => {
   it('Проверка создания жалобы на продукт', async () => {
     expect((await service.create(testNewReport, testJwtUser)).createdAt).toBeDefined();
   });
+
+  it("Проверка изменения жалобы на продукт", async () => {
+    expect((await service.edit(testEditReport, testJwtUser)).updatedAt).toBeDefined()
+  })
 });
