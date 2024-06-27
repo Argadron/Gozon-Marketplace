@@ -61,4 +61,10 @@ describe("ReviewsController (E2E)", () => {
         .send(testEditReview)
         .expect(200)
     })
+
+    it("Проверка запроса на удаление отзыва", async () => {
+        return request(app.getHttpServer())
+        .delete("/api/reviews/100")
+        .expect(404)
+    })
 })

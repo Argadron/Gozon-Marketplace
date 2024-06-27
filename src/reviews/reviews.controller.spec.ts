@@ -56,4 +56,8 @@ describe('ReviewsController', () => {
   it("Проверка изменения отзыва у товара", async () => {
     expect((await controller.editReview(testEditReview, testJwtUser)).createdAt).toBeDefined()
   })
+
+  it("Проверка удаления отзыва у товара", async () => {
+    expect((await controller.deleteReview(100, testJwtUser)).createdAt).toBeDefined()
+  })
 });

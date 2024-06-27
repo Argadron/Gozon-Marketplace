@@ -40,4 +40,8 @@ describe('ReviewsService', () => {
   it("Проверка изменения отзыва у товара", async () => [
     expect((await service.edit(testEditReview, testJwtUser)).createdAt).toBeDefined()
   ])
+
+  it("Проверка удаления отзыва у товара", async () => {
+    expect((await service.delete(100, testJwtUser)).createdAt).toBeDefined()
+  })
 });
