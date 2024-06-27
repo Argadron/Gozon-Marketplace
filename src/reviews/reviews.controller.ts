@@ -8,6 +8,7 @@ import { User } from '../auth/decorators/get-user.decorator';
 import { JwtUser } from '../auth/interfaces';
 import { EditReviewDto } from './dto/edit-review.dto';
 import { OptionalValidatorPipe } from '../common/pipes/optional-validator.pipe';
+import { EmptyStringDeletorPipe } from '../common/pipes/empty-string-deletor.pipe';
 
 @Controller('reviews')
 @UseGuards(JwtGuard)
@@ -34,7 +35,7 @@ export class ReviewsController {
   @ApiResponse({ status: 403, description: "This is not your review", type: SwaggerForbiddenException })
   @ApiResponse({ status: 404, description: "Review not found", type: SwaggerNotFound })
   @ApiBearerAuth()
-  @UsePipes(new OptionalValidatorPipe().check(["name", "description", "rate"]), new ValidationPipe())
+  @UsePipes(new EmptyStringDeletorPipe(),new OptionalValidatorPipe().check(["name", "description", "rate"]), new ValidationPipe())
   async editReview(@Body() dto: EditReviewDto, @User() user: JwtUser) {
     return await this.reviewsService.edit(dto, user)
   }
