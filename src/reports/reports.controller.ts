@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Put, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Param, ParseIntPipe, Post, Put, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ReportsService } from './reports.service';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -40,5 +40,16 @@ export class ReportsController {
   @UsePipes(new EmptyStringDeletorPipe(),new OptionalValidatorPipe().check(["name", "description"]),new ValidationPipe())
   async editReport(@Body() dto: Partial<EditReportDto>, @User() user: JwtUser) {
     return await this.reportsService.edit(dto, user)
+  }
+
+  @Delete("/delete/:id")
+  @ApiOperation({ summary: "Delete a product report" })
+  @ApiResponse({ status: 200, description: "Report deleted", type: SwaggerOK })
+  @ApiResponse({ status: 401, description: "Token Invalid/Unauthorized", type: SwaggerUnauthorizedException })
+  @ApiResponse({ status: 403, description: "This is not your report", type: SwaggerForbiddenException })
+  @ApiResponse({ status: 404, description: "Report not found", type: SwaggerNotFound })
+  @ApiBearerAuth()
+  async deleteReport(@Param("id", ParseIntPipe) id: number, @User() user: JwtUser) {
+    return await this.reportsService.delete(id, user)
   }
 }

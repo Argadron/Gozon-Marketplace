@@ -11,6 +11,20 @@ export class ReportsService {
                 private readonly productService: ProductsService
     ) {}
 
+    private async findByIdOrThrow(id: number, userId: number) {
+        const report = await this.prismaService.report.findUnique({ 
+            where: { 
+                id
+            }
+        })
+
+        if (!report) throw new NotFoundException("Report not found")
+
+        if (report.authorId !== userId) throw new ForbiddenException("This is not your report.")
+
+        return report
+    }
+
     async create(dto: CreateReportDto, user: JwtUser) {
         const product = await this.productService.getById(dto.productId)
 
@@ -25,16 +39,8 @@ export class ReportsService {
     }
 
     async edit(dto: Partial<EditReportDto>, user: JwtUser) {
-        const report = await this.prismaService.report.findUnique({ 
-            where: { 
-                id: dto.reportId
-            }
-        })
-
-        if (!report) throw new NotFoundException("Report not found")
-
-        if (report.authorId !== user.id) throw new ForbiddenException("This is not your report.")
-
+        await this.findByIdOrThrow(dto.reportId, user.id)
+        
         const { reportId, ...other } = dto
 
         return await this.prismaService.report.update({
@@ -42,6 +48,19 @@ export class ReportsService {
                 id: reportId
             },
             data: other
+        })
+    }
+
+    async delete(id: number, user: JwtUser) {
+        const report = await this.findByIdOrThrow(id, user.id)
+        const product = await this.productService.getById(report.productId)
+
+        await this.productService.updateInertnal(product.id, { reportsCount: product.reportsCount - 1 })
+
+        return await this.prismaService.report.delete({
+            where: {
+                id
+            }
         })
     }
 }
