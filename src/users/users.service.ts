@@ -6,6 +6,7 @@ import { Response } from 'express';
 import { UpdateUserStatusDto } from './dto/update-user-status.dto';
 import { AlertsService } from '../alerts/alerts.service';
 import { CreateUser } from './interfaces';
+import { RoleEnum } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -88,5 +89,16 @@ export class UsersService {
         })
 
         return `User ${dto.status ? "banned": "unbanned"}`
+    }
+
+    async setUserRole(role: RoleEnum, userId: number) {
+        return await this.prismaService.user.update({
+            where: {
+                id: userId
+            },
+            data: {
+                role
+            }
+        })
     }
 }
