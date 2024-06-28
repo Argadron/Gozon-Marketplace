@@ -5,10 +5,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { PrismaService } from '../prisma.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FileService } from  '../file.service'
-import { prisma } from '../prisma-client.forTest';
+import prismaTestClient from '../prisma-client.forTest'
 import 'dotenv/config'
 import { UsersService } from '../users/users.service';
 import { AlertsService } from '../alerts/alerts.service';
+
+const prisma = prismaTestClient()
 
 describe('AuthService', () => {
   let service: AuthService;

@@ -6,9 +6,11 @@ import { PrismaService } from '../src/prisma.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FileService } from  '../src/file.service'
 import * as request from 'supertest';
-import { prisma } from '../src/prisma-client.forTest';
 import { Request, Response } from 'express';
 import 'dotenv/config'
+import prismaTestClient from '../src/prisma-client.forTest'
+
+const prisma = prismaTestClient()
 
 describe("AuthController (E2E)", () => {
     let app: INestApplication;

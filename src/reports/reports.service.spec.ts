@@ -4,6 +4,9 @@ import { RoleEnum } from '@prisma/client';
 import { ProductsModule } from '../products/products.module';
 import { PrismaService } from '../prisma.service';
 import { AuthModule } from '../auth/auth.module';
+import prismaTestClient from '../prisma-client.forTest'
+
+const prisma = prismaTestClient()
 
 describe('ReportsService', () => {
   let service: ReportsService;
@@ -17,9 +20,16 @@ describe('ReportsService', () => {
     productId: 1
   }
   const testEditReport = {
-    name: "репортик",
-    reportId: 20
+    name: "репортик"
   }
+  let reportId: number; 
+
+  beforeAll(async () => {
+    const { id } = await prisma.report.create({ data: { ...testNewReport, authorId: 3 } })
+
+    reportId = id
+    testEditReport["reportId"] = id
+  })
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -39,6 +49,6 @@ describe('ReportsService', () => {
   })
 
   it("Проверка удаления жалобы на продукт", async () => {
-    expect((await service.delete(50, testJwtUser)).updatedAt).toBeDefined()
+    expect((await service.delete(reportId, testJwtUser)).updatedAt).toBeDefined()
   })
 });

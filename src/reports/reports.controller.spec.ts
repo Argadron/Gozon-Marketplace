@@ -8,6 +8,9 @@ import { RoleEnum } from '@prisma/client';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
+import prismaTestClient from '../prisma-client.forTest'
+
+const prisma = prismaTestClient()
 
 describe('ReportsController', () => {
   let controller: ReportsController;
@@ -21,9 +24,16 @@ describe('ReportsController', () => {
     productId: 1
   }
   const testEditReport = {
-    name: "репортик",
-    reportId: 20
+    name: "репортик"
   }
+  let reportId: number;
+
+  beforeAll(async () => {
+    const { id } = await prisma.report.create({ data: { ...testNewReport, authorId: 3 }  })
+
+    reportId = id
+    testEditReport["reportId"] = id
+  })
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -54,6 +64,6 @@ describe('ReportsController', () => {
   })
 
   it("Проверка запроса на удаление жалобы на продукт", async () => {
-    expect((await controller.deleteReport(5, testJwtUser)).updatedAt).toBeDefined()
+    expect((await controller.deleteReport(reportId, testJwtUser)).updatedAt).toBeDefined()
   })
 });

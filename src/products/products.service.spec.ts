@@ -5,9 +5,11 @@ import { AuthModule } from '../auth/auth.module';
 import { RoleEnum } from '@prisma/client';
 import { FileService } from '../file.service';
 import { ConfigService } from '@nestjs/config';
-import { prisma } from '../prisma-client.forTest';
+import prismaTestClient from '../prisma-client.forTest'
 import { response } from 'express';
 import { StringToArrayPipe } from '../common/pipes/string-to-array-pipe';
+
+const prisma = prismaTestClient()
 
 describe('ProductsService', () => {
   let service: ProductsService;
@@ -39,7 +41,13 @@ describe('ProductsService', () => {
     id: 1,
     count: 8
   }
-  let id: number;
+  let productId: number;
+  
+  beforeAll(async () => {
+    const { id } = await prisma.product.create({ data: { ...testNewProduct, sellerId: 64, productPhoto: "default.png" } })
+
+    productId = id
+  })
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -75,15 +83,20 @@ describe('ProductsService', () => {
   })
   
   it("Проверка удаления продукта", async () => {
-    expect((await service.delete(50, testSeller))).toBeDefined()
+    expect((await service.delete(productId, testSeller))).toBeDefined()
   })
 
   afterAll(async () => {
-
-
     await prisma.product.deleteMany({
       where: {
-        name: "продукт"
+        OR: [
+          {
+            name: "продукт"
+          },
+          {
+            id: productId
+          }
+        ]
       }
     })
   })

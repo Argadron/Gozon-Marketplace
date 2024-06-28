@@ -9,6 +9,10 @@ import { RoleEnum } from '@prisma/client';
 import { Request } from 'express';
 import * as request from 'supertest'
 import { ProductsModule } from '../src/products/products.module';
+import prismaTestClient from '../src/prisma-client.forTest'
+import { ReviewsController } from '../src/reviews/reviews.controller';
+
+const prisma = prismaTestClient()
 
 describe("ReviewsController (E2E)", () => {
     let app: INestApplication;
@@ -23,12 +27,20 @@ describe("ReviewsController (E2E)", () => {
         name: "отзыв",
         description: "отзыв",
         rate: 1,
-        reviewId: 17
       }
+      let reviewId: number; 
+
+      beforeAll(async () => {
+        const { id } = await prisma.review.create({ data: { ...testReview, authorId: 3 } })
+
+        reviewId = id
+        testEditReview["reviewId"] = id
+      })
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [AuthModule, ReviewsModule, ProductsModule],
+            controllers: [ReviewsController],
             providers: [ReviewsService, PrismaService]
         }).overrideGuard(JwtGuard).useValue({
             canActivate: (ctx: ExecutionContext) => {
@@ -65,7 +77,7 @@ describe("ReviewsController (E2E)", () => {
 
     it("Проверка запроса на удаление отзыва", async () => {
         return request(app.getHttpServer())
-        .delete("/api/reviews/100")
-        .expect(404)
+        .delete(`/api/reviews/delete/${reviewId}`)
+        .expect(200)
     })
 })

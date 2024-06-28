@@ -2,13 +2,15 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { SellerRequirementsService } from './seller-requirements.service';
 import { AuthModule } from '../auth/auth.module';
 import { PrismaService } from '../prisma.service';
-import { prisma } from '../prisma-client.forTest';
 import { RoleEnum } from '@prisma/client';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
 import { AdminGuard } from '../auth/guards/admin.guard';
 import { UsersModule } from '../users/users.module';
+import prismaTestClient from '../prisma-client.forTest'
+
+const prisma = prismaTestClient()
 
 describe('SellerRequirementsService', () => {
   let service: SellerRequirementsService;
@@ -20,8 +22,8 @@ describe('SellerRequirementsService', () => {
     email: "test@mail.ru"
   }
   const testJwtUser = {
-    id: 32,
-    role: RoleEnum.USER
+    id: 3,
+    role: RoleEnum.ADMIN
   }
   const testQuery = {
     page: 1,
@@ -32,6 +34,16 @@ describe('SellerRequirementsService', () => {
     accepted: false,
     description: "закрыто"
   }
+  const duplicateTestCloseRequirement = {
+    fio: "тест тест тест",
+    description: "тесттесттест",
+    phone: "+78005003535",
+    isCompany: true,
+    email: "test@mail.ru"
+  }
+  beforeAll(async () => {
+    await prisma.sellerRequirement.create({ data: { ...duplicateTestCloseRequirement, userId: 32} })
+  })
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -71,5 +83,9 @@ describe('SellerRequirementsService', () => {
 
   it("Проверка на закрытие запроса на роль селлера", async () => {
     expect((await service.close(testCloseRequirement)).createdAt).toBeDefined()
+  })
+
+  afterAll(async () => {
+    await prisma.sellerRequirement.deleteMany({ where: { userId: 3 } })
   })
 });

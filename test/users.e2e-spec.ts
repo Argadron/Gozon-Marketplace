@@ -13,6 +13,7 @@ import { FileService } from '../src/file.service';
 import { UsersService } from '../src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtGuard } from '../src/auth/guards/jwt.guard'
+import { UsersController } from '../src/users/users.controller';
 
 describe("UsersController (E2E)", () => {
     let app: INestApplication;
@@ -29,6 +30,7 @@ describe("UsersController (E2E)", () => {
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
+            controllers: [UsersController],
             providers: [PrismaService, AlertsService, AuthService, ConfigService, FileService, UsersService, JwtService]
         }).overrideGuard(AdminGuard).useValue({
             canActivate: (ctx: ExecutionContext) => {
@@ -64,19 +66,19 @@ describe("UsersController (E2E)", () => {
     it("Проверка получения профиля пользователя", async () => {
         return request(app.getHttpServer())
         .get("/api/users/getProfile")
-        .expect(404)
+        .expect(200)
     })
 
     it("Проверка получения фото профиля пользователя", async () => {
         return request(app.getHttpServer())
         .get("/api/users/getProfilePhoto")
-        .expect(404)
+        .expect(200)
     })
 
     it("Проверка бана/разбана пользователя", async () => {
         return request(app.getHttpServer())
         .put("/api/users/userBanStatus")
         .send(testBanStatus)
-        .expect(404)
+        .expect(200)
     })
 })

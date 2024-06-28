@@ -9,7 +9,9 @@ import { ConfigService } from '@nestjs/config';
 import { JwtGuard } from '../src/auth/guards/jwt.guard';
 import { Request } from 'express';
 import { SellerGuard } from '../src/auth/guards/seller.guard';
-import { prisma } from '../src/prisma-client.forTest';
+import prismaTestClient from '../src/prisma-client.forTest'
+
+const prisma = prismaTestClient()
 
 describe("ProductsController (E2E)", () => {
     let app: INestApplication;
@@ -24,6 +26,14 @@ describe("ProductsController (E2E)", () => {
         id: 1,
         count: 8
       }
+
+      let productId: number; 
+
+      beforeAll(async () => {
+        const { id } = await prisma.product.create({ data: { ...testNewProduct, productPhoto: "default.png", sellerId: 64 } })
+
+        productId = id
+      })
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -98,8 +108,8 @@ describe("ProductsController (E2E)", () => {
 
     it("Проверка удаления продукта", async () => {
         return request(app.getHttpServer())
-        .delete("/api/products/delete/50")
-        .expect(404)
+        .delete(`/api/products/delete/${productId}`)
+        .expect(200)
     })
 
     afterAll(async () => {

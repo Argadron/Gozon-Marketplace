@@ -6,9 +6,11 @@ import { AuthModule } from '../auth/auth.module';
 import { RoleEnum } from '@prisma/client';
 import { FileService } from '../file.service';
 import { ConfigService } from '@nestjs/config';
-import { prisma } from '../prisma-client.forTest';
+import prismaTestClient from '../prisma-client.forTest'
 import { response } from 'express';
 import { StringToArrayPipe } from '../common/pipes/string-to-array-pipe';
+
+const prisma = prismaTestClient()
 
 describe('ProductsController', () => {
   let controller: ProductsController;
@@ -17,7 +19,7 @@ describe('ProductsController', () => {
     productOnPage: 50
   }
   const testNewProduct = {
-    name: "продукт",
+    name: "продукт!",
     description: "продукт",
     tags: ["продукт"],
     price: 2.25,
@@ -40,6 +42,12 @@ describe('ProductsController', () => {
     id: 64,
     role: RoleEnum.SELLER
   }
+  let productId: number;
+  
+  beforeAll(async () => {
+    const { id } = await prisma.product.create({ data: { ...testNewProduct, sellerId: 64, productPhoto: "default.png" } })
+    productId = id
+  })
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -76,13 +84,20 @@ describe('ProductsController', () => {
   })
 
   it("Проверка удаления продута по ID", async () => {
-    expect((await controller.deleteProduct(56, testSeller))).toBeDefined()
+    expect((await controller.deleteProduct(productId, testSeller))).toBeDefined()
   })
 
   afterAll(async () => {
     await prisma.product.deleteMany({
       where: {
-        name: "продукт"
+        OR: [
+          {
+            name: "продукт!"
+          },
+          {
+            id: productId
+          }
+        ]
       }
     })
   })

@@ -6,10 +6,12 @@ import { PrismaService } from '../prisma.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FileService } from  '../file.service'
 import { JwtModule } from '@nestjs/jwt';
-import { prisma } from '../prisma-client.forTest';
+import prismaTestClient from '../prisma-client.forTest'
 import 'dotenv/config'
 import { AlertsService } from '../alerts/alerts.service';
 import { UsersService } from '../users/users.service';
+
+const prisma = prismaTestClient()
 
 describe('AuthController', () => {
   let controller: AuthController;

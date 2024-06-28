@@ -4,7 +4,6 @@ import { AuthModule } from '../src/auth/auth.module';
 import { PrismaService } from '../src/prisma.service';
 import { RoleEnum } from '@prisma/client';
 import * as request from 'supertest';
-import { prisma } from '../src/prisma-client.forTest'
 import { JwtGuard } from '../src/auth/guards/jwt.guard';
 import { Request } from 'express';
 import { SellerRequirementsModule } from '../src/seller-requirements/seller-requirements.module';

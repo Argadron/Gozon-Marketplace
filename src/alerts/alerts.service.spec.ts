@@ -1,11 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AlertsService } from './alerts.service';
-import { prisma } from '../prisma-client.forTest';
+import prismaTestClient from '../prisma-client.forTest'
 import { AuthModule } from '../auth/auth.module';
 import { AlertsModule } from './alerts.module';
 import { PrismaService } from '../prisma.service';
 import { RoleEnum } from '@prisma/client';
 import { forwardRef } from '@nestjs/common';
+
+const prisma = prismaTestClient()
 
 describe('AlertsService', () => {
   let service: AlertsService;
@@ -17,6 +19,13 @@ describe('AlertsService', () => {
     id: 3,
     role: RoleEnum.ADMIN
   }
+  let alertId: number;
+
+  beforeAll(async () => {
+    const { id } = await prisma.alert.create({ data: { userId: 3, description: "тебе уведомление!" } })
+
+    alertId = id
+  })
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -32,7 +41,7 @@ describe('AlertsService', () => {
   });
 
   it("Проверка удаления уведомления", async () => {
-    expect((await service.deleteOne(5, testJwtUser))).toBeDefined()
+    expect((await service.deleteOne(alertId, testJwtUser))).toBeDefined()
   })
 
   it("Проверка удаления ВСЕХ уведомлений", async () => {

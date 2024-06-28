@@ -8,6 +8,9 @@ import { ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
 import { RoleEnum } from '@prisma/client';
 import { ProductsModule } from '../products/products.module';
+import prismaTestClient from '../prisma-client.forTest'
+
+const prisma = prismaTestClient()
 
 describe('ReviewsController', () => {
   let controller: ReviewsController;
@@ -28,6 +31,13 @@ describe('ReviewsController', () => {
     id: 3,
     role: RoleEnum.ADMIN
   }
+  let reviewId: number; 
+
+  beforeAll(async () => {
+    const { id } = await prisma.review.create({ data: { ...testReview, authorId: 3 } })
+
+    reviewId = id
+  })
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -59,6 +69,6 @@ describe('ReviewsController', () => {
   })
 
   it("Проверка удаления отзыва у товара", async () => {
-    expect((await controller.deleteReview(100, testJwtUser)).createdAt).toBeDefined()
+    expect((await controller.deleteReview(reviewId, testJwtUser)).createdAt).toBeDefined()
   })
 });

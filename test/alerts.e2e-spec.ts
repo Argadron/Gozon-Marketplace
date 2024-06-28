@@ -7,13 +7,23 @@ import { RoleEnum } from '@prisma/client';
 import { Request } from 'express'
 import { AdminGuard } from '../src/auth/guards/admin.guard';
 import * as request from 'supertest'
+import prismaTestClient from '../src/prisma-client.forTest'
+
+const prisma = prismaTestClient()
 
 describe("AlertsController (E2E)", () => {
     let app: INestApplication;
     const testAlert = {
-        username: "ArgadronSeller!",
+        username: "Argadron",
         description: "тебе уведомление!"
       }
+      let alertId: number;
+
+      beforeAll(async () => {
+        const { id } = await prisma.alert.create({ data: { description: "тебе уведомление", userId: 3 } })
+
+        alertId = id
+      })
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -57,8 +67,8 @@ describe("AlertsController (E2E)", () => {
 
     it("Проверка запроса на удаление уведомления", async () => {
       return request(app.getHttpServer())
-      .delete("/api/alerts/delete/5")
-      .expect(404)
+      .delete(`/api/alerts/delete/${alertId}`)
+      .expect(200)
     })
 
     it("Проверка запроса на удаление ВСЕХ уведомлений", async () => {

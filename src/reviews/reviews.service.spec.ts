@@ -4,6 +4,9 @@ import { AuthModule } from '../auth/auth.module';
 import { PrismaService } from '../prisma.service';
 import { RoleEnum } from '@prisma/client';
 import { ProductsModule } from '../products/products.module';
+import prismaTestClient from '../prisma-client.forTest'
+
+const prisma = prismaTestClient()
 
 describe('ReviewsService', () => {
   let service: ReviewsService;
@@ -25,6 +28,14 @@ describe('ReviewsService', () => {
     role: RoleEnum.ADMIN
   }
 
+  let reviewId: number; 
+
+  beforeAll(async () => {
+    const { id } = await prisma.review.create({ data: { ...testReview, authorId: 3 } })
+
+    reviewId = id
+  })
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [AuthModule, ProductsModule],
@@ -43,6 +54,6 @@ describe('ReviewsService', () => {
   ])
 
   it("Проверка удаления отзыва у товара", async () => {
-    expect((await service.delete(100, testJwtUser)).createdAt).toBeDefined()
+    expect((await service.delete(reviewId, testJwtUser)).createdAt).toBeDefined()
   })
 });
