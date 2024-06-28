@@ -14,6 +14,8 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { StringToArrayPipe } from '../common/pipes/string-to-array-pipe';
+import { OptionalValidatorPipe } from '../common/pipes/optional-validator.pipe';
+import { EmptyStringDeletorPipe } from '../common/pipes/empty-string-deletor.pipe';
 
 @Controller('products')
 export class ProductsController {
@@ -64,7 +66,7 @@ export class ProductsController {
   @ApiResponse({ status: 403, description: "Your role not allowed to this action", type: SwaggerForbiddenException })
   @ApiBearerAuth()
   @UseGuards(JwtGuard, SellerGuard)
-  @UsePipes(ObjectStringToIntPipe,new StringToArrayPipe().Include(["tags", "categories"]), new ValidationPipe())
+  @UsePipes(ObjectStringToIntPipe,new StringToArrayPipe().Include(["tags", "productCategories"]), new ValidationPipe())
   @UseInterceptors(FileInterceptor("file"))
   async createProduct(@Body() dto: CreateProductDto, @User() user: JwtUser, @UploadedFile() file: Express.Multer.File=undefined) {
     return await this.productsService.create(dto, user, file)
@@ -78,8 +80,9 @@ export class ProductsController {
   @ApiResponse({ status: 403, description: "Your role not have access to this action", type: SwaggerForbiddenException })
   @ApiBearerAuth()
   @UseGuards(JwtGuard, SellerGuard)
-  @UsePipes(ObjectStringToIntPipe, new StringToArrayPipe().Include(["tags", "categories"]),new ValidationPipe())
-  async editProduct(@Body() dto: UpdateProductDto, @User() user: JwtUser, @UploadedFile() file: Express.Multer.File=undefined) {
+  @UsePipes(ObjectStringToIntPipe, new StringToArrayPipe().Include(["tags", "productCategories"]), new EmptyStringDeletorPipe(),
+  new OptionalValidatorPipe().check(["name", "description", "price", "count", "tags", "productCategories"]),new ValidationPipe())
+  async editProduct(@Body() dto: Partial<UpdateProductDto>, @User() user: JwtUser, @UploadedFile() file: Express.Multer.File=undefined) {
     return await this.productsService.update(dto, user, file)
   }
 

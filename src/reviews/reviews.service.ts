@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { JwtUser } from '../auth/interfaces';
@@ -40,9 +40,11 @@ export class ReviewsService {
         })
     }
 
-    async edit(dto: EditReviewDto, user: JwtUser) {
+    async edit(dto: Partial<EditReviewDto>, user: JwtUser) {
         const product = await this.productService.getById(dto.productId)
         const review = await this.getReviewOrThrow(dto.reviewId)
+
+        if (dto.rate <= 0 || dto.rate > 5) throw new BadRequestException("Rate must be great of 0 and less of 5")
 
         if (review.authorId !== user.id) throw new ForbiddenException("This is not your review")
 

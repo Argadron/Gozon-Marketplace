@@ -36,7 +36,7 @@ export class ReviewsController {
   @ApiResponse({ status: 404, description: "Review not found", type: SwaggerNotFound })
   @ApiBearerAuth()
   @UsePipes(new EmptyStringDeletorPipe(),new OptionalValidatorPipe().check(["name", "description", "rate"]), new ValidationPipe())
-  async editReview(@Body() dto: EditReviewDto, @User() user: JwtUser) {
+  async editReview(@Body() dto: Partial<EditReviewDto>, @User() user: JwtUser) {
     return await this.reviewsService.edit(dto, user)
   }
 

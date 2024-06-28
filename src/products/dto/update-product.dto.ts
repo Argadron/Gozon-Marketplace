@@ -29,6 +29,10 @@ export class UpdateProductDto {
     @IsOptional()
     readonly tags?: string[];
 
+    @IsArray()
+    @IsOptional()
+    readonly productCategories?: string[];
+
     @IsOptional()
     productPhoto?: string;
 }

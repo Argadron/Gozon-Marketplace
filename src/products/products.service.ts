@@ -49,28 +49,10 @@ export class ProductsService {
         return productPhoto ? productPhoto : undefined
     }
 
-    private updateRequestFilter(dto: UpdateProductDto, productPhoto: string=undefined) {
-        const result: Prisma.ProductUpdateInput = {}
-
-        const { count, price, name, description, tags } = dto
-
-        if (!count && !price && !name && !description && !tags?.length) throw new BadRequestException("1 of 5 plants must be writed")
-
-        count ? result.count = count: null 
-        price ? result.price = price : null 
-        name ? result.name = name : null 
-        description ? result.description = description : null 
-        tags?.length ? result.tags = tags : null 
-        productPhoto ? result.productPhoto = productPhoto : null
-
-        return result
-    }
-
     /**
      * This method validate product: his is exsists and seller id equal user id and returns product
      * @param id - Product id
      * @param user - User 
-     * @param isInternal - Is product updated from inernal code
      * @returns product
      */
     private async validateProduct(id: number, user: JwtUser) {
@@ -151,20 +133,21 @@ export class ProductsService {
         })
     }
 
-    async update(dto: UpdateProductDto, user: JwtUser, file: Express.Multer.File=undefined) {
-        await this.validateProduct(dto.id, user)
+    async update(dto: Partial<UpdateProductDto>, user: JwtUser, file: Express.Multer.File=undefined) {
+        const product = await this.validateProduct(dto.id, user)
 
         const productPhoto = this.photoDownloader(file)
 
         delete dto.productPhoto
 
-        const data = this.updateRequestFilter(dto, productPhoto)
-
         return await this.prismaService.product.update({  
             where: {
                 id: dto.id
             },
-            data
+            data: {
+                productPhoto: productPhoto ? productPhoto : product.productPhoto,
+                ...dto
+            }
         })
     }
 
