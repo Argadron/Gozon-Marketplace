@@ -52,4 +52,8 @@ describe('ReportsController', () => {
   it("Проверка запроса на изменение жалобы на продукт", async () => {
     expect((await controller.editReport(testEditReport, testJwtUser)).updatedAt).toBeDefined()
   })
+
+  it("Проверка запроса на удаление жалобы на продукт", async () => {
+    expect((await controller.deleteReport(5, testJwtUser)).updatedAt).toBeDefined()
+  })
 });

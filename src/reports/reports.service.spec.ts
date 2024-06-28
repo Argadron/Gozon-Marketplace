@@ -37,4 +37,8 @@ describe('ReportsService', () => {
   it("Проверка изменения жалобы на продукт", async () => {
     expect((await service.edit(testEditReport, testJwtUser)).updatedAt).toBeDefined()
   })
+
+  it("Проверка удаления жалобы на продукт", async () => {
+    expect((await service.delete(50, testJwtUser)).updatedAt).toBeDefined()
+  })
 });

@@ -9,6 +9,7 @@ import { PrismaService } from '../prisma.service';
 import { ProductsModule } from '../products/products.module';
 import { ProductsService } from '../products/products.service';
 import { FileService } from '../file.service';
+import { ConfigService } from '@nestjs/config';
 
 describe('BasketController', () => {
   let controller: BasketController;
@@ -24,7 +25,7 @@ describe('BasketController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [BasketController, ProductsModule],
-      providers: [BasketService, PrismaService, ProductsService, FileService],
+      providers: [BasketService, PrismaService, ProductsService, FileService, ConfigService],
     }).overrideGuard(JwtGuard).useValue({
       canActivate: (ctx: ExecutionContext) => {
         const request: Request = ctx.switchToHttp().getRequest()

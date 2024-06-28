@@ -55,10 +55,16 @@ describe("ReportsController (E2E)", () => {
         .expect(201)
     })
 
-    it("Проверка запрсоа на изменение жалобы на продукт", async () => {
+    it("Проверка запроса на изменение жалобы на продукт", async () => {
         return request(app.getHttpServer())
         .put("/api/reports/edit")
         .send(testEditReport)
         .expect(200)
+    })
+
+    it("Проверка запроса на удаление жалобы на продукт", async () => {
+        return request(app.getHttpServer())
+        .delete("/api/reports/delete/50")
+        .expect(404)
     })
 })
