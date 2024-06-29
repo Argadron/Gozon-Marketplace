@@ -1,9 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CategoriesService } from './categories.service';
 import { PrismaService } from '../prisma.service';
+import prismaTestClient from '../prisma-client.forTest'
+
+const prisma = prismaTestClient()
 
 describe('CategoriesService', () => {
   let service: CategoriesService;
+  const testNewCategory = {
+    name: "категория"
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -16,4 +22,16 @@ describe('CategoriesService', () => {
   it('Проверка получения всех категорий продуктов', async () => {
     expect((await service.getAll()).length).toBeDefined();
   });
+
+  it("Проверка создания новой категории продукта", async () => {
+    expect((await service.create(testNewCategory)).createdAt).toBeDefined()
+  })
+
+  afterAll(async () => {
+    await prisma.category.delete({
+      where: {
+        name: "категория"
+      }
+    })
+  })
 });

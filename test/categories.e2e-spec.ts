@@ -1,17 +1,49 @@
-import { INestApplication } from '@nestjs/common'
+import { ExecutionContext, INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { CategoriesModule } from '../src/categories/categories.module';
 import { PrismaService } from '../src/prisma.service';
 import * as request from 'supertest'
+import { AdminGuard } from '../src/auth/guards/admin.guard';
+import { JwtGuard } from '../src/auth/guards/jwt.guard';
+import { Request } from 'express';
+import { RoleEnum } from '@prisma/client';
+import prismaTestClient from '../src/prisma-client.forTest'
+
+const prisma = prismaTestClient()
 
 describe("CategoriesController (E2E)", () => {
     let app: INestApplication;
+    const testNewCategory = {
+        name: "категория"
+    }
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [CategoriesModule],
             providers: [PrismaService]
-        }).compile()
+        }).overrideGuard(JwtGuard).useValue({
+            canActivate: (ctx: ExecutionContext) => {
+              const request: Request = ctx.switchToHttp().getRequest()
+      
+              request.user = {
+                id: 3,
+                role: RoleEnum.ADMIN
+              }
+      
+              return true
+            }
+          }).overrideGuard(AdminGuard).useValue({
+            canActivate: (ctx: ExecutionContext) => {
+              const request: Request = ctx.switchToHttp().getRequest()
+      
+              request.user = {
+                id: 3,
+                role: RoleEnum.ADMIN
+              }
+      
+              return true
+            }
+          }).compile()
 
         app = moduleFixture.createNestApplication()
         app.setGlobalPrefix("/api")
@@ -23,5 +55,20 @@ describe("CategoriesController (E2E)", () => {
         return request(app.getHttpServer())
         .get("/api/categories/all")
         .expect(200)
+    })
+
+    it("Проверка запроса на создание новой категории продуктов", async () => {
+        return request(app.getHttpServer())
+        .post("/api/categories/new")
+        .send(testNewCategory)
+        .expect(201)
+    })
+
+    afterAll(async () => {
+        await prisma.category.delete({
+            where: {
+                name: "категория"
+            }
+        })
     })
 })
