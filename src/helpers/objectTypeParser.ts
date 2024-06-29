@@ -5,7 +5,7 @@ export function ObjectTypeParser(key: string, value: string) {
 
     if (key === "tags") return value.replace(/[\[\'\]"/']/g, "").split(",")
 
-    if (key === "categories") return value.replace(/\[\[\'\]\"]/g, "").split(",")
+    if (key === "categories") return value.replace(/[\[\'\]"/']/g, "").split(",")
  
     if (key === "sortUp") {
         return value === "true" ? true : false

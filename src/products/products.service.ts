@@ -8,11 +8,13 @@ import { Filters, UpdateData } from './interfaces';
 import { Prisma } from '@prisma/client';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Response } from 'express';
+import { CategoriesService } from '../categories/categories.service';
 
 @Injectable()
 export class ProductsService {
     constructor(private readonly prismaService: PrismaService,
-                private readonly fileService: FileService
+                private readonly fileService: FileService,
+                private readonly categoriesService: CategoriesService
     ) {}
 
     private filterCreator(filters: Filters) {
@@ -25,13 +27,7 @@ export class ProductsService {
         if (filters.tags?.length > 0) result.push({ tags: { hasSome: filters.tags } })
 
         if (filters.categories?.length > 0) result.push({ categories: {
-            some: {
-                categories: {
-                    name: {
-                        in: filters.categories
-                    }
-                }
-            }
+            hasEvery: filters.categories
         } })
 
         return result
@@ -120,6 +116,14 @@ export class ProductsService {
     }
 
     async create(dto: CreateProductDto, user: JwtUser, file: Express.Multer.File=undefined) {
+        if (dto.categories?.length > 0) {
+            const categories = await this.categoriesService.getAll()
+
+            for (let i in dto.categories) {
+                if (!categories.find(elem => elem.name === dto.categories[i])) throw new BadRequestException("Product category(es) not valid")
+            }
+        }
+
         const productPhoto = this.photoDownloader(file)
 
         delete dto.productPhoto
@@ -128,7 +132,7 @@ export class ProductsService {
             data: {
                 ...dto, 
                 productPhoto: productPhoto ? productPhoto : "default.png",
-                sellerId: user.id
+                sellerId: user.id,
             }
         })
     }

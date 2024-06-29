@@ -8,9 +8,10 @@ import { FileService } from '../file.service';
 import { ConfigService } from '@nestjs/config';
 import { StringFiltersToObject } from '../common/pipes/string-filters-to-object.pipe';
 import { StringToArrayPipe } from '../common/pipes/string-to-array-pipe';
+import { CategoriesModule } from '../categories/categories.module';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, CategoriesModule],
   controllers: [ProductsController],
   providers: [ProductsService, PrismaService, ObjectStringToIntPipe, FileService, ConfigService, StringFiltersToObject, StringToArrayPipe],
   exports: [ObjectStringToIntPipe, StringFiltersToObject, ProductsService]

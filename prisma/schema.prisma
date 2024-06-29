@@ -46,13 +46,13 @@ model Product {
   reportsCount Int @default(0)
   count Int @default(1)
   tags String[] @default(["none"])
+  categories String[] @default([])
   productPhoto String @map("product_photo")
   isSold Boolean @default(false) @map("is_sold")
   sellerId Int @map("seller_id")
   users User[]
   reviews Review[]
   userProducts UserProducts[] 
-  categories ProductCategories[]
   reports Report[]
   createdAt DateTime @default(now()) @map("created_at") 
   updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
@@ -128,24 +128,10 @@ model Tokens {
 model Category {
   id Int @id @default(autoincrement())
   name String @unique
-  products ProductCategories[]
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
 
   @@map("category")
-}
-
-model ProductCategories {
-  id Int @default(autoincrement())
-  productId Int @map("product_id")
-  products Product @relation(fields: [productId], references: [id])
-  categoryId Int @map("category_id")
-  categories Category @relation(fields: [categoryId], references: [id])
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
-
-  @@id([categoryId, productId])
-  @@map("product_categories")
 }
 
 model Report {

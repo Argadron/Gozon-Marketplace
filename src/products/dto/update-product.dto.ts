@@ -31,7 +31,7 @@ export class UpdateProductDto {
 
     @IsArray()
     @IsOptional()
-    readonly productCategories?: string[];
+    readonly categories?: string[];
 
     @IsOptional()
     productPhoto?: string;
