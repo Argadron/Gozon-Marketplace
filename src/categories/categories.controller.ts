@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { SwaggerBadRequest, SwaggerConflictMessage, SwaggerCreated, SwaggerForbiddenException, SwaggerOK, SwaggerUnauthorizedException } from '../swagger/apiResponse.interfaces';
+import { SwaggerBadRequest, SwaggerConflictMessage, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '../swagger/apiResponse.interfaces';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -29,5 +29,17 @@ export class CategoriesController {
   @UsePipes(new ValidationPipe())
   async create(@Body() dto: CreateCategoryDto) {
     return await this.categoriesService.create(dto)
+  }
+
+  @Delete("/delete/:id")
+  @ApiOperation({ summary: "Delete category" })
+  @ApiResponse({ status: 200, description: "Category deleted", type: SwaggerOK })
+  @ApiResponse({ status: 401, description: "Token Invalid/Unauthorized", type: SwaggerUnauthorizedException })
+  @ApiResponse({ status: 403, description: "Your role not have access to this action", type: SwaggerForbiddenException })
+  @ApiResponse({ status: 404, description: "Category not found", type: SwaggerNotFound })
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard, AdminGuard)
+  async delete(@Param("id", ParseIntPipe) id: number) {
+    return await this.categoriesService.delete(id)
   }
 }
