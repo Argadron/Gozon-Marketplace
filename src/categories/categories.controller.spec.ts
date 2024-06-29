@@ -16,6 +16,13 @@ describe('CategoriesController', () => {
   const testNewCategory = {
     name: "категория1"
   }
+  let categoryId: number;
+
+  beforeAll(async () => {
+    const { id } = await prisma.category.create({ data: { name: "ультракатегория" } })
+
+    categoryId = id
+  })
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -54,6 +61,10 @@ describe('CategoriesController', () => {
 
   it("Проверка запроса на создание новой категории продуктов", async () => {
     expect((await controller.create(testNewCategory)).createdAt).toBeDefined()
+  })
+
+  it("Проверка запроса на удаление категории продукта", async () => {
+    expect((await controller.delete(categoryId)).name).toBeDefined()
   })
 
   afterAll(async () => {

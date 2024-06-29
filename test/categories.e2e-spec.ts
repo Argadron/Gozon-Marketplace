@@ -16,6 +16,13 @@ describe("CategoriesController (E2E)", () => {
     const testNewCategory = {
         name: "категория"
     }
+    let categoryId: number;
+
+  beforeAll(async () => {
+    const { id } = await prisma.category.create({ data: { name: "ультракатегория" } })
+
+    categoryId = id
+  })
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -62,6 +69,12 @@ describe("CategoriesController (E2E)", () => {
         .post("/api/categories/new")
         .send(testNewCategory)
         .expect(201)
+    })
+
+    it("Проверка запроса на удаление категории продукта", async () => {
+      return request(app.getHttpServer())
+      .delete(`/api/categories/delete/${categoryId}`)
+      .expect(200)
     })
 
     afterAll(async () => {
