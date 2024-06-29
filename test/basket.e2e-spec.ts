@@ -9,6 +9,8 @@ import { AuthModule } from '../src/auth/auth.module';
 import { JwtGuard } from '../src/auth/guards/jwt.guard';
 import { Request } from 'express';
 import { ProductsModule } from '../src/products/products.module';
+import { CategoriesModule } from '../src/categories/categories.module';
+import { CategoriesService } from '../src/categories/categories.service';
 
 describe("BasketController (E2E)", () => {
     let app: INestApplication;
@@ -19,8 +21,8 @@ describe("BasketController (E2E)", () => {
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [BasketModule, AuthModule, ProductsModule],
-            providers: [BasketService, PrismaService]
+            imports: [BasketModule, AuthModule, ProductsModule, CategoriesModule],
+            providers: [BasketService, PrismaService, CategoriesService]
         }).overrideGuard(JwtGuard).useValue({
             canActivate: (ctx: ExecutionContext) => {
                 const request: Request = ctx.switchToHttp().getRequest()

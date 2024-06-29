@@ -10,6 +10,7 @@ import { JwtGuard } from '../src/auth/guards/jwt.guard';
 import { Request } from 'express';
 import { SellerGuard } from '../src/auth/guards/seller.guard';
 import prismaTestClient from '../src/prisma-client.forTest'
+import { CategoriesService } from '../src/categories/categories.service';
 
 const prisma = prismaTestClient()
 
@@ -38,7 +39,7 @@ describe("ProductsController (E2E)", () => {
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [ProductsModule],
-            providers: [PrismaService, FileService, ConfigService]
+            providers: [PrismaService, FileService, ConfigService, CategoriesService]
         }).overrideGuard(JwtGuard).useValue({
             canActivate: (ctx: ExecutionContext) => {
                 const request: Request = ctx.switchToHttp().getRequest()

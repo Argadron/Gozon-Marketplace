@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import prismaTestClient from '../prisma-client.forTest'
 import { response } from 'express';
 import { StringToArrayPipe } from '../common/pipes/string-to-array-pipe';
+import { CategoriesService } from '../categories/categories.service';
 
 const prisma = prismaTestClient()
 
@@ -52,7 +53,7 @@ describe('ProductsService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [AuthModule],
-      providers: [ProductsService, PrismaService, FileService, ConfigService, StringToArrayPipe],
+      providers: [ProductsService, PrismaService, FileService, ConfigService, StringToArrayPipe, CategoriesService],
     }).compile();
 
     service = module.get<ProductsService>(ProductsService);
