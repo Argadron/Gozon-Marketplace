@@ -15,7 +15,8 @@
     Impedit aliquid consequuntur sunt provident quidem praesentium optio! Iusto illum quo voluptatum ex, qui, veritatis, vitae autem corporis nihil fugiat odio doloremque accusamus consequuntur dolor itaque odit maiores nam! Officiis?
     Obcaecati vero accusantium iure esse. Similique excepturi consequuntur dolores ipsam illo? Corporis, enim impedit deserunt nisi perspiciatis neque nihil vitae saepe at ullam harum minus qui veniam voluptatum dicta expedita?
     </p>
-    <q-btn :label="'В корзину  '+formattedPrice()"></q-btn>
+    <q-btn @click="toBasket()" :label="'В корзину  '+formattedPrice()"></q-btn>
+    <q-input v-model="count" v-if="inBasket" label="Введите количество"></q-input>
 </template>
 
 
@@ -46,13 +47,20 @@ import {ref} from "vue"
 export default{
     data(){
         return{
-            product:ref(Object)
+            product:ref(Object),
+            count,
         }
     },
     async created(){
-       this.product = await requester.requester("GETnoToken","products/"+this.$route.query.id)
+       this.product = await requester("GET","products/"+this.$route.query.id)
     },
     methods:{
+        async toBasket(){
+            await requester("POST","basket/addProduct",{
+                productCount:this.count,
+                productId:this.product.id
+            })
+        },
         formattedPrice() {
                 let res = 0;
                 let reversedPrice = this.product.price.toString().split("").reverse().join("")//Еблан почему-то не принимает если я передаю цену из html аргументом в функцию

@@ -1,23 +1,28 @@
 <template>
     <div style="width: 240px;" class="product-container" >
         <div style="text-align: center;" class="cursor-pointer toProduct" @click="toProduct">
-            <img style="width: 15vw;" src="../assets/largelogo.png">
-            <p style="color: var(--q-accent); font-size: larger; text-align: center;" class="text-truncate">{{ formattedName() }}</p>
-            <p class="text-truncate">{{formattedDescription() }}</p>
+            <img style="width: 15vw;" src="src/assets/largelogo.png">
+            <p style="color: var(--q-accent); font-size: larger; text-align: center;" class="text-truncate">{{ formattedName }}</p>
+            <p class="text-truncate">{{formattedDescription }}</p>
         </div>
-        <div style="text-align: center; align-self: flex-end;">
+        <div v-if="!inBasket" style="text-align: center; align-self: flex-end;">
             <p style="margin-bottom:5px;"><strong>Цена: {{ formattedPrice(product.price) }}</strong></p>
-            <q-btn label="В корзину" style="max-height: 35px;" @click="saveProduct"/>
+            <q-btn :label="dropedInBasket ? 'В корзину' : 'Купить'"  style="max-height: 35px;" @click="dropedInBasket ? saveToBasket() : dropToBasket()"/>
+            <q-input type="number" v-model="count" v-if="dropedInBasket" label="Введите количество"/>
         </div>
     </div>
 </template>
 
 <script>
 import formattedString from "src/boot/formatted.js"
+import {ref, watchEffect} from "vue"
+import requester from "src/boot/requester";
 export default {
     props: {
-        product: Object
-
+        product:{
+            type:Object,
+            required:true,
+        },
         /*
         {
         "id": 1,
@@ -46,15 +51,16 @@ export default {
       }
     },
     data(){
-        const formattedName = ()=>{
-            return formattedString(this.product.name,20)
-        }
-        const formattedDescription = ()=>{
-            return formattedString(this.product.description,45)
-        }
+        const formattedName = formattedString(this.product.name,20)
+
+        const formattedDescription = formattedString(this.product.description,45)
         return{
             formattedName,
-            formattedDescription
+            formattedDescription,
+            count:1,
+            
+        dropedInBasket:ref(false)
+
         }
     },
     setup(){
@@ -64,7 +70,6 @@ export default {
     },
     computed: {
         formattedPrice() {
-            console.log(formattedString)
             return price => {
                 let res = "";
                 let reversedPrice = price.toString().split("").reverse().join("")
@@ -83,13 +88,20 @@ export default {
         }
     },
     methods:{
-        saveProduct(){
-            if(localStorage.products){
-                localStorage.products =+ this.product.id.toString()
-                console.log('asd')
-            }else{
-                localStorage.products = this.product.id.toString()
-            }
+        async dropToBasket(){
+            this.dropedInBasket = true
+            console.log(this.dropedToBasket)
+        },
+        async saveToBasket(){
+            this.dropedInBasket = false
+            console.log({
+                productCount:this.count,
+                productId:this.product.id
+            })
+            await requester("POST","basket/addProduct",{
+                productCount:Number(this.count),
+                productId:this.product.id
+            })
         },
         toProduct(){
             window.location.href = 'product?id='+this.product.id

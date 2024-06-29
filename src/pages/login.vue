@@ -32,7 +32,7 @@ export default {
             password: this.password,
         }
         console.log(request)
-        let res = await requester.requester("POST","auth/login",request)
+        let res = await requester("POST","auth/login",request)
         console.log(res)
 
         localStorage.accessToken = res.access;

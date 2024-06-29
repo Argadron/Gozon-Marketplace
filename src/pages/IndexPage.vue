@@ -1,25 +1,25 @@
 <template>
   <div class="flex">
-    <product v-for="product in products" v-bind:product="product">
-    </product>
+    <productCard v-for="product in products" v-bind:product="product"/>
   </div>
 
 </template>
 
 <script>
 import { defineComponent, ref } from 'vue';
-import product from './components/indexPage/productCard.vue'
+import productCard from 'src/components/productCard.vue'
 import requester from 'src/boot/requester';
-
+import axios from 'axios';
 export default {
   name: 'IndexPage',
   components:{
-    product
+    productCard
   },
   setup() {
+    console.log(axios["get"])
     const products = ref([]);
     async function fetchProducts() {
-      const res = await requester.requester("GETnoToken","products/all?page=1&productOnPage=10");
+      const res = await requester("GET","products/all?page=1&productOnPage=10");
       products.value = res.result;
     }
     fetchProducts();

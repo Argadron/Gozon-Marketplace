@@ -51,7 +51,7 @@
         request.phone = this?.phone
         request.email = this?.email
         console.log(request)
-        let res = await requester.requester("POST","auth/register",request)
+        let res = await requester("POST","auth/register",request)
         console.log(res)
         localStorage.accessToken = res.access;
         localStorage.refreshToken  = res.refresh;
