@@ -1,6 +1,6 @@
 import { Controller, Get, Query, ValidationPipe, UsePipes, Param, ParseIntPipe, Post, UseGuards, Body, UploadedFile, Put, Res, Delete, UseInterceptors } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { ApiOperation, ApiResponse, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiQuery, ApiBearerAuth, ApiTags, ApiBody } from '@nestjs/swagger';
 import { SwaggerBadRequest, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '../swagger/apiResponse.interfaces';
 import { AllProductsDto } from './dto/all-products.dto';
 import { ObjectStringToIntPipe } from '../common/pipes/object-string-to-int.pipe';
@@ -18,6 +18,7 @@ import { OptionalValidatorPipe } from '../common/pipes/optional-validator.pipe';
 import { EmptyStringDeletorPipe } from '../common/pipes/empty-string-deletor.pipe';
 
 @Controller('products')
+@ApiTags("Products Controller")
 export class ProductsController {
   constructor(private readonly productsService: ProductsService,
               private readonly stringToArrayPipe: StringToArrayPipe
@@ -28,9 +29,6 @@ export class ProductsController {
   @ApiOperation({ summary: "Get all products" })
   @ApiResponse({ status: 200, description: "Return all products", type: SwaggerOK })
   @ApiResponse({ status: 400, description: "Validation failed", type: SwaggerBadRequest })
-  @ApiQuery({ name: "page"})
-  @ApiQuery({ name: "productOnPage" })
-  @ApiQuery({ name: "filters", description: "Describe all filters. All filters must be writed on array.", example: "priceMin=5+priceMax=2", required: false })
   @ApiQuery({ name: "priceMin", required: false, type: Number, description: "Min product price"})
   @ApiQuery({ name: "priceMax", required: false, type: Number, description: "Max product price"})
   @ApiQuery({ name: "category", required: false, description: "A string array of categories"})
@@ -79,6 +77,7 @@ export class ProductsController {
   @ApiResponse({ status: 401, description: "Token Invalid/Unauthorized", type: SwaggerUnauthorizedException })
   @ApiResponse({ status: 403, description: "Your role not have access to this action", type: SwaggerForbiddenException })
   @ApiBearerAuth()
+  @ApiBody({ type: UpdateProductDto })
   @UseGuards(JwtGuard, SellerGuard)
   @UsePipes(ObjectStringToIntPipe, new StringToArrayPipe().Include(["tags", "categories"]), new EmptyStringDeletorPipe(),
   new OptionalValidatorPipe().check(["name", "description", "price", "count", "tags", "categories"]),new ValidationPipe())

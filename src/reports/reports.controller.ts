@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Param, ParseIntPipe, Post, Put, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ReportsService } from './reports.service';
 import { JwtGuard } from '../auth/guards/jwt.guard';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SwaggerBadRequest, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '../swagger/apiResponse.interfaces';
 import { CreateReportDto } from './dto/create-report.dto';
 import { User } from '../auth/decorators/get-user.decorator';
@@ -12,6 +12,7 @@ import { EmptyStringDeletorPipe } from '../common/pipes/empty-string-deletor.pip
 
 @Controller('reports')
 @UseGuards(JwtGuard)
+@ApiTags("Reports Controller")
 export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 

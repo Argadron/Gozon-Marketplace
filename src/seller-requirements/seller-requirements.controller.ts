@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Put, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { SellerRequirementsService } from './seller-requirements.service';
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtUser } from '../auth/interfaces';
 import { SwaggerBadRequest, SwaggerConflictMessage, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '../swagger/apiResponse.interfaces';
 import { CreateSellerRequirementDto } from './dto/create-seller-requirement.dto';
@@ -12,6 +12,7 @@ import { ObjectStringToIntPipe } from '../common/pipes/object-string-to-int.pipe
 import { CloseSellerRequirementDto } from './dto/close-seller-requirement.dto';
 
 @Controller('seller-requirements')
+@ApiTags("Seller-Requirements Controller")
 export class SellerRequirementsController {
   constructor(private readonly sellerRequirementsService: SellerRequirementsService) {}
 

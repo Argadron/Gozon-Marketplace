@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Param, ParseIntPipe, Post, Put, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { JwtGuard } from '../auth/guards/jwt.guard';
-import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SwaggerBadRequest, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '../swagger/apiResponse.interfaces';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { User } from '../auth/decorators/get-user.decorator';
@@ -12,6 +12,7 @@ import { EmptyStringDeletorPipe } from '../common/pipes/empty-string-deletor.pip
 
 @Controller('reviews')
 @UseGuards(JwtGuard)
+@ApiTags("Reviews Controller")
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 
@@ -35,6 +36,9 @@ export class ReviewsController {
   @ApiResponse({ status: 403, description: "This is not your review", type: SwaggerForbiddenException })
   @ApiResponse({ status: 404, description: "Review not found", type: SwaggerNotFound })
   @ApiBearerAuth()
+  @ApiBody({
+    type: EditReviewDto
+  })
   @UsePipes(new EmptyStringDeletorPipe(),new OptionalValidatorPipe().check(["name", "description", "rate"]), new ValidationPipe())
   async editReview(@Body() dto: Partial<EditReviewDto>, @User() user: JwtUser) {
     return await this.reviewsService.edit(dto, user)

@@ -66,7 +66,7 @@ export class ProductsService {
     }
 
     async getAll(query: AllProductsDto) {
-        const filters: Filters = query.filter
+        const filters: Filters = query["filter"]
         const result = await this.prismaService.product.findMany({
             skip: (query.page - 1)*query.productOnPage,
             take: query.productOnPage,
