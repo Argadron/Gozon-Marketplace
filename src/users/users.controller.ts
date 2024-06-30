@@ -22,6 +22,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: "Return a user info", type: SwaggerOK })
   @ApiResponse({ status: 404, description: "User not found", type: SwaggerNotFound })
   @ApiResponse({ status: 401, description: "Token Invalid/Unauthorized", type: SwaggerUnauthorizedException })
+  @ApiResponse({ status: 403, description: "User banned", type: SwaggerForbiddenException })
   @ApiBearerAuth()
   async getProfile(@User() user: JwtUser) {
     return await this.usersService.getProfile(user.id)

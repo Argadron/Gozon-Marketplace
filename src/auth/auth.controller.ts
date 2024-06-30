@@ -4,7 +4,7 @@ import { AuthDto } from './dto/auth.dto';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiResponse, ApiOperation, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { SwaggerBadRequest, SwaggerJwtUser, SwaggerConflictMessage, SwaggerOK } from '../swagger/apiResponse.interfaces';
+import { SwaggerBadRequest, SwaggerJwtUser, SwaggerConflictMessage, SwaggerOK, SwaggerForbiddenException } from '../swagger/apiResponse.interfaces';
 import { Token } from './decorators/get-token.decorator';
 
 @Controller('auth')
@@ -30,6 +30,7 @@ export class AuthController {
   @ApiBody({
     type: AuthDto
   })
+  @ApiResponse({ status: 403, description: "User are banned", type: SwaggerForbiddenException })
   @ApiOperation({ summary: "Login user" })
   @HttpCode(200)
   async login(@Res({ passthrough: true }) res: Response, @Body() dto: Partial<AuthDto>) {
@@ -40,6 +41,7 @@ export class AuthController {
   @HttpCode(200)
   @ApiResponse({ status: 200, description: "This method check refresh token and return new tokens", type: SwaggerOK })
   @ApiResponse({ status: 401, description: "Refresh token invalid", type: SwaggerBadRequest })
+  @ApiResponse({ status: 403, description: "User are banned", type: SwaggerForbiddenException })
   @ApiOperation({ summary: "Refresh access and refresh tokens" })
   @ApiBearerAuth()
   async refresh(@Token() token: string, @Res({ passthrough: true }) res: Response) {

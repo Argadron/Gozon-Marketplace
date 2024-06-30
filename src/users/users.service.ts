@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { JwtUser } from '../auth/interfaces';
 import { FileService } from '../file.service';
@@ -29,6 +29,8 @@ export class UsersService {
         })
 
         if (!User) throw new NotFoundException("User not found")
+
+        if (User.isBanned) throw new ForbiddenException("User are banned")
 
         const globalAlerts = await this.alertService.getMany({ isGlobal: true, NOT: { deletedIds: { has: User.id } } })
         
