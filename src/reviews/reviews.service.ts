@@ -41,8 +41,8 @@ export class ReviewsService {
     }
 
     async edit(dto: Partial<EditReviewDto>, user: JwtUser) {
-        const product = await this.productService.getById(dto.productId)
         const review = await this.getReviewOrThrow(dto.reviewId)
+        const product = await this.productService.getById(review.productId)
 
         if (dto.rate <= 0 || dto.rate > 5) throw new BadRequestException("Rate must be great of 0 and less of 5")
 
@@ -57,7 +57,6 @@ export class ReviewsService {
 
         await this.productService.updateInertnal(product.id, { rate: newRate })
 
-        delete dto.productId
         delete dto.reviewId
 
         return await this.prismaService.review.update({

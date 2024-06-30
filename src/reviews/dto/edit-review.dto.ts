@@ -48,15 +48,5 @@ export class EditReviewDto {
         minimum: 1,
         maximum: 5
     })
-    readonly rate?: number; 
-
-    @IsNumber()
-    @Min(1)
-    @ApiProperty({
-        description: "Id of product",
-        type: Number,
-        example: 1,
-        minimum: 1
-    })
-    productId: number; 
+    readonly rate?: number;  
 }
