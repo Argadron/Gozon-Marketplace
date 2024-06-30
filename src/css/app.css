@@ -9,3 +9,6 @@
     --q-info: #31CCEC;
     --q-warning: #F2C037;
   }
+p{
+  color: var(--q-text);
+}

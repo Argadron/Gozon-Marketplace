@@ -5,11 +5,11 @@
           <q-toolbar>
               <q-toolbar-title class="flex items-center" :class="{'justify-between': $q.screen.lt.sm}">
                     <img class="cursor-pointer" @click="toMain" src="../assets/logo.png"/>
-                    <p class="cursor-pointer" @click="toMain" v-if="!$q.screen.lt.sm">
+                    <p style="color: white;" class="cursor-pointer" @click="toMain" v-if="!$q.screen.lt.sm">
                       GOZON
                     </p>
                     <div @click="toUser" class=" cursor-pointer" style="flex: 1 1 0%; text-align: right;">
-                        <p style="display: inline;">Личный кабинет</p> <q-icon name="person_outline" class="text-white" size="30px"></q-icon>
+                        <p  style="display: inline; color: white;">Личный кабинет</p> <q-icon name="person_outline" class="text-white" size="30px"></q-icon>
                     </div>
               </q-toolbar-title>
               

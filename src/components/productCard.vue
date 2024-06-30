@@ -1,11 +1,11 @@
 <template>
     <div style="width: 240px;" class="product-container" >
         <div style="text-align: center;" class="cursor-pointer toProduct" @click="toProduct">
-            <img style="width: 15vw;" src="src/assets/largelogo.png">
+            <img style="width: 15vw;" src="../assets/largelogo.png">
             <p style="color: var(--q-accent); font-size: larger; text-align: center;" class="text-truncate">{{ formattedName }}</p>
             <p class="text-truncate">{{formattedDescription }}</p>
         </div>
-        <div v-if="!inBasket" style="text-align: center; align-self: flex-end;">
+        <div v-if="!isInBasket" style="text-align: center; align-self: flex-end;">
             <p style="margin-bottom:5px;"><strong>Цена: {{ formattedPrice(product.price) }}</strong></p>
             <q-btn :label="dropedInBasket ? 'В корзину' : 'Купить'"  style="max-height: 35px;" @click="dropedInBasket ? saveToBasket() : dropToBasket()"/>
             <q-input type="number" v-model="count" v-if="dropedInBasket" label="Введите количество"/>
@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import formattedString from "src/boot/formatted.js"
+import {formattedString} from "src/boot/formatted.js"
 import {ref, watchEffect} from "vue"
 import requester from "src/boot/requester";
 export default {
@@ -23,6 +23,9 @@ export default {
             type:Object,
             required:true,
         },
+        isInBasket:{
+            type:Boolean
+        }
         /*
         {
         "id": 1,

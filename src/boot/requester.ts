@@ -3,14 +3,12 @@ const HEADERS = {
                     "Content-Type": "application/json",
                     'Authorization': `Bearer `+localStorage.accessToken        
                 }
+
 import axios from 'axios';
 import catchError from "./errors"
-
-export default async function(method, url, body){
+export default async function requeter (method: "GET" | "POST" | "PUT" | "DELETE", url:string, body:Object){
   try{
-    method = method.toLowerCase()
-    const res =  await axios[method](API+url, body? body : {headers : HEADERS}, { headers: HEADERS })
-    await console.log(res)
+    const res =  await axios[method.toLowerCase()](API+url, body? body : {headers : HEADERS}, { headers: HEADERS })
     return res.data
   }catch(e){
     if(e.response?.data?.message === 'Access Token Invalid'){
@@ -22,8 +20,7 @@ export default async function(method, url, body){
                                 })
 
       localStorage.accessToken = res.data.accessToken
-      localStorage.refreshToken = res.data.refreshToken
-
+      localStorage.refreshToken = res.data.refreshToken                
       await this(method,url,body)
       return
     }else{

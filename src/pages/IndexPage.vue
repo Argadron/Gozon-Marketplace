@@ -8,7 +8,7 @@
 <script>
 import { defineComponent, ref } from 'vue';
 import productCard from 'src/components/productCard.vue'
-import requester from 'src/boot/requester';
+import requester from 'src/boot/requester.ts';
 import axios from 'axios';
 export default {
   name: 'IndexPage',
