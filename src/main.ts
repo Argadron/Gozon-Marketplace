@@ -20,6 +20,14 @@ async function bootstrap() {
   .setTitle("The Gozon API")
   .setDescription("Documentation Gozon API")
   .setVersion(constants.API_VERSION)
+  .addBearerAuth({
+    type: "http",
+    bearerFormat: "JWT",
+    in: "header",
+    scheme: "bearer",
+    name: "JWT",
+    description: "Enter your access jwt token",
+  })
   .build()
   
   const document = SwaggerModule.createDocument(app, swaggerConfig)
