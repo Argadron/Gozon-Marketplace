@@ -53,7 +53,7 @@ export class SellerRequirementsService {
         if (!await this.prismaService.sellerRequirement.findUnique({ where: { userId: User.id } })) throw new BadRequestException("User not has a valid seller requirement")
 
         if (dto.accepted) {
-            await this.userService.setUserRole(RoleEnum.SELLER, User.id)
+            await this.userService.setUserRole(RoleEnum.SELLER, User.username)
         }
         
         return await this.prismaService.sellerRequirement.delete({

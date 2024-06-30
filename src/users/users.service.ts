@@ -52,7 +52,7 @@ export class UsersService {
         })
     }
 
-    async findBy(find: any) {
+    async findBy(find: Object) {
         return await this.prismaService.user.findFirst({ where: find })
     }
 
@@ -73,11 +73,7 @@ export class UsersService {
 
         if (User.username === dto.username) throw new BadRequestException("You cannot set ban status yourself")
 
-        if (!await this.prismaService.user.findUnique({
-            where: {
-                username: dto.username
-            }
-        })) throw new NotFoundException("User not found")
+        if (!await this.findBy({ id: User.id })) throw new NotFoundException("User not found")
 
         await this.prismaService.user.update({
             where: {
@@ -91,14 +87,18 @@ export class UsersService {
         return `User ${dto.status ? "banned": "unbanned"}`
     }
 
-    async setUserRole(role: RoleEnum, userId: number) {
-        return await this.prismaService.user.update({
+    async setUserRole(role: RoleEnum, username: string) {
+        if (!await this.findBy({ username })) throw new NotFoundException("User not found")
+
+        await this.prismaService.user.update({
             where: {
-                id: userId
+                username
             },
             data: {
                 role
             }
         })
+
+        return `Set user role to ${role}`
     }
 }
