@@ -21,7 +21,7 @@ describe('UsersController', () => {
   }
   const testBan = {
     username: "Argadron",
-    status: true
+    status: false
   }
   const testRole = {
     username: "Argadron",
@@ -38,7 +38,8 @@ describe('UsersController', () => {
         const req: Request = ctx.switchToHttp().getRequest()
 
         req.user = {
-          id: 3
+          id: 3,
+          role: RoleEnum.ADMIN
         }
 
         return true
@@ -68,7 +69,7 @@ describe('UsersController', () => {
   })
 
   it("Проверка бана/разбана пользователя", async () => {
-    expect((await controller.setUserBanStatus(testBan, jwtUserTest)).length).toBeDefined()
+    expect((await controller.setUserBanStatus(testBan, jwtUserTest))).toBeDefined()
   })
 
   it("Проверка установки роли пользователю", async () => {

@@ -9,7 +9,6 @@ import { Response } from 'express';
 import { UpdateUserStatusDto } from './dto/update-user-status.dto';
 import { AdminGuard } from '../auth/guards/admin.guard';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
-import { RoleEnum } from '@prisma/client';
 
 @UseGuards(JwtGuard)
 @Controller('users')
