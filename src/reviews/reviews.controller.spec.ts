@@ -24,8 +24,7 @@ describe('ReviewsController', () => {
     productId: 1,
     name: "отзыв",
     description: "отзыв",
-    rate: 1,
-    reviewId: 17
+    rate: 1
   }
   const testJwtUser = {
     id: 3,
@@ -37,6 +36,7 @@ describe('ReviewsController', () => {
     const { id } = await prisma.review.create({ data: { ...testReview, authorId: 3 } })
 
     reviewId = id
+    testEditReview["reviewId"] = id
   })
 
   beforeEach(async () => {
