@@ -23,6 +23,10 @@ describe('UsersController', () => {
     username: "Argadron",
     status: true
   }
+  const testRole = {
+    username: "Argadron",
+    role: RoleEnum.USER
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -65,5 +69,9 @@ describe('UsersController', () => {
 
   it("Проверка бана/разбана пользователя", async () => {
     expect((await controller.setUserBanStatus(testBan, jwtUserTest)).length).toBeDefined()
+  })
+
+  it("Проверка установки роли пользователю", async () => {
+    expect((await controller.setUserRole(testRole)).length).toBeDefined()
   })
 });

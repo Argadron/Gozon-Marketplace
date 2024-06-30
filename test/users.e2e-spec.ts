@@ -21,6 +21,10 @@ describe("UsersController (E2E)", () => {
         status: false,
         username: "Argadron"
     }
+    const testRole = {
+        username: "Argadron",
+        role: RoleEnum.USER
+      }
 
     function setAuthorizationRefresh(req: Request, res: Response, next: Function) {
         req.headers.authorization = `Bearer ${process.env.TOKEN}`
@@ -79,6 +83,13 @@ describe("UsersController (E2E)", () => {
         return request(app.getHttpServer())
         .put("/api/users/userBanStatus")
         .send(testBanStatus)
+        .expect(200)
+    })
+
+    it("Проверка установки роли пользователю", async () => {
+        return request(app.getHttpServer())
+        .put("/api/users/userRole")
+        .send(testRole)
         .expect(200)
     })
 })

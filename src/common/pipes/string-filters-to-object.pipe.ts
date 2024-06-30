@@ -4,7 +4,7 @@ import { ObjectTypeParser } from "../../helpers/objectTypeParser";
 @Injectable()
 export class StringFiltersToObject implements PipeTransform {
     transform(value: any, metadata: ArgumentMetadata) {
-        if (!value.filters) return 
+        if (!value.filters) return value
  
         const array = value.filters.split("+")
         value.filter = {}

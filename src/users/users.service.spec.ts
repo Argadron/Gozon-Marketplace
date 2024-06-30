@@ -20,6 +20,10 @@ describe('UsersService', () => {
     username: "Argadron",
     status: false
   }
+  const testRole = {
+    username: "Argadron",
+    role: RoleEnum.USER
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -40,5 +44,9 @@ describe('UsersService', () => {
 
   it("Проверка бана/разбана пользователя", async () => {
     expect((await service.setUserBanStatus(testBan, jwtUserTest)).length).toBeDefined()
+  })
+
+  it("Проверка установки роли пользователю", async () => {
+    expect((await service.setUserRole(testRole.role, testRole.username)).length).toBeDefined()
   })
 });
