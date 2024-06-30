@@ -11,13 +11,13 @@ export class FileService {
 
     constructor(@Inject(ConfigService) private readonly configService: ConfigService) {}
 
-    downolad(file: Express.Multer.File): string {
+    async downolad(file: Express.Multer.File): Promise<string> {
         if (!fs.existsSync(path.join(process.cwd(), "uploads"))) fs.mkdirSync(path.join(process.cwd(), "uploads"))
 
         const fileName = v4()
         const filePath = path.join(process.cwd(), `uploads`, `${fileName + path.extname(file.originalname)}`)
 
-        fs.writeFileSync(filePath, file.buffer, { encoding: `utf-8` })
+        await fs.promises.writeFile(filePath, file.buffer)
 
         return `${fileName + path.extname(file.originalname)}`
     } 
@@ -38,7 +38,7 @@ export class FileService {
         return this.allowedMimeTypes.includes(path.extname(type)) ? true: false
     }
 
-    delete(filePath: string) {
+    async delete(filePath: string) {
         if (filePath === "default.png") return;
 
         if (!this.validateFileType(filePath)) throw new BadRequestException("Cannot delete this file")
@@ -47,6 +47,6 @@ export class FileService {
 
         if (!fs.existsSync(realPath)) throw new BadRequestException("File not exsists")
 
-        fs.unlinkSync(realPath)
+        await fs.promises.unlink(realPath)
     }
 }

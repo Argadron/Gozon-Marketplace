@@ -33,14 +33,14 @@ export class ProductsService {
         return result
     }
 
-    private photoDownloader(file: Express.Multer.File=undefined) {
+    private async photoDownloader(file: Express.Multer.File=undefined) {
         let productPhoto = "";
 
         if (file) {
             if (!this.fileService.validateFileType(file.originalname)) throw new BadRequestException("Product photo has invalid type")
         }
 
-        file ? productPhoto = this.fileService.downolad(file) : null 
+        file ? productPhoto = await this.fileService.downolad(file) : null 
 
         return productPhoto ? productPhoto : undefined
     }
@@ -124,7 +124,7 @@ export class ProductsService {
             }
         }
 
-        const productPhoto = this.photoDownloader(file)
+        const productPhoto = await this.photoDownloader(file)
 
         delete dto.productPhoto
 
@@ -140,7 +140,7 @@ export class ProductsService {
     async update(dto: Partial<UpdateProductDto>, user: JwtUser, file: Express.Multer.File=undefined) {
         const product = await this.validateProduct(dto.id, user)
 
-        const productPhoto = this.photoDownloader(file)
+        const productPhoto = await this.photoDownloader(file)
 
         delete dto.productPhoto
 
@@ -158,7 +158,7 @@ export class ProductsService {
     async delete(id: number, user: JwtUser) {
         const product = await this.validateProduct(id, user)
 
-        this.fileService.delete(product.productPhoto)
+        await this.fileService.delete(product.productPhoto)
 
         return await this.prismaService.product.delete({
             where: {

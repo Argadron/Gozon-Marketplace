@@ -93,7 +93,7 @@ export class AuthService {
         const { id, role } = await this.userService.create({ 
             password: await bcrypt.hash(password, 3),
             ...addInfo,
-            profilePhoto: file ? this.fileService.downolad(file) : "default.png" 
+            profilePhoto: file ? await this.fileService.downolad(file) : "default.png" 
         })
 
         const { access, refresh } = await this.generateTokens(id, role)
