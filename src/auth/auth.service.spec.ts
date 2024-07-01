@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { response } from 'express';
+import { Request, response } from 'express';
 import { JwtModule } from '@nestjs/jwt';
 import { PrismaService } from '../prisma.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -9,6 +9,9 @@ import prismaTestClient from '../prisma-client.forTest'
 import 'dotenv/config'
 import { UsersService } from '../users/users.service';
 import { AlertsService } from '../alerts/alerts.service';
+import { RoleEnum } from '@prisma/client';
+import { JwtGuard } from './guards/jwt.guard';
+import { ExecutionContext } from '@nestjs/common';
 
 const prisma = prismaTestClient()
 
@@ -20,6 +23,10 @@ describe('AuthService', () => {
     email: "test5464564565456546456456@mail.ru",
     phone: "+7820560101"
   }
+  const testJwtUser = {
+    id: 3,
+    role: RoleEnum.ADMIN
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -27,6 +34,17 @@ describe('AuthService', () => {
         secret: "secret"
     }), ConfigModule.forRoot()],
       providers: [AuthService, PrismaService, ConfigService, FileService, UsersService, AlertsService],
+    }).overrideGuard(JwtGuard).useValue({
+      canActivate: (ctx: ExecutionContext) => {
+        const request: Request = ctx.switchToHttp().getRequest()
+
+        request.user = {
+          id: 3,
+          role: RoleEnum.ADMIN
+        }
+
+        return true
+      }
     }).compile();
 
     service = module.get<AuthService>(AuthService);
@@ -42,6 +60,10 @@ describe('AuthService', () => {
 
   it("Проверка рефреша токенов", async () => {
     expect((await service.refresh(process.env.TOKEN, response)).access).toBeDefined()
+  })
+
+  it("Проверка выхода из аккаунта", async () => {
+    expect((await service.logout(testJwtUser, response)).id).toBeDefined()
   })
 
   afterAll(async () => {

@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common'
+import { ExecutionContext, INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AuthModule } from '../src/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
@@ -9,6 +9,8 @@ import * as request from 'supertest';
 import { Request, Response } from 'express';
 import 'dotenv/config'
 import prismaTestClient from '../src/prisma-client.forTest'
+import { JwtGuard } from '../src/auth/guards/jwt.guard';
+import { RoleEnum } from '@prisma/client';
 
 const prisma = prismaTestClient()
 
@@ -33,7 +35,18 @@ describe("AuthController (E2E)", () => {
                 secret: "secret"
             }), ConfigModule.forRoot()],
             providers: [PrismaService, ConfigService, FileService]
-        }).compile()
+        }).overrideGuard(JwtGuard).useValue({
+            canActivate: (ctx: ExecutionContext) => {
+              const request: Request = ctx.switchToHttp().getRequest()
+      
+              request.user = {
+                id: 3,
+                role: RoleEnum.ADMIN
+              }
+      
+              return true
+            }
+          }).compile()
 
         app = moduleFixture.createNestApplication()
 
@@ -60,6 +73,12 @@ describe("AuthController (E2E)", () => {
     it("/api/auth/refresh (GET) (Проверка рефреша токенов)", async () => {
         return request(app.getHttpServer())
         .get("/api/auth/refresh")
+        .expect(200)
+    })
+
+    it("/api/auth/logout (GET) (Проверка выхода из аккаунта)", async () => {
+        return request(app.getHttpServer())
+        .get("/api/auth/logout")
         .expect(200)
     })
 

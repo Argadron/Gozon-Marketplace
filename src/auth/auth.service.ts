@@ -191,7 +191,7 @@ export class AuthService {
     }
 
     async logout(user: JwtUser, res: Response) {
-        this.clearRefreshFromCookie(res)
+        this.configService.get("NODE_ENV") === "production" ? this.clearRefreshFromCookie(res) : null
 
         return await this.prismaService.tokens.update({
             where: {
