@@ -43,6 +43,12 @@ export class AuthService {
         })
     }
 
+    private clearRefreshFromCookie(res: Response) {
+        res.cookie(this.configService.get("REFRESH_TOKEN_COOKIE_NAME"), "", {
+            maxAge: 0
+        })
+    }
+
     private async verifyJwt(token: string): Promise<JwtUser> {
         try {
             return await this.jwtService.verifyAsync(token)
@@ -182,5 +188,18 @@ export class AuthService {
         })
 
         return await this.checkNodeEnvAndReturn(access, refresh, res)
+    }
+
+    async logout(user: JwtUser, res: Response) {
+        this.clearRefreshFromCookie(res)
+
+        return await this.prismaService.tokens.update({
+            where: {
+                userId: user.id
+            },
+            data: {
+                token: ""
+            }
+        })
     }
 }

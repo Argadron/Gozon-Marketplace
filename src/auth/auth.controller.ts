@@ -1,11 +1,14 @@
-import { Body, Controller, Get, HttpCode, Post, Res, UnauthorizedException, UploadedFile, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiResponse, ApiOperation, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { SwaggerBadRequest, SwaggerJwtUser, SwaggerConflictMessage, SwaggerOK, SwaggerForbiddenException } from '../swagger/apiResponse.interfaces';
+import { SwaggerBadRequest, SwaggerJwtUser, SwaggerConflictMessage, SwaggerOK, SwaggerForbiddenException, SwaggerUnauthorizedException } from '../swagger/apiResponse.interfaces';
 import { Token } from './decorators/get-token.decorator';
+import { User } from './decorators/get-user.decorator';
+import { JwtUser } from './interfaces';
+import { JwtGuard } from './guards/jwt.guard';
 
 @Controller('auth')
 @ApiTags("Auth Controller")
@@ -48,5 +51,16 @@ export class AuthController {
     if (!token) throw new UnauthorizedException("No refresh token")
 
     return await this.authService.refresh(token, res)
+  }
+
+  @Get("/logout")
+  @HttpCode(200)
+  @ApiOperation({ summary: "Logout from account" })
+  @ApiResponse({ status: 200, description: "Logout success", type: SwaggerOK })
+  @ApiResponse({ status: 401, description: "Token Invalid/Unauthorized", type: SwaggerUnauthorizedException })
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
+  async logout(@User() user: JwtUser, @Res({ passthrough: true }) res: Response) {
+    return await this.authService.logout(user, res)
   }
 }
