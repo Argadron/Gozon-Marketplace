@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiResponse, ApiOperation, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiResponse, ApiOperation, ApiBearerAuth, ApiTags, ApiCookieAuth } from '@nestjs/swagger';
 import { SwaggerBadRequest, SwaggerJwtUser, SwaggerConflictMessage, SwaggerOK, SwaggerForbiddenException, SwaggerUnauthorizedException } from '../swagger/apiResponse.interfaces';
 import { Token } from './decorators/get-token.decorator';
 import { User } from './decorators/get-user.decorator';
@@ -46,7 +46,7 @@ export class AuthController {
   @ApiResponse({ status: 401, description: "Refresh token invalid", type: SwaggerBadRequest })
   @ApiResponse({ status: 403, description: "User are banned", type: SwaggerForbiddenException })
   @ApiOperation({ summary: "Refresh access and refresh tokens" })
-  @ApiBearerAuth()
+  @ApiCookieAuth()
   async refresh(@Token() token: string, @Res({ passthrough: true }) res: Response) {
     if (!token) throw new UnauthorizedException("No refresh token")
 

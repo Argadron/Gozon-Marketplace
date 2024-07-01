@@ -39,7 +39,9 @@ export class AuthService {
         res.cookie(this.configService.get("REFRESH_TOKEN_COOKIE_NAME"), token, {
             httpOnly: true,
             maxAge: 30 * 24 * 60 * 60 * 1000,
-            sameSite: this.configService.get("NODE_ENV") === "development" ? "none" : "lax"
+            sameSite: this.configService.get("NODE_ENV") === "development" ? "none" : "none",
+            domain: `${this.configService.get("CLIENT_DOMAIN")}.${this.configService.get("HOST")}`,
+            secure: true
         })
     }
 
@@ -67,9 +69,9 @@ export class AuthService {
     private async checkNodeEnvAndReturn(access: string, refresh: string, res: Response): Promise<Tokens> {
         const NODE_ENV = this.configService.get("NODE_ENV")
 
-        NODE_ENV === "development" || "test" ? null : this.sendRefreshToCookie(res, refresh)
+        NODE_ENV === "production" ? this.sendRefreshToCookie(res, refresh) : null
 
-        return NODE_ENV === "development" || "test" ? { access, refresh } : { access }
+        return NODE_ENV === "production" ? { access } : { access, refresh } 
     }
 
     async register(res: Response, dto: AuthDto, file: Express.Multer.File=null): Promise<Tokens> {
