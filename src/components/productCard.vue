@@ -47,10 +47,7 @@ export default {
     },
     watch:{
       product:{
-        handler(newValue) {
-            console.log(newValue);
-            this.user.stringRole = newValue[this.user.userRole-1].roleValue
-        },
+
       }
     },
     data(){

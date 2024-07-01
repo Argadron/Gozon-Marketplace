@@ -7,7 +7,7 @@
             <p style="margin-left:5px;font-size:25px; color: var(--q-text);">{{ user.username }}</p>
         </div>
        
-        <q-btn style="justify-self: flex-end; max-height: 5vh">Я хочу стать продавцом!</q-btn>
+        <q-btn @click="sellerDialogCall = true" style="justify-self: flex-end; max-height: 5vh">Я хочу стать продавцом!</q-btn>
     </div>
 
     <h3 style="margin:0; text-align: center;">Корзина</h3>
@@ -20,14 +20,15 @@
         </tbody>
     </table>
 
-    <p style="font-size: large;">Здесь пока ничего нет...</p>
-    <p style="font-size: large;">Хотите перейти к <strong class="cursor-pointer" @click="goToMain()">выбору товара?</strong></p>
-        
+    <p     v-if="!products[0]" style="font-size: large;">Здесь пока ничего нет... Хотите перейти к <strong class="cursor-pointer" @click="goToMain()">выбору товара?</strong></p>
+    <sellerDialog @close="sellerDialogCall = false" v-bind:user="user" v-model="sellerDialogCall"/>
 </template>
 <script>
 import { AxiosError } from 'axios'
+import {ref} from 'vue'
 import productCard from './components/user/productCardInBasket.vue'
 import requester from 'src/boot/requester.ts'
+import sellerDialog from './components/user/sellerDialog.vue'
 export default{
     methods:{
         goToMain(){
@@ -54,9 +55,13 @@ export default{
     },
     components:{
         productCard,
+        sellerDialog
     },
     data(){
         return{
+            description:'',
+            isCompany:false,
+            sellerDialogCall:ref(false),
             user:Object,
             products:Array
         }

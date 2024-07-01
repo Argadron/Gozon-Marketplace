@@ -10,7 +10,7 @@ export default async function requeter (method: "GET" | "POST" | "PUT" | "DELETE
   try{
     const res =  await axios[method.toLowerCase()](API+url, body? body : {headers : HEADERS}, { headers: HEADERS })
     return res.data
-  }catch(e){
+  }catch(e:any){
     if(e.response?.data?.message === 'Access Token Invalid'){
       const res = await axios.get(`${API}auth/refresh`,{  
                                 headers:{
