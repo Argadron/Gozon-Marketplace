@@ -14,7 +14,8 @@ async function bootstrap() {
   app.enableCors({
     origin: constants.API_CLIENT_URL,
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true
+    credentials: true,
+    exposedHeaders: "Set-Cookie"
   })
   app.useGlobalInterceptors(new GlobalLogger)
   app.use(cookieParser())

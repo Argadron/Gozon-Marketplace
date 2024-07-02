@@ -39,8 +39,8 @@ export class AuthService {
         res.cookie(this.configService.get("REFRESH_TOKEN_COOKIE_NAME"), token, {
             httpOnly: true,
             maxAge: 30 * 24 * 60 * 60 * 1000,
-            sameSite: this.configService.get("NODE_ENV") === "development" ? "none" : "none",
-            domain: `${this.configService.get("CLIENT_DOMAIN")}.${this.configService.get("HOST")}`,
+            sameSite: this.configService.get("NODE_ENV") === "development" ? "none" : "lax",
+            domain: `${this.configService.get("CLIENT_DOMAIN")}${this.configService.get("HOST")}`,
             secure: true
         })
     }
@@ -57,21 +57,6 @@ export class AuthService {
         } catch(e) {
             throw new UnauthorizedException("Refresh token invalid")
         }
-    }
-
-    /**
-     * This method check NODE_ENV variable and send refresh to cookie or return if mode equal development
-     * @param access - Access token
-     * @param refresh - Refresh token
-     * @param res - Response from Express
-     * @returns - Access and refresh tokens (or only access)
-     */
-    private async checkNodeEnvAndReturn(access: string, refresh: string, res: Response): Promise<Tokens> {
-        const NODE_ENV = this.configService.get("NODE_ENV")
-
-        NODE_ENV === "production" ? this.sendRefreshToCookie(res, refresh) : null
-
-        return NODE_ENV === "production" ? { access } : { access, refresh } 
     }
 
     async register(res: Response, dto: AuthDto, file: Express.Multer.File=null): Promise<Tokens> {
@@ -113,7 +98,9 @@ export class AuthService {
             }
         })
 
-        return await this.checkNodeEnvAndReturn(access, refresh, res)
+        this.sendRefreshToCookie(res, refresh)
+
+        return { access }
     }
 
     async login(res: Response, dto: Partial<AuthDto>) {
@@ -158,7 +145,9 @@ export class AuthService {
             }
         })
 
-        return await this.checkNodeEnvAndReturn(access, refresh, res)
+        this.sendRefreshToCookie(res, refresh)
+
+        return { access }
     }
 
     async refresh(token: string, res: Response) {
@@ -189,7 +178,9 @@ export class AuthService {
             }
         })
 
-        return await this.checkNodeEnvAndReturn(access, refresh, res)
+        this.sendRefreshToCookie(res, refresh)
+
+        return { access }
     }
 
     async logout(user: JwtUser, res: Response) {
