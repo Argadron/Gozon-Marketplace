@@ -14,6 +14,9 @@ import { UsersService } from '../src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtGuard } from '../src/auth/guards/jwt.guard'
 import { UsersController } from '../src/users/users.controller';
+import prismaTestClient from '../src/prisma-client.forTest'
+
+const prisma = prismaTestClient()
 
 describe("UsersController (E2E)", () => {
     let app: INestApplication;
@@ -24,6 +27,9 @@ describe("UsersController (E2E)", () => {
     const testRole = {
         username: "Argadron",
         role: RoleEnum.USER
+      }
+      const testBlackList = {
+        username: "Argadron"
       }
 
     function setAuthorizationRefresh(req: Request, res: Response, next: Function) {
@@ -91,5 +97,23 @@ describe("UsersController (E2E)", () => {
         .put("/api/users/userRole")
         .send(testRole)
         .expect(200)
+    })
+
+    it("Проверка добавления пользователя в черный список", async () => {
+        return request(app.getHttpServer())
+        .post("/api/users/addToBlacklist")
+        .send(testBlackList)
+        .expect(200)
+    })
+
+    afterAll(async () => {
+        await prisma.user.update({
+          where: {
+            id: 3
+          },
+          data: {
+            blackList: []
+          }
+        })
     })
 })

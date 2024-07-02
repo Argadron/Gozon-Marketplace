@@ -8,6 +8,9 @@ import { ConfigService } from '@nestjs/config';
 import { RoleEnum } from '@prisma/client';
 import { AlertsModule } from '../alerts/alerts.module';
 import { forwardRef } from '@nestjs/common';
+import prismaTestClient from '../prisma-client.forTest'
+
+const prisma = prismaTestClient()
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -23,6 +26,9 @@ describe('UsersService', () => {
   const testRole = {
     username: "Argadron",
     role: RoleEnum.USER
+  }
+  const testBlackList = {
+    username: "Argadron"
   }
 
   beforeEach(async () => {
@@ -48,5 +54,20 @@ describe('UsersService', () => {
 
   it("Проверка установки роли пользователю", async () => {
     expect((await service.setUserRole(testRole.role, testRole.username)).length).toBeDefined()
+  })
+
+  it("Проверка добавления пользователя в черный список", async () => {
+    expect((await service.addBlackList(testBlackList, jwtUserTest)).id).toBeDefined()
+  })
+
+  afterAll(async () => {
+    await prisma.user.update({
+      where: {
+        id: 3
+      },
+      data: {
+        blackList: []
+      }
+    })
   })
 });
