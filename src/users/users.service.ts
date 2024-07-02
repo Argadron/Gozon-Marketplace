@@ -25,6 +25,7 @@ export class UsersService {
                 reviews: true,
                 alerts: true,
                 reports: true,
+                blackList: true
             }
         })
 
