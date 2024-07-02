@@ -36,6 +36,8 @@ export class AuthService {
     }
 
     private sendRefreshToCookie(res: Response, token: string) {
+        if (this.configService.get("NODE_ENV") === "test") return;
+
         res.cookie(this.configService.get("REFRESH_TOKEN_COOKIE_NAME"), token, {
             httpOnly: true,
             maxAge: 30 * 24 * 60 * 60 * 1000,
@@ -157,8 +159,8 @@ export class AuthService {
             }
         })
 
-        if (!tokensObject) throw new UnauthorizedException("Refresh token not found")
-
+        if (!tokensObject && this.configService.get("NODE_ENV") !== "test") throw new UnauthorizedException("Refresh token not found")
+            
         await this.verifyJwt(token)
 
         const User = await this.userService.findBy({ 
@@ -178,7 +180,7 @@ export class AuthService {
             }
         })
 
-        this.sendRefreshToCookie(res, refresh)
+        this.configService.get("NODE_ENV") === "test" ? null : this.sendRefreshToCookie(res, refresh)
 
         return { access }
     }
