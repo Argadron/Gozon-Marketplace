@@ -1,14 +1,15 @@
-import { Body, Controller, Get, Put, Res, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, Res, UseGuards, UsePipes, ValidationPipe, HttpCode } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { User } from '../auth/decorators/get-user.decorator';
 import { JwtUser } from '../auth/interfaces';
-import { SwaggerBadRequest, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '../swagger/apiResponse.interfaces';
+import { SwaggerBadRequest, SwaggerConflictMessage, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '../swagger/apiResponse.interfaces';
 import { Response } from 'express';
 import { UpdateUserStatusDto } from './dto/update-user-status.dto';
 import { AdminGuard } from '../auth/guards/admin.guard';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
+import { AddBlackListDto } from './dto/add-blacklist-dto';
 
 @UseGuards(JwtGuard)
 @Controller('users')
@@ -63,5 +64,19 @@ export class UsersController {
   @UseGuards(AdminGuard)
   async setUserRole(@Body() dto: UpdateUserRoleDto) {
     return await this.usersService.setUserRole(dto.role, dto.username)
+  }
+
+  @Post("/addToBlacklist")
+  @UsePipes(new ValidationPipe())
+  @ApiOperation({ summary: "Add user to blacklist" })
+  @ApiResponse({ status: 200, description: "User added to blacklist", type: SwaggerOK })
+  @ApiResponse({ status: 400, description: "Validation failed", type: SwaggerBadRequest })
+  @ApiResponse({ status: 401, description: "Token Invalid/Unauthorized", type: SwaggerUnauthorizedException })
+  @ApiResponse({ status: 404, description: "User not found", type: SwaggerNotFound })
+  @ApiResponse({ status: 409, description: "User already on blacklist", type: SwaggerConflictMessage })
+  @ApiBearerAuth()
+  @HttpCode(200)
+  async addBlacklist(@Body() dto: AddBlackListDto, @User() user: JwtUser) {
+    return await this.usersService.addBlackList(dto, user)
   }
 }

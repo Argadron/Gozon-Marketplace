@@ -23,6 +23,7 @@ model User {
   isBanned Boolean @default(false) @map("is_banned")
   role RoleEnum @default(USER)
   profilePhoto String @map("profile_photo")
+  blackList Int[] @default([]) @map("black_list")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
 
@@ -33,7 +34,6 @@ model User {
   refreshToken Tokens?
   reports Report[]
   alerts Alert[]
-  blackList BlackList[]
   chats Chat[]
   messages Message[]
 
@@ -162,17 +162,6 @@ model Alert {
   updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
 
   @@map("alert")
-}
-
-model BlackList {
-  id Int @id @default(autoincrement())
-  blockedIds Int[] @map("blocked_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
-  userId Int @map("user_id") @unique
-  user User @relation(fields: [userId], references: [id])
-
-  @@map("black_list")
 }
 
 model Chat {

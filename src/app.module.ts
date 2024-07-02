@@ -11,12 +11,11 @@ import { BasketModule } from './basket/basket.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { ReportsModule } from './reports/reports.module';
 import { CategoriesModule } from './categories/categories.module';
-import { BlacklistModule } from './blacklist/blacklist.module';
 
 @Module({
   imports: [AuthModule, ConfigModule.forRoot({
     isGlobal: true
-  }), UsersModule, ProductsModule, SellerRequirementsModule, AlertsModule, BasketModule, ReviewsModule, ReportsModule, CategoriesModule, BlacklistModule],
+  }), UsersModule, ProductsModule, SellerRequirementsModule, AlertsModule, BasketModule, ReviewsModule, ReportsModule, CategoriesModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { JwtUser } from '../auth/interfaces';
 import { FileService } from '../file.service';
@@ -7,6 +7,7 @@ import { UpdateUserStatusDto } from './dto/update-user-status.dto';
 import { AlertsService } from '../alerts/alerts.service';
 import { CreateUser } from './interfaces';
 import { RoleEnum } from '@prisma/client';
+import { AddBlackListDto } from './dto/add-blacklist-dto';
 
 @Injectable()
 export class UsersService {
@@ -24,8 +25,7 @@ export class UsersService {
                 userProducts: true,
                 reviews: true,
                 alerts: true,
-                reports: true,
-                blackList: true
+                reports: true
             }
         })
 
@@ -103,5 +103,26 @@ export class UsersService {
         })
 
         return `Set user role to ${role}`
+    }
+
+    async addBlackList(dto: AddBlackListDto, user: JwtUser) {
+        const User = await this.prismaService.user.findUnique({ where: { username: dto.username } })
+
+        if (!User) throw new NotFoundException("User not found")
+
+        if (User.id === user.id) throw new BadRequestException("You cannot add to blacklist yourself!")
+
+        const { blackList } = await this.prismaService.user.findUnique({ where: { id: user.id } })
+
+        if (blackList.includes(User.id)) throw new ConflictException("User already on blacklist!")
+
+        return await this.prismaService.user.update({
+            where: {
+                id: user.id
+            },
+            data: {
+                blackList: [User.id, ...blackList]
+            }
+        })
     }
 }
