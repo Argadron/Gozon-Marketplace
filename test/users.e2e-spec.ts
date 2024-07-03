@@ -32,6 +32,17 @@ describe("UsersController (E2E)", () => {
         username: "Argadron"
       }
 
+      beforeAll(async () => {
+        await prisma.user.update({
+          where: {
+            id: 3
+          },
+          data: {
+            blackList: [64]
+          }
+        })
+      })
+
     function setAuthorizationRefresh(req: Request, res: Response, next: Function) {
         req.headers.authorization = `Bearer ${process.env.TOKEN}`
 
@@ -106,6 +117,12 @@ describe("UsersController (E2E)", () => {
         .expect(200)
     })
 
+    it("Проверка удаления пользователя из черного списка", async () => {
+        return request(app.getHttpServer())
+        .delete("/api/users/removeFromBlacklist/ArgadronSeller!")
+        .expect(200)
+    })
+
     afterAll(async () => {
         await prisma.user.update({
           where: {
@@ -115,5 +132,7 @@ describe("UsersController (E2E)", () => {
             blackList: []
           }
         })
+
+        await app.close()
     })
 })

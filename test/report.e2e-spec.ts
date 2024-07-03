@@ -77,4 +77,8 @@ describe("ReportsController (E2E)", () => {
         .delete(`/api/reports/delete/${reportId}`)
         .expect(200)
     })
+
+    afterAll(async () => {
+        await app.close()
+    })
 })

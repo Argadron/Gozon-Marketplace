@@ -79,4 +79,8 @@ describe("Seller-requirementsController (E2E)", () => {
         .send(testCloseRequirement)
         .expect(200)
     })
+
+    afterAll(async () => {
+        await app.close()
+    })
 })

@@ -119,5 +119,7 @@ describe("ProductsController (E2E)", () => {
             name: "продукт"
           }
         })
+
+        await app.close()
       })
 })

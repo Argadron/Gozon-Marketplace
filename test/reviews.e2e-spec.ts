@@ -80,4 +80,8 @@ describe("ReviewsController (E2E)", () => {
         .delete(`/api/reviews/delete/${reviewId}`)
         .expect(200)
     })
+
+    afterAll(async () => {
+        await app.close()
+    })
 })

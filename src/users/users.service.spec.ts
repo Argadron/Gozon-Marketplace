@@ -31,6 +31,17 @@ describe('UsersService', () => {
     username: "Argadron"
   }
 
+  beforeAll(async () => {
+    await prisma.user.update({
+      where: {
+        id: 3
+      },
+      data: {
+        blackList: [64]
+      }
+    })
+  })
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [AuthModule, forwardRef(() => AlertsModule)],
@@ -58,6 +69,10 @@ describe('UsersService', () => {
 
   it("Проверка добавления пользователя в черный список", async () => {
     expect((await service.addBlackList(testBlackList, jwtUserTest)).id).toBeDefined()
+  })
+
+  it("Проверка удаления пользователя из черного списка", async () => {
+    expect((await service.removeBlackList("ArgadronSeller!", jwtUserTest)).id).toBeDefined()
   })
 
   afterAll(async () => {

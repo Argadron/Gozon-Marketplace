@@ -83,5 +83,7 @@ describe("CategoriesController (E2E)", () => {
                 name: "категория"
             }
         })
+
+        await app.close()
     })
 })

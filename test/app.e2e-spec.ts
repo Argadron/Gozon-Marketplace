@@ -24,4 +24,8 @@ describe('AppController (e2e)', () => {
       .expect(200)
       .expect('Server worked!');
   });
+
+  afterAll(async () => {
+    await app.close()
+})
 });

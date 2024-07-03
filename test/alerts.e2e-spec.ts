@@ -76,4 +76,8 @@ describe("AlertsController (E2E)", () => {
       .delete("/api/alerts/deleteAll")
       .expect(200)
     })
+
+    afterAll(async () => {
+      await app.close()
+  })
 })

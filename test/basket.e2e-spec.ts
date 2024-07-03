@@ -54,4 +54,8 @@ describe("BasketController (E2E)", () => {
         .delete("/api/basket/deleteProduct/1")
         .expect(200)
     })
+
+    afterAll(async () => {
+        await app.close()
+    })
 })

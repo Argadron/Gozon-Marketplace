@@ -103,5 +103,7 @@ describe("AuthController (E2E)", () => {
                 username: "Васек"
             }
         })
+
+        await app.close()
     })
 })

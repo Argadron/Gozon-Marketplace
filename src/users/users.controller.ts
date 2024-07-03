@@ -80,7 +80,7 @@ export class UsersController {
     return await this.usersService.addBlackList(dto, user)
   }
 
-  @Delete("/removeFromBlaklist/:username")
+  @Delete("/removeFromBlacklist/:username")
   @ApiOperation({ summary: "Delete user from blacklist" })
   @ApiResponse({ status: 200, description: "User deleted from blacklist", type: SwaggerOK })
   @ApiResponse({ status: 401, description: "Token Invalid/Unauthorized", type: SwaggerUnauthorizedException })
