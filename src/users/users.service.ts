@@ -125,4 +125,25 @@ export class UsersService {
             }
         })
     }
+
+    async removeBlackList(username: string, user: JwtUser) {
+        const { blackList } = await this.findBy({ id: user.id })
+
+        const User = await this.findBy({ username })
+
+        if (!User) throw new NotFoundException("User not found")
+
+        if (!blackList.includes(User.id)) throw new BadRequestException("User not found in blacklist")
+
+        blackList.splice(blackList.indexOf(User.id))
+
+        return await this.prismaService.user.update({
+            where: {
+                id: user.id
+            },
+            data: {
+                blackList
+            }
+        })
+    }
 }

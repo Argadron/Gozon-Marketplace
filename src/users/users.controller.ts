@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Put, Res, UseGuards, UsePipes, ValidationPipe, HttpCode } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, Res, UseGuards, UsePipes, ValidationPipe, HttpCode, Delete, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from '../auth/guards/jwt.guard';
@@ -78,5 +78,16 @@ export class UsersController {
   @HttpCode(200)
   async addBlacklist(@Body() dto: AddBlackListDto, @User() user: JwtUser) {
     return await this.usersService.addBlackList(dto, user)
+  }
+
+  @Delete("/removeFromBlaklist/:username")
+  @ApiOperation({ summary: "Delete user from blacklist" })
+  @ApiResponse({ status: 200, description: "User deleted from blacklist", type: SwaggerOK })
+  @ApiResponse({ status: 401, description: "Token Invalid/Unauthorized", type: SwaggerUnauthorizedException })
+  @ApiResponse({ status: 400, description: "User not in blacklist", type: SwaggerBadRequest })
+  @ApiResponse({ status: 404, description: "User not found", type: SwaggerNotFound })
+  @ApiBearerAuth()
+  async removeBlacklist(@Param("username") username: string, @User() user: JwtUser) {
+    return await this.usersService.removeBlackList(username, user)
   }
 }
