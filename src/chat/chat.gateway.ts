@@ -7,7 +7,7 @@ import { Server, Socket } from 'socket.io'
 import { NewChatDto } from './dto/new-chat.dto';
 import { UsersService } from '../users/users.service';
 import { WebsocketUser } from '../auth/decorators/get-user-websocket.decorator';
-import { WebSocketJwtGuard } from 'src/common/guards/WebsocketJwt.guard';
+import { WebSocketJwtGuard } from '../common/guards/WebsocketJwt.guard';
 import { JwtUser } from '../auth/interfaces';
 import { NewMessageDto } from './dto/new-message.dto';
 import { ChatConnectDto } from './dto/chat-connect.dto';
