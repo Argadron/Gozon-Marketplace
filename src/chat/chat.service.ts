@@ -16,6 +16,51 @@ export class ChatService {
                     { sellerId },
                     { userId }
                 ]
+            },
+            include: {
+                messages: true
+            }
+        })
+    }
+
+    async findMessage(messageId: number) {
+        return await this.prismaService.message.findUnique({ where: { id: messageId } })
+    }
+
+    async createChat(sellerId: number, userId: number) {
+        return await this.prismaService.chat.create({
+            data: {
+                sellerId,
+                userId
+            }
+        })
+    }
+
+    async sendMessage(message: string, userId: number, chatId: number) {
+        return await this.prismaService.message.create({
+            data: {
+                chatId,
+                userId,
+                text: message
+            }
+        })
+    }
+
+    async editMessage(message: string, messageId: number) {
+        return await this.prismaService.message.update({
+            where: {
+                id: messageId
+            },
+            data: {
+                text: message
+            }
+        })
+    }
+
+    async deleteMessage(messageId: number) {
+        return await this.prismaService.message.delete({
+            where: {
+                id: messageId
             }
         })
     }

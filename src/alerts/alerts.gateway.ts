@@ -3,50 +3,36 @@ import { PrismaService } from "../prisma.service";
 import { Socket, Server } from 'socket.io'
 import config from '../config/constants'
 import { SendAlertDto } from "./dto/send-alert.dto";
-import { BadRequestException, NotFoundException, UseFilters, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
+import { BadRequestException, UseFilters, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { WebSocketExecption } from "../common/filters/websockets-execeptions.filter";
-import { RegisterGateWayDto } from "./dto/register-gateway.dto";
-import { WebsocketJwtGuard } from "../auth/guards/websocket-jwt.guard";
+import { WebSocketJwtGuard } from "../common/guards/WebsocketJwt.guard";
+import { AdminGuard } from "../auth/guards/admin.guard";
 
 const constants = config()
 
 @WebSocketGateway({ cors: constants.API_CLIENT_URL })
 @UseFilters(WebSocketExecption)
+@UseGuards(WebSocketJwtGuard)
 export class AlertsGateWay {
     constructor(private readonly prismaService: PrismaService
     ) {}
 
     @WebSocketServer() private readonly server: Server;
 
-    @SubscribeMessage("register")
-    @UsePipes(new ValidationPipe())
-    async register(@ConnectedSocket() client: Socket, @MessageBody() payload: RegisterGateWayDto) {
-        const User = await this.prismaService.user.findUnique({
-            where: {
-                username: payload.username
-            }
-        })
-
-        if (!User) throw new NotFoundException("User not found")
-
-        client.join(`${User.id}`)
-        client.emit("getRoomData", {
-            room: `${User.id}`
-        })
-    }
-
     @SubscribeMessage("sendAlert")
     @UsePipes(new ValidationPipe())
-    @UseGuards(WebsocketJwtGuard)
+    @UseGuards(AdminGuard)
     async alert(@ConnectedSocket() client: Socket, @MessageBody() payload: SendAlertDto) {
-       const { id } = await this.prismaService.user.findUnique({
+       if (payload.isGlobal) return this.server.emit("alert", payload.description)
+
+       const User = await this.prismaService.user.findUnique({
             where: {
                 username: payload.username
             }
        })
 
-       if (!id) throw new BadRequestException("User not found")
+       if (!User) throw new BadRequestException("User not found")
 
-       this.server.to(`${id}`).emit("alert", payload.description)
+       this.server.to(`local:${User.id}`).emit("alert", payload.description)
     }
 }

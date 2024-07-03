@@ -24,16 +24,6 @@ export class SendAlertDto {
     })
     readonly description: string;
 
-    @IsString()
-    @IsOptional()
-    @ApiProperty({ 
-        description: "Websocket room where send a message",
-        type: Boolean,
-        required: false,
-        example: "1"
-    })
-    readonly room?: string;
-
     @IsBoolean()
     @IsOptional()
     @ApiProperty({ 
