@@ -9,6 +9,7 @@ import { JwtUser, Tokens } from './interfaces';
 import { FileService } from '../file.service';
 import { RoleEnum } from '@prisma/client';
 import { UsersService } from '../users/users.service';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -196,5 +197,15 @@ export class AuthService {
                 token: ""
             }
         })
+    }
+
+    async changePassword(dto: ChangePasswordDto, user: JwtUser) {
+        const User = await this.userService.findBy({ id: user.id })
+
+        if (!(await bcrypt.compare(dto.oldPassword, User.password))) throw new BadRequestException("Passwords not match")
+
+        await this.userService.update({ password: await bcrypt.hash(dto.newPassword, 3) }, user.id)
+
+        return "Password changed"
     }
 }

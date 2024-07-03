@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Post, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Put, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 import { Response } from 'express';
@@ -9,6 +9,7 @@ import { Token } from './decorators/get-token.decorator';
 import { User } from './decorators/get-user.decorator';
 import { JwtUser } from './interfaces';
 import { JwtGuard } from './guards/jwt.guard';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Controller('auth')
 @ApiTags("Auth Controller")
@@ -62,5 +63,17 @@ export class AuthController {
   @UseGuards(JwtGuard)
   async logout(@User() user: JwtUser, @Res({ passthrough: true }) res: Response) {
     return await this.authService.logout(user, res)
+  }
+
+  @Put("/changepassword")
+  @ApiOperation({ summary: "Change password on user account" })
+  @ApiResponse({ status: 200, description: "Password changed", type: SwaggerOK })
+  @ApiResponse({ status: 400, description: "Validation failed /Bad password", type: SwaggerBadRequest })
+  @ApiResponse({ status: 401, description: "Token Invalid/Unauthorized", type: SwaggerUnauthorizedException })
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
+  @UsePipes(new ValidationPipe())
+  async changePassword(@Body() dto: ChangePasswordDto, @User() user: JwtUser) {
+    return await this.authService.changePassword(dto, user)
   }
 }

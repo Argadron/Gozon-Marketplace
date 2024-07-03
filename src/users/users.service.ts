@@ -146,4 +146,13 @@ export class UsersService {
             }
         })
     }
+
+    async update(data: Object, userId: number) {
+        return await this.prismaService.user.update({
+            where: {
+                id: userId
+            },
+            data
+        })
+    }
 }
