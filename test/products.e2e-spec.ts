@@ -69,45 +69,45 @@ describe("ProductsController (E2E)", () => {
         await app.init()
     })
 
-    it("Проверка получения всех продуктов (страницы)", async () => {
+    it("/api/products/all?page=1&productOnPage=1 (GET) (Проверка получения всех продуктов (страницы))", async () => {
         return request(app.getHttpServer())
         .get("/api/products/all?page=1&productOnPage=1")
         .expect(200)
     })
 
-    it("Проверка получения продуктов с фильтром", async () => {
+    it("/api/products/allpage=1&productOnPage=1&filters=priceMin=1+priceMax=5+tags=['test'] (GET) (Проверка получения продуктов с фильтром)", async () => {
         return request(app.getHttpServer())
         .get("/api/products/all?page=1&productOnPage=1&filters=priceMin=1+priceMax=5+tags=['test']")
         .expect(200)
     })
 
-    it("Проверка получения продукта по ID", async () => {
+    it("/api/products/1 (GET) (Проверка получения продукта по ID)", async () => {
         return request(app.getHttpServer())
         .get("/api/products/1")
         .expect(200)
     })
 
-    it("Проверка получения фото продукта по ID", async () => {
+    it("/api/products/photo/1 (GET) (Проверка получения фото продукта по ID)", async () => {
         return request(app.getHttpServer())
         .get("/api/products/photo/1")
         .expect(200)
     })
 
-    it("Проверка создания продукта", async () => {
+    it("/api/products/newProduct (POST) (Проверка создания продукта)", async () => {
         return request(app.getHttpServer())
         .post("/api/products/newProduct")
         .send(testNewProduct)
         .expect(201)
     })
 
-    it("Проверка обновления продукта", async () => {
+    it("/api/products/updateProduct (PUT) (Проверка обновления продукта)", async () => {
         return request(app.getHttpServer())
         .put("/api/products/updateProduct")
         .send(testUpdateProduct)
         .expect(200)
     })
 
-    it("Проверка удаления продукта", async () => {
+    it("/api/products/delete/${productId} (DELETE) (Проверка удаления продукта)", async () => {
         return request(app.getHttpServer())
         .delete(`/api/products/delete/${productId}`)
         .expect(200)

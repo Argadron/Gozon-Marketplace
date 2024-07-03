@@ -22,6 +22,10 @@ describe("AuthController (E2E)", () => {
         email: "test2424242@mail.ru",
         phone: "+78005121001"
       }
+      const testChangePassword = {
+        oldPassword: "123123123",
+        newPassword: "123123123"
+      }
 
     function setAuthorizationRefresh(req: Request, res: Response, next: Function) {
         req.headers.authorization = `Bearer ${process.env.TOKEN}`
@@ -74,6 +78,13 @@ describe("AuthController (E2E)", () => {
         return request(app.getHttpServer())
         .get("/api/auth/logout")
         .expect(200)
+    })
+
+    it("/api/auth/changepassword (PUT) (Проверка смены пароля)", async () => {
+      return request(app.getHttpServer())
+      .put("/api/auth/changepassword")
+      .send(testChangePassword)
+      .expect(200)
     })
 
     afterAll(async () => {

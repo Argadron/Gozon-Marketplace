@@ -27,6 +27,10 @@ describe('AuthService', () => {
     id: 3,
     role: RoleEnum.ADMIN
   }
+  const testChangePassword = {
+    oldPassword: "123123123",
+    newPassword: "123123123"
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -64,6 +68,10 @@ describe('AuthService', () => {
 
   it("Проверка выхода из аккаунта", async () => {
     expect((await service.logout(testJwtUser, response)).id).toBeDefined()
+  })
+
+  it("Проверка смены пароля", async () => {
+    expect((await service.changePassword(testChangePassword, testJwtUser)).length).toBeDefined()
   })
 
   afterAll(async () => {

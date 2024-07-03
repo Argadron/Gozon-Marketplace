@@ -58,20 +58,20 @@ describe("CategoriesController (E2E)", () => {
         await app.init()
     })
 
-    it("Проверка запроса на получение всех категорий продуктов", async () => {
+    it("/api/categories/all (GET) (Проверка запроса на получение всех категорий продуктов)", async () => {
         return request(app.getHttpServer())
         .get("/api/categories/all")
         .expect(200)
     })
 
-    it("Проверка запроса на создание новой категории продуктов", async () => {
+    it("/api/categories/new (POST) (Проверка запроса на создание новой категории продуктов)", async () => {
         return request(app.getHttpServer())
         .post("/api/categories/new")
         .send(testNewCategory)
         .expect(201)
     })
 
-    it("Проверка запроса на удаление категории продукта", async () => {
+    it("/api/categories/delete/${categoryId} (DELETE) (Проверка запроса на удаление категории продукта)", async () => {
       return request(app.getHttpServer())
       .delete(`/api/categories/delete/${categoryId}`)
       .expect(200)

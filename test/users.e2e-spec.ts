@@ -84,40 +84,40 @@ describe("UsersController (E2E)", () => {
         await app.init()
     })
 
-    it("Проверка получения профиля пользователя", async () => {
+    it("/api/users/getProfile (GET) (Проверка получения профиля пользователя)", async () => {
         return request(app.getHttpServer())
         .get("/api/users/getProfile")
         .expect(200)
     })
 
-    it("Проверка получения фото профиля пользователя", async () => {
+    it("/api/users/getProfilePhoto (GET) (Проверка получения фото профиля пользователя)", async () => {
         return request(app.getHttpServer())
         .get("/api/users/getProfilePhoto")
         .expect(200)
     })
 
-    it("Проверка бана/разбана пользователя", async () => {
+    it("/api/users/userBanStatus (PUT) (Проверка бана/разбана пользователя)", async () => {
         return request(app.getHttpServer())
         .put("/api/users/userBanStatus")
         .send(testBanStatus)
         .expect(200)
     })
 
-    it("Проверка установки роли пользователю", async () => {
+    it("/api/users/userRole (PUT) (Проверка установки роли пользователю)", async () => {
         return request(app.getHttpServer())
         .put("/api/users/userRole")
         .send(testRole)
         .expect(200)
     })
 
-    it("Проверка добавления пользователя в черный список", async () => {
+    it("/api/users/addToBlacklist (POST) (Проверка добавления пользователя в черный список)", async () => {
         return request(app.getHttpServer())
         .post("/api/users/addToBlacklist")
         .send(testBlackList)
         .expect(200)
     })
 
-    it("Проверка удаления пользователя из черного списка", async () => {
+    it("/api/users/removeFromBlacklist/${username} (DELETE) (Проверка удаления пользователя из черного списка)", async () => {
         return request(app.getHttpServer())
         .delete("/api/users/removeFromBlacklist/ArgadronSeller!")
         .expect(200)

@@ -42,14 +42,14 @@ describe("BasketController (E2E)", () => {
         await app.init()
     })
 
-    it("Проверка добавления товара в корзину", async () => {
+    it("/api/basket/addProduct (POST) (Проверка добавления товара в корзину)", async () => {
         return request(app.getHttpServer())
         .post("/api/basket/addProduct")
         .send(testAddProduct)
         .expect(200)
     })
 
-    it("Проверка удаления товара из корзины", async () => {
+    it("/api/basket/deleteProduct/1 (DELETE) (Проверка удаления товара из корзины)", async () => {
         return request(app.getHttpServer())
         .delete("/api/basket/deleteProduct/1")
         .expect(200)

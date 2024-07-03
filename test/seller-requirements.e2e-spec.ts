@@ -60,20 +60,20 @@ describe("Seller-requirementsController (E2E)", () => {
         await app.init()
     })
 
-    it("Проверка создания запроса на роль селлера", async () => {
+    it("/api/seller-requirements/createSellerRequirement (POST) (Проверка создания запроса на роль селлера)", async () => {
         return request(app.getHttpServer())
         .post("/api/seller-requirements/createSellerRequirement")
         .send(testSellerRequirement)
         .expect(201)
     })
 
-    it("Проверка получения всех запросов на роль селлера", async () => {
+    it("/api/seller-requirements/all?page=1&requirementsOnPage=1 (GET) (Проверка получения всех запросов на роль селлера)", async () => {
         return request(app.getHttpServer())
         .get("/api/seller-requirements/all?page=1&requirementsOnPage=1")
         .expect(200)
     })
 
-    it("Проверка закрытия запроса на роль селлера", async () => {
+    it("/api/seller-requirements/closeRequirement (PUT) (Проверка закрытия запроса на роль селлера)", async () => {
         return request(app.getHttpServer())
         .put("/api/seller-requirements/closeRequirement")
         .send(testCloseRequirement)

@@ -58,21 +58,21 @@ describe("ReportsController (E2E)", () => {
         await app.init()
     })
 
-    it("Проверка запроса на создание жалобы на продукт", async () => {
+    it("/api/reports/new (POST) (Проверка запроса на создание жалобы на продукт)", async () => {
         return request(app.getHttpServer())
         .post("/api/reports/new")
         .send(testNewReport)
         .expect(201)
     })
 
-    it("Проверка запроса на изменение жалобы на продукт", async () => {
+    it("/api/reports/edit (PUT) (Проверка запроса на изменение жалобы на продукт)", async () => {
         return request(app.getHttpServer())
         .put("/api/reports/edit")
         .send(testEditReport)
         .expect(200)
     })
 
-    it("Проверка запроса на удаление жалобы на продукт", async () => {
+    it("/api/reports/delete/${reportId} (DELETE) (Проверка запроса на удаление жалобы на продукт)", async () => {
         return request(app.getHttpServer())
         .delete(`/api/reports/delete/${reportId}`)
         .expect(200)

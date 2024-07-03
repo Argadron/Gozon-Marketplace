@@ -58,20 +58,20 @@ describe("AlertsController (E2E)", () => {
         await app.init()
     })
 
-    it("Проверка запроса на создание уведомления", async () => {
+    it("/api/alerts/send (POST) (Проверка запроса на создание уведомления)", async () => {
         return request(app.getHttpServer())
         .post("/api/alerts/send")
         .send(testAlert)
         .expect(201)
     })
 
-    it("Проверка запроса на удаление уведомления", async () => {
+    it("/api/alerts/delete/${alertId} (DELETE) (Проверка запроса на удаление уведомления)", async () => {
       return request(app.getHttpServer())
       .delete(`/api/alerts/delete/${alertId}`)
       .expect(200)
     })
 
-    it("Проверка запроса на удаление ВСЕХ уведомлений", async () => {
+    it("/api/alerts/deleteAll (DELETE) (Проверка запроса на удаление ВСЕХ уведомлений)", async () => {
       return request(app.getHttpServer())
       .delete("/api/alerts/deleteAll")
       .expect(200)

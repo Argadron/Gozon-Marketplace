@@ -61,21 +61,21 @@ describe("ReviewsController (E2E)", () => {
         await app.init()
     })
 
-    it("Проверка запроса на создание отзыва", async () => {
+    it("/api/reviews/new (POST) (Проверка запроса на создание отзыва)", async () => {
         return request(app.getHttpServer())
         .post("/api/reviews/new")
         .send(testReview)
         .expect(201)
     })
 
-    it("Проверка запроса на изменение отзыва", async () => {
+    it("/api/reviews/edit (PUT) (Проверка запроса на изменение отзыва)", async () => {
         return request(app.getHttpServer())
         .put("/api/reviews/edit")
         .send(testEditReview)
         .expect(200)
     })
 
-    it("Проверка запроса на удаление отзыва", async () => {
+    it("/api/reviews/delete/${reviewId} (DELETE) (Проверка запроса на удаление отзыва)", async () => {
         return request(app.getHttpServer())
         .delete(`/api/reviews/delete/${reviewId}`)
         .expect(200)
