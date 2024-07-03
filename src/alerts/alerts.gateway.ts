@@ -3,9 +3,10 @@ import { PrismaService } from "../prisma.service";
 import { Socket, Server } from 'socket.io'
 import config from '../config/constants'
 import { SendAlertDto } from "./dto/send-alert.dto";
-import { BadRequestException, NotFoundException, UseFilters, UsePipes, ValidationPipe } from "@nestjs/common";
+import { BadRequestException, NotFoundException, UseFilters, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { WebSocketExecption } from "../common/filters/websockets-execeptions.filter";
 import { RegisterGateWayDto } from "./dto/register-gateway.dto";
+import { WebsocketJwtGuard } from "../auth/guards/websocket-jwt.guard";
 
 const constants = config()
 
@@ -36,6 +37,7 @@ export class AlertsGateWay {
 
     @SubscribeMessage("sendAlert")
     @UsePipes(new ValidationPipe())
+    @UseGuards(WebsocketJwtGuard)
     async alert(@ConnectedSocket() client: Socket, @MessageBody() payload: SendAlertDto) {
        const { id } = await this.prismaService.user.findUnique({
             where: {
