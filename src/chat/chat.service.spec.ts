@@ -54,16 +54,14 @@ describe('ChatService', () => {
     expect((await service.deleteMessage(messageId)).id).toBeDefined()
   })
 
+  it("Проверка удаления чата", async () => {
+    expect((await service.deleteChat(chatId)))
+  })
+
   afterAll(async () => {
     await prisma.message.deleteMany({
       where: {
         text: "привет"
-      }
-    })
-
-    await prisma.chat.deleteMany({
-      where: {
-        sellerId: 64
       }
     })
   })
