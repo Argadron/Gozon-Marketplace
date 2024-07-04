@@ -14,6 +14,7 @@ import { ChatConnectDto } from './dto/chat-connect.dto';
 import { ChatDisconnectDto } from './dto/chat-disconnect.dto';
 import { EditMessageDto } from './dto/edit-message.dto';
 import { DeleteMessageDto } from './dto/delete-message.dto';
+import { DeleteChatDto } from './dto/delete-chat.dto';
 
 const constants = config()
 
@@ -45,7 +46,7 @@ export class ChatGateway {
     await this.chatService.createChat(User.id, user.id)
 
     client.emit("newChat", { username: User.username })
-    this.server.to(`${User.id}`).emit("newChat", { username })
+    this.server.to(`local:${User.id}`).emit("newChat", { username })
   }
 
   @SubscribeMessage("joinChat")
@@ -92,11 +93,13 @@ export class ChatGateway {
 
     if (!Chat) throw new NotFoundException("Chat not found!")
 
-    if ((await this.chatService.findMessage(payload.messageId)).userId !== user.id) throw new ForbiddenException("This is not your meesage!")
+    const oldMessage = await this.chatService.findMessage(payload.messageId)
+
+    if (!oldMessage) throw new NotFoundException("Message not found")
+
+    if (oldMessage.userId !== user.id) throw new ForbiddenException("This is not your message!")
 
     const message = await this.chatService.editMessage(payload.message, payload.messageId)
-
-    if (!message) throw new NotFoundException("Message not found")
 
     this.server.to(`chat:${Chat.id}`).emit("messageEdited", { messageId: message.id, userId: message.userId, text: message.text })
   }
@@ -104,12 +107,28 @@ export class ChatGateway {
   @SubscribeMessage("deleteMessage")
   @UsePipes(new ValidationPipe())
   async deleteMessage(@ConnectedSocket() client: Socket, @MessageBody() payload: DeleteMessageDto, @WebsocketUser() user: JwtUser) {
-    if ((await this.chatService.findMessage(payload.messageId)).userId !== user.id) throw new ForbiddenException("This is not your meesage!")
+    const message = await this.chatService.findMessage(payload.messageId)
+    
+    if (!message) throw new NotFoundException("Message not found")
+
+    if (message.userId !== user.id) throw new ForbiddenException("This is not your message!")
       
     const deleted = await this.chatService.deleteMessage(payload.messageId)
 
-    if (!deleted) throw new NotFoundException("Message not found")
-
     this.server.to(`chat:${payload.room}`).emit("messageDeleted", { userId: user.id, messageId: deleted.id, text: deleted.text })
+  }
+
+  @SubscribeMessage("deleteChat")
+  @UsePipes(new ValidationPipe())
+  async deleteChat(@ConnectedSocket() client: Socket, @MessageBody() payload: DeleteChatDto, @WebsocketUser() user: JwtUser) {
+    const Chat = await this.chatService.findChat(user.id, user.id)
+
+    if (!Chat) throw new NotFoundException("Chat not found")
+
+    if (payload.chatId !== Chat.id) throw new ForbiddenException("You cannot delete this chat!")
+
+    await this.chatService.deleteChat(Chat.id)
+
+    this.server.to(`chat:${Chat.id}`).emit("deleteChat", { deletorId: user.id, chatId: Chat.id })
   }
 }

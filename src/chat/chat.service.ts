@@ -36,6 +36,19 @@ export class ChatService {
         })
     }
 
+    async deleteChat(chatId: number) {  
+        await this.prismaService.message.deleteMany({ where: { chatId } })
+
+        return await this.prismaService.chat.delete({
+            where: {
+                id: chatId
+            },
+            include: {
+                messages: true
+            }
+        })
+    }
+
     async sendMessage(message: string, userId: number, chatId: number) {
         return await this.prismaService.message.create({
             data: {

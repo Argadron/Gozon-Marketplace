@@ -25,7 +25,8 @@ export class UsersService {
                 userProducts: true,
                 reviews: true,
                 alerts: true,
-                reports: true
+                reports: true,
+                chats: true
             }
         })
 
