@@ -1,5 +1,12 @@
 import { ArgumentMetadata, Injectable, PipeTransform } from "@nestjs/common";
 
+/**
+ * This pipe parse query string to array.
+ * Example: "test=["hello!", "world"]" => ["hello", "world"]
+ * Include - plants need to transform
+ * Execlude - skip this plants 
+ * Use: new StringToArrayPipe().Include(["test"])
+ */
 @Injectable()
 export class StringToArrayPipe implements PipeTransform {
     private ExecludePlants: string[] = [];

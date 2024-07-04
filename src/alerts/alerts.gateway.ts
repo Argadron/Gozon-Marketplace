@@ -7,6 +7,7 @@ import { BadRequestException, UseFilters, UseGuards, UsePipes, ValidationPipe } 
 import { WebSocketExecption } from "../common/filters/websockets-execeptions.filter";
 import { WebSocketJwtGuard } from "../common/guards/WebsocketJwt.guard";
 import { AdminGuard } from "../auth/guards/admin.guard";
+import { OptionalValidatorPipe } from "../common/pipes/optional-validator.pipe";
 
 const constants = config()
 
@@ -20,7 +21,7 @@ export class AlertsGateWay {
     @WebSocketServer() private readonly server: Server;
 
     @SubscribeMessage("sendAlert")
-    @UsePipes(new ValidationPipe())
+    @UsePipes(new OptionalValidatorPipe().check(["username", "isGlobal"]), new ValidationPipe())
     @UseGuards(AdminGuard)
     async alert(@ConnectedSocket() client: Socket, @MessageBody() payload: SendAlertDto) {
        if (payload.isGlobal) return this.server.emit("alert", payload.description)

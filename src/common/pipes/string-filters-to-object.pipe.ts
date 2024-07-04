@@ -1,6 +1,9 @@
 import { ArgumentMetadata, Injectable, PipeTransform } from "@nestjs/common";
 import { ObjectTypeParser } from "../../helpers/objectTypeParser";
 
+/**
+ * Parse query filters to object
+ */
 @Injectable()
 export class StringFiltersToObject implements PipeTransform {
     transform(value: any, metadata: ArgumentMetadata) {

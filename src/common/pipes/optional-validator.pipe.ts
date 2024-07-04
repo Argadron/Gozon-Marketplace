@@ -1,5 +1,10 @@
 import { ArgumentMetadata, BadRequestException, Injectable, PipeTransform } from "@nestjs/common";
 
+/**
+ * This pipe validate optional plants.
+ * Example: Missing name or email. Type: new OptionalValidatorPipe().check(["name", "email"])
+ * If name and email is null, throw BadRequest error
+ */
 @Injectable()
 export class OptionalValidatorPipe implements PipeTransform {
     private plants: string[] = [];
@@ -17,7 +22,7 @@ export class OptionalValidatorPipe implements PipeTransform {
 
         value === undefined ? check = true : null
 
-        if (!check && !value?.role) throw new BadRequestException("One of optional plants must be writed")
+        if (!check && !value?.role && !value.client) throw new BadRequestException(`One of optional plants must be writed: ${this.plants}`)
 
         return value
     }

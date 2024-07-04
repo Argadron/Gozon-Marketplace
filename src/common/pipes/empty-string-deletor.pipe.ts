@@ -1,5 +1,8 @@
 import { ArgumentMetadata, Injectable, PipeTransform } from "@nestjs/common";
 
+/**
+ * This pipe delete empty string from request body
+ */
 @Injectable()
 export class EmptyStringDeletorPipe implements PipeTransform {
     transform(value: any, metadata: ArgumentMetadata) {
