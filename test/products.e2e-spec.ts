@@ -93,6 +93,12 @@ describe("ProductsController (E2E)", () => {
         .expect(200)
     })
 
+    it("/api/products/only/reports (GET) (Проверка получения продуктов с репортами)", async () => {
+        return request(app.getHttpServer())
+        .get("/api/products/only/reports")
+        .expect(200)
+    })
+
     it("/api/products/newProduct (POST) (Проверка создания продукта)", async () => {
         return request(app.getHttpServer())
         .post("/api/products/newProduct")

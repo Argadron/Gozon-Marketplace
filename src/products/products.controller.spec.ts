@@ -72,6 +72,10 @@ describe('ProductsController', () => {
     expect((await controller.getById(1))).toBeDefined()
   })
 
+  it("Проверка получения продуктов с жалобами", async () => {
+    expect((await controller.getWithReports()).length).toBeDefined()
+  })
+
   it("Проверка получения фото продукта по ID", async () => {
     expect((await controller.getPhotoById(1, response))).toBeDefined()
   })

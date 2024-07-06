@@ -75,6 +75,10 @@ describe('ProductsService', () => {
     expect((await service.getPhotoById(1, response))).toBeDefined()
   })
 
+  it("Проверка получения продуктов с жалобами", async () => {
+    expect((await service.getWithReports()).length).toBeDefined()
+  })
+
   it("Проверка создания продукта", async () => {
     expect((await service.create(testNewProduct, testSeller)).name).toBeDefined()
   })
