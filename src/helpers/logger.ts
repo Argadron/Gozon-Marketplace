@@ -1,7 +1,7 @@
-import { ExecutionContext } from "@nestjs/common";
+import { ExecutionContext, Logger } from "@nestjs/common";
 import { Response } from 'express'
 
-class Logger {
+class LoggerHelper {
     before(ctx: ExecutionContext, debugMode: boolean) {
         const time = new Date() 
         const hours = time.getUTCHours() + 5 
@@ -17,9 +17,9 @@ class Logger {
         const url = request.url
         const body = JSON.stringify(request.body) || null 
       
-        const log = `[LOG] [${hours}:${mins}] [${type}] [${url}] request Body: ${debugMode ? body : body.length > 2 ? true: false}\n` 
+        const log = `[${hours}:${mins}] [${type}] [${url}] request Body: ${debugMode ? body : body.length > 2 ? true: false}\n` 
       
-        console.log(log)
+        Logger.log(log)
     }
 
     after(ctx: ExecutionContext, data: unknown) {
@@ -37,19 +37,19 @@ class Logger {
         
         typeof(data) === "object" ? data = JSON.stringify(data) : null
         
-        const log = `[DEBUG] [${status}] [${hours}:${mins}] response body: ${data}`
+        const log = `[${status}] [${hours}:${mins}] response body: ${data}`
 
-        console.log(log)
+        Logger.debug(log)
 
         if (status >= 500) {
             const handler = ctx.getHandler() 
             const controller = ctx.getClass()
             
-            const error = `[ERROR] [${status}] [${hours}:${mins}] in ${controller} in method ${handler} response body: ${data}`
+            const error = `[${status}] [${hours}:${mins}] in ${controller} in method ${handler} response body: ${data}`
 
-            console.error(error)
+            Logger.error(error)
         }
     }
 }
 
-export default new Logger()
+export default new LoggerHelper()
