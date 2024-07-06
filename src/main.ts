@@ -4,6 +4,7 @@ import config from '@config/constants'
 import { GlobalLogger } from '@interceptors/globalLogger.interceptor';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser'
+import { InternalExceptionsFilter } from '@filters/internal-exceptions.filter';
 
 const constants = config()
 
@@ -18,6 +19,7 @@ async function bootstrap() {
     exposedHeaders: "Set-Cookie"
   })
   app.useGlobalInterceptors(new GlobalLogger)
+  app.useGlobalFilters(new InternalExceptionsFilter)
   app.use(cookieParser())
   
   const swaggerConfig = new DocumentBuilder()

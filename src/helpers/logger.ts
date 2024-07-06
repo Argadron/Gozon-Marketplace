@@ -1,8 +1,8 @@
-import { ExecutionContext, Logger } from "@nestjs/common";
-import { Response } from 'express'
+import { ArgumentsHost, ExecutionContext, InternalServerErrorException, Logger } from "@nestjs/common";
+import { Request, Response } from 'express'
 
 class LoggerHelper {
-    before(ctx: ExecutionContext, debugMode: boolean) {
+    private createDate() {
         const time = new Date() 
         const hours = time.getUTCHours() + 5 
         let mins: any = time.getUTCMinutes() 
@@ -10,6 +10,14 @@ class LoggerHelper {
         if (mins < 10) {
             mins = `0${mins}`
         }
+
+        return {
+            hours, mins
+        }
+    }
+
+    before(ctx: ExecutionContext, debugMode: boolean) {
+        const { hours, mins } = this.createDate()
       
         const request: Request = ctx.switchToHttp().getRequest()
 
@@ -25,13 +33,7 @@ class LoggerHelper {
     after(ctx: ExecutionContext, data: unknown) {
         const response: Response = ctx.switchToHttp().getResponse()
 
-        const time = new Date() 
-        const hours = time.getUTCHours() + 5 
-        let mins: any = time.getUTCMinutes() 
-
-        if (mins < 10) {
-            mins = `0${mins}`
-        }
+        const { hours, mins } = this.createDate()
 
         const status = response.statusCode
         
@@ -40,15 +42,29 @@ class LoggerHelper {
         const log = `[${status}] [${hours}:${mins}] response body: ${data}`
 
         Logger.debug(log)
+    }
 
-        if (status >= 500) {
-            const handler = ctx.getHandler() 
-            const controller = ctx.getClass()
-            
-            const error = `[${status}] [${hours}:${mins}] in ${controller} in method ${handler} response body: ${data}`
+    error(exception: any, host: ArgumentsHost) {
+        const { hours, mins } = this.createDate()
 
-            Logger.error(error)
+        let error: string;
+
+        if (exception satisfies Error && !(exception instanceof InternalServerErrorException)) {
+            const request: Request = host.switchToHttp().getRequest()
+
+            const body = JSON.stringify(request.body)
+
+            error = `[Internal] [${hours}:${mins}] [${request.method}] Untracked error in processing user request by url: ${request.url} \n request body: ${body}`
         }
+        else {
+            const request: Request = host.switchToHttp().getRequest()
+
+            const body = JSON.stringify(request.body)
+
+            error = `[500] [${hours}:${mins}] [${request.method}] error in processing user request by url ${request.url} \n body: ${body} `
+        }
+
+        Logger.error(error, exception.stack)
     }
 }
 
