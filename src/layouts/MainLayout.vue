@@ -8,8 +8,13 @@
                     <p style="color: white;" class="cursor-pointer" @click="toMain" v-if="!$q.screen.lt.sm">
                       GOZON
                     </p>
-                    <div @click="toUser" class=" cursor-pointer" style="flex: 1 1 0%; text-align: right;">
-                        <p  style="display: inline; color: white;">Личный кабинет</p> <q-icon name="person_outline" class="text-white" size="30px"></q-icon>
+
+
+                    <div  style="flex: 1 1 0%; text-align: right;">
+                            <q-icon size="larger" class="cursor-pointer" name="notifications" style="margin-right: 15px;" />
+                            <p @click="toUser" class=" cursor-pointer"  style="display: inline; color: white;">Личный кабинет</p> 
+                            <q-icon name="person_outline" class="text-white animated-icon pulse" size="30px"></q-icon>
+                        
                     </div>
               </q-toolbar-title>
               
@@ -26,6 +31,9 @@
 </template>
 
 <script>
+import io from 'socket.io-client';
+import requeter from '../boot/requester';
+
 export default{
     methods:{
         toUser(){
@@ -34,7 +42,27 @@ export default{
         toMain(){
             window.location.href = "/"
         }
+    },
+    async created(){
+    //     const socket = io("http://localhost:3000", {
+    //         auth: {
+    //             token:localStorage.accessToken
+    //         }
+    //     });
+    //     console.log(socket.connected)
+
+    //    socket.emit('sendAlert',{
+    //         auth: {
+    //             token:localStorage.accessToken
+    //         }
+    //     })
+       // const {alerts} = requeter("GET","users/getProfile")
+        // socket.on('message',(message)=>{
+        //     console.log(message)
+        // })
     }
+       
+    
 }
 
 </script>

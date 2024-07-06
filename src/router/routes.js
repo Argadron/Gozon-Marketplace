@@ -1,3 +1,5 @@
+import { components } from 'vuetify/dist/vuetify-labs.js'
+
 const routes = [
   {
     path: '/',
@@ -8,6 +10,7 @@ const routes = [
       { path: 'user', component:()=> import('pages/user.vue')},
       { path: 'login', component:()=> import('pages/login.vue')},
       { path: 'product', component:()=> import('pages/product.vue')},
+      { path: 'admin', component:()=>import('pages/admin.vue')}
     ]
   },
 

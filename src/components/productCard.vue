@@ -1,6 +1,6 @@
 <template>
-    <div style="width: 240px;" class="product-container" >
-        <div style="text-align: center;" class="cursor-pointer toProduct" @click="toProduct">
+    <div style="width: 240px;" class="product-container">
+        <div style="text-align: center;" class="cursor-pointer toProduct" @click="toProduct()">
             <img style="width: 15vw;" src="../assets/largelogo.png">
             <p style="color: var(--q-accent); font-size: larger; text-align: center;" class="text-truncate">{{ formattedName }}</p>
             <p class="text-truncate">{{formattedDescription }}</p>
@@ -10,8 +10,23 @@
             <q-btn :label="dropedInBasket ? 'В корзину' : 'Купить'"  style="max-height: 35px;" @click="dropedInBasket ? saveToBasket() : dropToBasket()"/>
             <q-input type="number" v-model="count" v-if="dropedInBasket" label="Введите количество"/>
         </div>
+        <div class="bottom flex justify-between items-center">
+            <div class="icon-text-wrapper">
+                <q-icon color="warning" name="warning">
+                    <q-tooltip content="Описание количества жалоб">Жалобы</q-tooltip>
+                </q-icon>
+                <p>{{ product.reports.length }}</p>
+            </div>
+            <div class="icon-text-wrapper">
+                <q-icon id="reviewsItem" color="info" name="info">
+                    <q-tooltip content="Описание количества отзывов">Отзывы</q-tooltip>
+                </q-icon>
+                <p>{{ product.reviews.length }}</p>
+            </div>
+        </div>
     </div>
 </template>
+
 
 <script>
 import {formattedString} from "src/boot/formatted.js"
@@ -28,20 +43,24 @@ export default {
         }
         /*
         {
-        "id": 1,
-        "name": "Автоувлажнитель",
-        "description": "Мегаультрасупердуперувлажнитель всего за 299.499",
-        "price": 3000000,
-        "rate": 0,
-        "reports": 2,
-        "count": 3,
-        "tags": [
-            "#dlyaloxow #Скамлоха"
-        ],
-        "productPhoto": "no",
-        "isSold": false,
-        "createdAt": "2023-01-30T17:43:33.629Z",
-        "updatedAt": "2023-01-30T17:43:33.629Z"
+            "id": 1,
+            "name": "Товар 2",
+            "description": "Описани очень  длинное ываываываываываываыв",
+            "price": 20,
+            "rate": 220,
+            "reportsCount": 0,
+            "count": 30,
+            "tags": [
+                "тэг1"
+            ],
+            "categories": [],
+            "productPhoto": "no",
+            "isSold": false,
+            "sellerId": 1,
+            "createdAt": "2024-07-03T16:59:11.891Z",
+            "updatedAt": "2024-07-03T16:59:11.891Z",
+            "reviews": [],
+            "reports": []
         }
         */
     },
@@ -138,5 +157,23 @@ export default {
 /* Для поддержки Firefox */
 .text-truncate {
   word-wrap: break-word;
+}
+
+.stars span {
+    font-size: 1.2em;
+    color: gold;
+}
+
+.stars span.filled {
+    color: orange;
+}
+.icon-text-wrapper {
+    display: flex;
+    align-items: center;
+}
+.reviewsItem{
+    margin: 0;
+    padding: 0;
+    translate: 0;
 }
 </style>

@@ -1,4 +1,4 @@
-export default function (e) {
+export default function (e:any) {
     if(e.response?.data?.message){
         console.log(e)
         switch(e.response?.data?.message){

@@ -7,7 +7,12 @@
             <p style="margin-left:5px;font-size:25px; color: var(--q-text);">{{ user.username }}</p>
         </div>
        
-        <q-btn @click="sellerDialogCall = true" style="justify-self: flex-end; max-height: 5vh">Я хочу стать продавцом!</q-btn>
+        <q-btn v-if="user.role !== 'SELLER'" @click="sellerDialogCall = true" style="justify-self: flex-end; max-height: 5vh">Я хочу стать продавцом!</q-btn>
+    </div>
+
+    <div v-if="user.role === 'SELLER'" class="seller-api">
+        <h3 style="color: var(--q-text); text-align: center;">Мои продукты</h3>
+        <div @click="createProduct()" class="sellerProducts"><q-btn icon="add" label="Создать продукт"/></div>
     </div>
 
     <h3 style="margin:0; text-align: center;">Корзина</h3>
@@ -51,6 +56,9 @@ export default{
                             count:element.productCount
                 }
             })); 
+        },
+        createProduct(){
+            window.location.href = 'createProduct'
         }
     },
     components:{
