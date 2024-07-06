@@ -1,13 +1,13 @@
 import { Body, Controller, Get, Post, Put, Res, UseGuards, UsePipes, ValidationPipe, HttpCode, Delete, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { JwtGuard } from '../auth/guards/jwt.guard';
-import { User } from '../auth/decorators/get-user.decorator';
+import { JwtGuard } from '@guards/jwt.guard';
+import { User } from '@decorators/get-user.decorator';
 import { JwtUser } from '../auth/interfaces';
-import { SwaggerBadRequest, SwaggerConflictMessage, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '../swagger/apiResponse.interfaces';
+import { SwaggerBadRequest, SwaggerConflictMessage, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
 import { Response } from 'express';
 import { UpdateUserStatusDto } from './dto/update-user-status.dto';
-import { AdminGuard } from '../auth/guards/admin.guard';
+import { AdminGuard } from '@guards/admin.guard';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { AddBlackListDto } from './dto/add-blacklist-dto';
 

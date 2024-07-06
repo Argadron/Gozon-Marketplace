@@ -1,14 +1,14 @@
 import { Body, Controller, Delete, Param, ParseIntPipe, Post, Put, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
-import { JwtGuard } from '../auth/guards/jwt.guard';
+import { JwtGuard } from '@guards/jwt.guard';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { SwaggerBadRequest, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '../swagger/apiResponse.interfaces';
+import { SwaggerBadRequest, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
 import { CreateReviewDto } from './dto/create-review.dto';
-import { User } from '../auth/decorators/get-user.decorator';
+import { User } from '@decorators/get-user.decorator';
 import { JwtUser } from '../auth/interfaces';
 import { EditReviewDto } from './dto/edit-review.dto';
-import { OptionalValidatorPipe } from '../common/pipes/optional-validator.pipe';
-import { EmptyStringDeletorPipe } from '../common/pipes/empty-string-deletor.pipe';
+import { OptionalValidatorPipe } from '@pipes/optional-validator.pipe';
+import { EmptyStringDeletorPipe } from '@pipes/empty-string-deletor.pipe';
 
 @Controller('reviews')
 @UseGuards(JwtGuard)

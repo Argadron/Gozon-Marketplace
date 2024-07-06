@@ -2,13 +2,13 @@ import { Body, Controller, Get, Post, Put, Query, UseGuards, UsePipes, Validatio
 import { SellerRequirementsService } from './seller-requirements.service';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtUser } from '../auth/interfaces';
-import { SwaggerBadRequest, SwaggerConflictMessage, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '../swagger/apiResponse.interfaces';
+import { SwaggerBadRequest, SwaggerConflictMessage, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
 import { CreateSellerRequirementDto } from './dto/create-seller-requirement.dto';
-import { User } from '../auth/decorators/get-user.decorator';
-import { JwtGuard } from '../auth/guards/jwt.guard';
-import { AdminGuard } from '../auth/guards/admin.guard';
+import { User } from '@decorators/get-user.decorator';
+import { JwtGuard } from '@guards/jwt.guard';
+import { AdminGuard } from '@guards/admin.guard';
 import { GetAllRequirementsDto } from './dto/get-all-requirements-query.dto';
-import { ObjectStringToIntPipe } from '../common/pipes/object-string-to-int.pipe';
+import { ObjectStringToIntPipe } from '@pipes/object-string-to-int.pipe';
 import { CloseSellerRequirementDto } from './dto/close-seller-requirement.dto';
 
 @Controller('seller-requirements')

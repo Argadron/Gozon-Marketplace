@@ -1,13 +1,13 @@
 import { Body, Controller, Delete, Param, ParseIntPipe, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AlertsService } from './alerts.service';
-import { JwtGuard } from '../auth/guards/jwt.guard';
-import { AdminGuard } from '../auth/guards/admin.guard';
+import { JwtGuard } from '@guards/jwt.guard';
+import { AdminGuard } from '@guards/admin.guard';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { SwaggerBadRequest, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '../swagger/apiResponse.interfaces';
+import { SwaggerBadRequest, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
 import { SendAlertDto } from './dto/send-alert.dto';
-import { User } from '../auth/decorators/get-user.decorator';
+import { User } from '@decorators/get-user.decorator';
 import { JwtUser } from '../auth/interfaces';
-import { OptionalValidatorPipe } from '../common/pipes/optional-validator.pipe';
+import { OptionalValidatorPipe } from '@pipes/optional-validator.pipe';
 
 @Controller('alerts')
 @UseGuards(JwtGuard)
@@ -18,7 +18,7 @@ export class AlertsController {
   @Post("/send")
   @UseGuards(AdminGuard)
   @ApiOperation({ summary: "Send a alerts to users" })
-  @ApiResponse({ status: 200, description: "Alert sended", type: SwaggerCreated })
+  @ApiResponse({ status: 201, description: "Alert sended", type: SwaggerCreated })
   @ApiResponse({ status: 400, description: "Validation failed", type: SwaggerBadRequest })
   @ApiResponse({ status: 401, description: "Token Invalid /Unauthorized", type: SwaggerUnauthorizedException })
   @ApiResponse({ status: 403, description: "Your role not have access to this action", type: SwaggerForbiddenException })

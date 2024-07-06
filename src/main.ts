@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import config from './config/constants'
-import { GlobalLogger } from './common/interceptors/globalLogger.interceptor';
+import config from '@config/constants'
+import { GlobalLogger } from '@interceptors/globalLogger.interceptor';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser'
 

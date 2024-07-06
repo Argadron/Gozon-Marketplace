@@ -1,14 +1,14 @@
 import { Body, Controller, Delete, Param, ParseIntPipe, Post, Put, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ReportsService } from './reports.service';
-import { JwtGuard } from '../auth/guards/jwt.guard';
+import { JwtGuard } from '@guards/jwt.guard';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { SwaggerBadRequest, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '../swagger/apiResponse.interfaces';
+import { SwaggerBadRequest, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
 import { CreateReportDto } from './dto/create-report.dto';
-import { User } from '../auth/decorators/get-user.decorator';
+import { User } from '@decorators/get-user.decorator';
 import { JwtUser } from '../auth/interfaces';
 import { EditReportDto } from './dto/edit-report.dto';
-import { OptionalValidatorPipe } from '../common/pipes/optional-validator.pipe';
-import { EmptyStringDeletorPipe } from '../common/pipes/empty-string-deletor.pipe';
+import { OptionalValidatorPipe } from '@pipes/optional-validator.pipe';
+import { EmptyStringDeletorPipe } from '@pipes/empty-string-deletor.pipe';
 
 @Controller('reports')
 @UseGuards(JwtGuard)

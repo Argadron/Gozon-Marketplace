@@ -1,12 +1,12 @@
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { ChatService } from './chat.service';
-import config from '../config/constants'
+import config from '@config/constants'
 import { BadRequestException, ConflictException, ForbiddenException, NotFoundException, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
-import { WebSocketExecption } from '../common/filters/websockets-execeptions.filter';
+import { WebSocketExecption } from '@filters/websockets-execeptions.filter';
 import { Server, Socket } from 'socket.io'
 import { NewChatDto } from './dto/new-chat.dto';
 import { UsersService } from '../users/users.service';
-import { WebsocketUser } from '../auth/decorators/get-user-websocket.decorator';
+import { WebsocketUser } from '@decorators/get-user-websocket.decorator';
 import { WebSocketJwtGuard } from '../common/guards/WebsocketJwt.guard';
 import { JwtUser } from '../auth/interfaces';
 import { NewMessageDto } from './dto/new-message.dto';

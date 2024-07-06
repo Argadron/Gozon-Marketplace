@@ -4,7 +4,7 @@ import { AuthDto } from './dto/auth.dto';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiResponse, ApiOperation, ApiBearerAuth, ApiTags, ApiCookieAuth } from '@nestjs/swagger';
-import { SwaggerBadRequest, SwaggerJwtUser, SwaggerConflictMessage, SwaggerOK, SwaggerForbiddenException, SwaggerUnauthorizedException } from '../swagger/apiResponse.interfaces';
+import { SwaggerBadRequest, SwaggerJwtUser, SwaggerConflictMessage, SwaggerOK, SwaggerForbiddenException, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
 import { Token } from './decorators/get-token.decorator';
 import { User } from './decorators/get-user.decorator';
 import { JwtUser } from './interfaces';

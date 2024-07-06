@@ -1,21 +1,21 @@
 import { Controller, Get, Query, ValidationPipe, UsePipes, Param, ParseIntPipe, Post, UseGuards, Body, UploadedFile, Put, Res, Delete, UseInterceptors } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { ApiOperation, ApiResponse, ApiQuery, ApiBearerAuth, ApiTags, ApiBody } from '@nestjs/swagger';
-import { SwaggerBadRequest, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '../swagger/apiResponse.interfaces';
+import { SwaggerBadRequest, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
 import { AllProductsDto } from './dto/all-products.dto';
-import { ObjectStringToIntPipe } from '../common/pipes/object-string-to-int.pipe';
-import { SellerGuard } from '../auth/guards/seller.guard';
+import { ObjectStringToIntPipe } from '@pipes/object-string-to-int.pipe';
+import { SellerGuard } from '@guards/seller.guard';
 import { CreateProductDto } from './dto/create-product.dto';
 import { JwtUser } from '../auth/interfaces';
-import { User } from '../auth/decorators/get-user.decorator';
-import { JwtGuard } from '../auth/guards/jwt.guard';
-import { StringFiltersToObject } from '../common/pipes/string-filters-to-object.pipe';
+import { User } from '@decorators/get-user.decorator';
+import { JwtGuard } from '@guards/jwt.guard';
+import { StringFiltersToObject } from '@pipes/string-filters-to-object.pipe';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { StringToArrayPipe } from '../common/pipes/string-to-array-pipe';
-import { OptionalValidatorPipe } from '../common/pipes/optional-validator.pipe';
-import { EmptyStringDeletorPipe } from '../common/pipes/empty-string-deletor.pipe';
+import { StringToArrayPipe } from '@pipes/string-to-array-pipe';
+import { OptionalValidatorPipe } from '@pipes/optional-validator.pipe';
+import { EmptyStringDeletorPipe } from '@pipes/empty-string-deletor.pipe';
 
 @Controller('products')
 @ApiTags("Products Controller")
