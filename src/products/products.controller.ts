@@ -48,6 +48,13 @@ export class ProductsController {
     return await this.productsService.getById(id)
   }
 
+  @Get("/only/reports")
+  @ApiOperation({ summary: "Return all products, who have 1 or more reports." })
+  @ApiResponse({ status: 200, description: "Products given", type: SwaggerOK })
+  async getWithReports() {
+    return await this.productsService.getWithReports()
+  }
+
   @Get(`/photo/:id`)
   @ApiOperation({ summary: "Get product photo by id" })
   @ApiResponse({ status: 200, description: "Return a product photo", type: SwaggerOK })

@@ -115,6 +115,16 @@ export class ProductsService {
         return this.fileService.get(res, product.productPhoto)
     }
 
+    async getWithReports() {
+        return await this.prismaService.product.findMany({
+            where: {
+                reportsCount: {
+                    gte: 1
+                }
+            }
+        })
+    }
+
     async create(dto: CreateProductDto, user: JwtUser, file: Express.Multer.File=undefined) {
         if (dto.categories?.length > 0) {
             const categories = await this.categoriesService.getAll()
