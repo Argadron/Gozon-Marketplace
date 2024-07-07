@@ -20,7 +20,8 @@ describe('ReportsService', () => {
     productId: 1
   }
   const testEditReport = {
-    name: "репортик"
+    name: "репортик",
+    reportId: 0
   }
   let reportId: number; 
 

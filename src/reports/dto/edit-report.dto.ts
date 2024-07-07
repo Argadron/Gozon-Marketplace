@@ -1,10 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { Expose } from "class-transformer";
 import { IsNumber, IsOptional, IsString, Min, MinLength } from "class-validator";
 
 export class EditReportDto {
     @IsString()
     @MinLength(1)
     @IsOptional()
+    @Expose()
     @ApiProperty({
         description: "New report header",
         type: String,
@@ -17,6 +19,7 @@ export class EditReportDto {
     @IsString()
     @MinLength(5)
     @IsOptional()
+    @Expose()
     @ApiProperty({
         description: "New report description",
         type: String,
@@ -28,6 +31,7 @@ export class EditReportDto {
 
     @IsNumber()
     @Min(1)
+    @Expose()
     @ApiProperty({
         description: "Id of report",
         type: Number,

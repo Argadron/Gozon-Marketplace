@@ -27,6 +27,7 @@ describe("ReviewsController (E2E)", () => {
         name: "отзыв",
         description: "отзыв",
         rate: 1,
+        reviewId: 0
       }
       let reviewId: number; 
 

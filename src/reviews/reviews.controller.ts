@@ -9,6 +9,7 @@ import { JwtUser } from '../auth/interfaces';
 import { EditReviewDto } from './dto/edit-review.dto';
 import { OptionalValidatorPipe } from '@pipes/optional-validator.pipe';
 import { EmptyStringDeletorPipe } from '@pipes/empty-string-deletor.pipe';
+import { ExcessPlantsValidatorPipe } from '@pipes/excess-plants-validator.pipe';
 
 @Controller('reviews')
 @UseGuards(JwtGuard)
@@ -39,8 +40,9 @@ export class ReviewsController {
   @ApiBody({
     type: EditReviewDto
   })
-  @UsePipes(new EmptyStringDeletorPipe(),new OptionalValidatorPipe().check(["name", "description", "rate"]), new ValidationPipe())
-  async editReview(@Body() dto: Partial<EditReviewDto>, @User() user: JwtUser) {
+  @UsePipes(new EmptyStringDeletorPipe(),new OptionalValidatorPipe().check(["name", "description", "rate"]), new ValidationPipe(),
+  new ExcessPlantsValidatorPipe().setType(EditReviewDto))
+  async editReview(@Body() dto: EditReviewDto, @User() user: JwtUser) {
     return await this.reviewsService.edit(dto, user)
   }
 

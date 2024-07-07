@@ -9,6 +9,7 @@ import { JwtUser } from '../auth/interfaces';
 import { EditReportDto } from './dto/edit-report.dto';
 import { OptionalValidatorPipe } from '@pipes/optional-validator.pipe';
 import { EmptyStringDeletorPipe } from '@pipes/empty-string-deletor.pipe';
+import { ExcessPlantsValidatorPipe } from '@pipes/excess-plants-validator.pipe';
 
 @Controller('reports')
 @UseGuards(JwtGuard)
@@ -38,8 +39,9 @@ export class ReportsController {
   @ApiResponse({ status: 404, description: "Report not found", type: SwaggerNotFound })
   @ApiBearerAuth()
   @ApiBody({ type: EditReportDto })
-  @UsePipes(new EmptyStringDeletorPipe(),new OptionalValidatorPipe().check(["name", "description"]),new ValidationPipe())
-  async editReport(@Body() dto: Partial<EditReportDto>, @User() user: JwtUser) {
+  @UsePipes(new EmptyStringDeletorPipe(),new OptionalValidatorPipe().check(["name", "description"]),new ValidationPipe(),
+  new ExcessPlantsValidatorPipe().setType(EditReportDto))
+  async editReport(@Body() dto: EditReportDto, @User() user: JwtUser) {
     return await this.reportsService.edit(dto, user)
   }
 

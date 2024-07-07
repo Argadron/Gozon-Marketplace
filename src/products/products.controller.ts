@@ -16,6 +16,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { StringToArrayPipe } from '@pipes/string-to-array-pipe';
 import { OptionalValidatorPipe } from '@pipes/optional-validator.pipe';
 import { EmptyStringDeletorPipe } from '@pipes/empty-string-deletor.pipe';
+import { ExcessPlantsValidatorPipe } from '@pipes/excess-plants-validator.pipe';
 
 @Controller('products')
 @ApiTags("Products Controller")
@@ -86,9 +87,11 @@ export class ProductsController {
   @ApiBearerAuth()
   @ApiBody({ type: UpdateProductDto })
   @UseGuards(JwtGuard, SellerGuard)
+  @UseInterceptors(FileInterceptor("file"))
   @UsePipes(ObjectStringToIntPipe, new StringToArrayPipe().Include(["tags", "categories"]), new EmptyStringDeletorPipe(),
-  new OptionalValidatorPipe().check(["name", "description", "price", "count", "tags", "categories"]),new ValidationPipe())
-  async editProduct(@Body() dto: Partial<UpdateProductDto>, @User() user: JwtUser, @UploadedFile() file: Express.Multer.File=undefined) {
+  new OptionalValidatorPipe().check(["name", "description", "price", "count", "tags", "categories"]),new ValidationPipe(),
+  new ExcessPlantsValidatorPipe().setType(UpdateProductDto))
+  async editProduct(@Body() dto: UpdateProductDto, @User() user: JwtUser, @UploadedFile() file: Express.Multer.File=undefined) {
     return await this.productsService.update(dto, user, file)
   }
 

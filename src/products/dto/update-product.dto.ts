@@ -1,9 +1,11 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { Expose } from "class-transformer";
 import { IsArray, IsNumber, IsOptional, IsString, Min, MinLength } from "class-validator";
 
 export class UpdateProductDto {
     @IsNumber()
     @Min(1)
+    @Expose()
     @ApiProperty({
         description: "Product id",
         type: Number,
@@ -15,6 +17,7 @@ export class UpdateProductDto {
     @IsString()
     @MinLength(5)
     @IsOptional()
+    @Expose()
     @ApiProperty({
         description: "New product name",
         type: String,
@@ -27,6 +30,7 @@ export class UpdateProductDto {
     @IsString()
     @MinLength(10)
     @IsOptional()
+    @Expose()
     @ApiProperty({
         description: "New product description",
         type: String,
@@ -38,6 +42,7 @@ export class UpdateProductDto {
     @IsNumber()
     @Min(1)
     @IsOptional()
+    @Expose()
     @ApiProperty({
         description: "New product price",
         type: Number,
@@ -50,6 +55,7 @@ export class UpdateProductDto {
     @IsNumber()
     @Min(1)
     @IsOptional()
+    @Expose()
     @ApiProperty({
         description: "New product count",
         type: Number,
@@ -61,6 +67,7 @@ export class UpdateProductDto {
 
     @IsArray()
     @IsOptional()
+    @Expose()
     @ApiProperty({
         description: "New product tags",
         type: [String],
@@ -71,6 +78,7 @@ export class UpdateProductDto {
 
     @IsArray()
     @IsOptional()
+    @Expose()
     @ApiProperty({
         description: "New product categories",
         type: [String],
@@ -80,6 +88,7 @@ export class UpdateProductDto {
     readonly categories?: string[];
 
     @IsOptional()
+    @Expose()
     @ApiProperty({
         description: "New product photo",
         type: String,
