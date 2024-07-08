@@ -23,7 +23,6 @@ describe("ReviewsController (E2E)", () => {
         rate: 1
       }
       const testEditReview = {
-        productId: 1,
         name: "отзыв",
         description: "отзыв",
         rate: 1,

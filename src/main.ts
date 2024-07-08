@@ -2,9 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import config from '@config/constants'
 import { GlobalLogger } from '@interceptors/globalLogger.interceptor';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser'
 import { InternalExceptionsFilter } from '@filters/internal-exceptions.filter';
+import { SwaggerModuleLocal } from '@swagger/swagger.module';
 
 const constants = config()
 
@@ -21,29 +21,8 @@ async function bootstrap() {
   app.useGlobalInterceptors(new GlobalLogger)
   app.useGlobalFilters(new InternalExceptionsFilter)
   app.use(cookieParser())
-  
-  const swaggerConfig = new DocumentBuilder()
-  .setTitle("The Gozon API")
-  .setDescription("Documentation Gozon API")
-  .setVersion(constants.API_VERSION)
-  .addBearerAuth({
-    type: "http",
-    bearerFormat: "JWT",
-    in: "header",
-    scheme: "bearer",
-    name: "JWT",
-    description: "Enter your access jwt token",
-  })
-  .addCookieAuth(constants.REFRESH_TOKEN_COOKIE_NAME, {
-    type: "apiKey",
-    in: "cookie",
-    description: "Enter your cookie refresh jwt token",
-    name: constants.REFRESH_TOKEN_COOKIE_NAME
-  })
-  .build()
-  
-  const document = SwaggerModule.createDocument(app, swaggerConfig)
-  SwaggerModule.setup("/swagger", app, document)
+
+  SwaggerModuleLocal.forRoot(app)
 
   await app.listen(constants.PORT, constants.HOST);
 }
