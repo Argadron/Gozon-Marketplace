@@ -84,3 +84,14 @@ export class SwaggerCreated {
     @ApiProperty({ description: "Error message", default: "" })
     readonly error: string;
 }
+
+export class SwaggerNoContent {
+    @ApiProperty({ description: "Code from response", default: 204 })
+    readonly statusCode: number; 
+
+    @ApiProperty({ description: "Response message", default: "" })
+    readonly message: string; 
+
+    @ApiProperty({ description: "Error message", default: "" })
+    readonly error: string;
+}
