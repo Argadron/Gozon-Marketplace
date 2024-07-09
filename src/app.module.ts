@@ -12,12 +12,15 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { ReportsModule } from './reports/reports.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ChatModule } from './chat/chat.module';
+import { EmailModule } from './email/email.module';
+import { EmailService } from './email/email.service';
 
 @Module({
   imports: [AuthModule, ConfigModule.forRoot({
     isGlobal: true
-  }), UsersModule, ProductsModule, SellerRequirementsModule, AlertsModule, BasketModule, ReviewsModule, ReportsModule, CategoriesModule, ChatModule],
+  }), UsersModule, ProductsModule, SellerRequirementsModule, AlertsModule, BasketModule, ReviewsModule,
+  ReportsModule, CategoriesModule, ChatModule, EmailModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, EmailService],
 })
 export class AppModule {}
