@@ -11,6 +11,7 @@ import { LocalStrategy } from './strategies/jwt.strategy';
 import { SellerGuard } from './guards/seller.guard';
 import { AdminGuard } from './guards/admin.guard';
 import { UsersModule } from '../users/users.module';
+import { EmailModule } from '../email/email.module';
 
 const constants = config()
 
@@ -18,7 +19,7 @@ const constants = config()
   imports: [JwtModule.register({
       global: true,
       secret: constants.JWT_SECRET
-  }), UsersModule],
+  }), UsersModule, EmailModule],
   controllers: [AuthController],
   providers: [AuthService, PrismaService, ConfigService, FileService, JwtGuard, LocalStrategy, AdminGuard, SellerGuard],
   exports: [JwtGuard, LocalStrategy, AdminGuard, SellerGuard]

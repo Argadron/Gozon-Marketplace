@@ -11,6 +11,7 @@ import 'dotenv/config'
 import prismaTestClient from '../src/prisma-client.forTest'
 import { JwtGuard } from '../src/auth/guards/jwt.guard';
 import { RoleEnum } from '@prisma/client';
+import { EmailModule } from '../src/email/email.module'
 
 const prisma = prismaTestClient()
 
@@ -37,7 +38,7 @@ describe("AuthController (E2E)", () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [AuthModule, JwtModule.register({
                 secret: "secret"
-            }), ConfigModule.forRoot()],
+            }), ConfigModule.forRoot(), EmailModule],
             providers: [PrismaService, ConfigService, FileService]
         }).overrideGuard(JwtGuard).useValue({
             canActivate: (ctx: ExecutionContext) => {

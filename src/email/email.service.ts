@@ -1,7 +1,7 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Transporter, createTransport } from "nodemailer";
-import { EmailOptions } from "./interfaces";
+import { CreateTag, EmailOptions } from "./interfaces";
 import * as fs from 'fs'
 import * as path from 'path'
 import { v4 } from 'uuid'
@@ -29,7 +29,7 @@ export class EmailService {
        })
     }
 
-    private async sendEmail(emailOptions: EmailOptions) {
+    async sendEmail(emailOptions: EmailOptions) {
         let html = await fs.promises.readFile(path.join("src", "email", "public", "public.html"), { encoding: "utf-8" })
         html = templater(html, emailOptions.templateObject)
 
@@ -51,7 +51,7 @@ export class EmailService {
 
         if (!User.email) throw new BadRequestException("User not has email")
 
-        if (await this.prismaService.emailConfirms.findUnique({ where: { userId: User.id } })) throw new ConflictException("Already has email")
+        if (await this.findTagByUserId(User.id)) throw new ConflictException("Already has email")
 
         const urlTag = v4()
 
@@ -66,12 +66,7 @@ export class EmailService {
             }
         })
 
-        return await this.prismaService.emailConfirms.create({
-            data: {
-                userId: User.id,
-                urlTag
-            }
-        })
+        return await this.createTag({ userId: user.id, urlTag })
     }
 
     async validateTag(tag: string) {
@@ -84,13 +79,31 @@ export class EmailService {
         if (!verifyObject) throw new NotFoundException("Tag not found")
 
         await this.usersService.update({
-            isEmailVerify: true
+            isEmailVerify: this.configService.get("NODE_ENV") === "test" ? false : true
         }, verifyObject.userId)
+       
+        await this.deleteTagByUserId(verifyObject.userId)
+    }
 
-        await this.prismaService.emailConfirms.delete({
+    async findTagByUserId(userId: number) {
+        return await this.prismaService.emailConfirms.findUnique({
             where: {
-                userId: verifyObject.userId
+                userId
             }
+        })
+    }
+
+    async deleteTagByUserId(userId: number) {
+        return await this.prismaService.emailConfirms.delete({
+            where: {
+                userId
+            }
+        })
+    }
+
+    async createTag(data: CreateTag) {
+        return await this.prismaService.emailConfirms.create({
+            data
         })
     }
 }

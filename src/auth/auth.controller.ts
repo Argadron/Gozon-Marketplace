@@ -1,10 +1,10 @@
-import { Body, Controller, Get, HttpCode, Post, Put, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Put, Query, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiResponse, ApiOperation, ApiBearerAuth, ApiTags, ApiCookieAuth } from '@nestjs/swagger';
-import { SwaggerBadRequest, SwaggerJwtUser, SwaggerConflictMessage, SwaggerOK, SwaggerForbiddenException, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
+import { ApiBody, ApiResponse, ApiOperation, ApiBearerAuth, ApiTags, ApiCookieAuth, ApiQuery } from '@nestjs/swagger';
+import { SwaggerBadRequest, SwaggerJwtUser, SwaggerConflictMessage, SwaggerOK, SwaggerForbiddenException, SwaggerUnauthorizedException, SwaggerNotFound } from '@swagger/apiResponse.interfaces';
 import { Token } from './decorators/get-token.decorator';
 import { User } from './decorators/get-user.decorator';
 import { JwtUser } from './interfaces';
@@ -70,10 +70,12 @@ export class AuthController {
   @ApiResponse({ status: 200, description: "Password changed", type: SwaggerOK })
   @ApiResponse({ status: 400, description: "Validation failed /Bad password", type: SwaggerBadRequest })
   @ApiResponse({ status: 401, description: "Token Invalid/Unauthorized", type: SwaggerUnauthorizedException })
+  @ApiResponse({ status: 404, description: "Reset tag not found", type: SwaggerNotFound })
+  @ApiQuery({ name: "urlTag", required: false, type: String, description: "Add tag if reset password from email" })
   @ApiBearerAuth()
   @UseGuards(JwtGuard)
   @UsePipes(new ValidationPipe())
-  async changePassword(@Body() dto: ChangePasswordDto, @User() user: JwtUser) {
-    return await this.authService.changePassword(dto, user)
+  async changePassword(@Body() dto: ChangePasswordDto, @User() user: JwtUser, @Query("urlTag") tag?: string) {
+    return await this.authService.changePassword(dto, user, tag)
   }
 }

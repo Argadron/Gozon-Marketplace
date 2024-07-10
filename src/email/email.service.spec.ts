@@ -23,7 +23,7 @@ describe("EmailService", () => {
         const { urlTag } = await prisma.emailConfirms.create({
             data: { userId: 3, urlTag: v4() }
           })
-  
+
         tag = urlTag
     })
 
@@ -47,7 +47,7 @@ describe("EmailService", () => {
     afterAll(async () => {
         await prisma.emailConfirms.delete({
             where: {
-                id: 64
+                userId: 64
             }
         })
     })

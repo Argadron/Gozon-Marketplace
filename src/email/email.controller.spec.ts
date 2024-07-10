@@ -63,7 +63,7 @@ describe("EmailController", () => {
   afterAll(async () => {
     await prisma.emailConfirms.delete({
         where: {
-            id: 64
+            userId: 64
         }
     })
 })

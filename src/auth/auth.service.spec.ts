@@ -12,6 +12,7 @@ import { AlertsService } from '../alerts/alerts.service';
 import { RoleEnum } from '@prisma/client';
 import { JwtGuard } from './guards/jwt.guard';
 import { ExecutionContext } from '@nestjs/common';
+import { EmailService } from '../email/email.service'
 
 const prisma = prismaTestClient()
 
@@ -37,7 +38,7 @@ describe('AuthService', () => {
       imports: [JwtModule.register({
         secret: "secret"
     }), ConfigModule.forRoot()],
-      providers: [AuthService, PrismaService, ConfigService, FileService, UsersService, AlertsService],
+      providers: [AuthService, PrismaService, ConfigService, FileService, UsersService, AlertsService, EmailService],
     }).overrideGuard(JwtGuard).useValue({
       canActivate: (ctx: ExecutionContext) => {
         const request: Request = ctx.switchToHttp().getRequest()

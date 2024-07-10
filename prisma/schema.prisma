@@ -21,7 +21,7 @@ model User {
   phone String? @unique
   password String
   isBanned Boolean @default(false) @map("is_banned")
-  isEmailVerify Boolean @default(false)
+  isEmailVerify Boolean @default(false) @map("is_email_verify")
   role RoleEnum @default(USER)
   profilePhoto String @map("profile_photo")
   blackList Int[] @default([]) @map("black_list")

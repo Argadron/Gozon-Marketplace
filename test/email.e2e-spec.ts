@@ -56,14 +56,14 @@ describe("EmailController (E2E)", () => {
         await app.init()
     })
 
-    it("Проверка создания письма на верифакцию почту", async () => {
+    it("/api/email/createVerification (POST) (Проверка создания письма на верифакцию почту)", async () => {
         return request(app.getHttpServer())
         .post("/api/email/createVerification")
         .send(testJwtUser)
         .expect(201)
     })
 
-    it("Проверка верификации тега почты", async () => {
+    it("/api/email/verifyEmailConfirmTag/?urlTag=${tag} (GET) Проверка верификации тега почты", async () => {
         return request(app.getHttpServer())
         .get(`/api/email/verifyEmailConfirmTag/?urlTag=${tag}`)
         .expect(204)

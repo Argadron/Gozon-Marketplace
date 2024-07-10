@@ -15,3 +15,9 @@ export interface EmailOptions {
 
     readonly templateObject: templateObject;
 }
+
+export interface CreateTag {
+    readonly userId: number;
+
+    readonly urlTag: string;
+}

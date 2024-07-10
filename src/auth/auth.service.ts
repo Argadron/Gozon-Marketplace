@@ -10,6 +10,8 @@ import { FileService } from '../file.service';
 import { RoleEnum } from '@prisma/client';
 import { UsersService } from '../users/users.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { EmailService } from '../email/email.service';
+import { v4 } from 'uuid'
 
 @Injectable()
 export class AuthService {
@@ -17,7 +19,8 @@ export class AuthService {
                 private readonly jwtService: JwtService,
                 private readonly configService: ConfigService,
                 private readonly fileService: FileService,
-                private readonly userService: UsersService
+                private readonly userService: UsersService,
+                private readonly emailService: EmailService
     ) {}
 
     private async generateTokens(id: number, role: RoleEnum) {
@@ -199,10 +202,39 @@ export class AuthService {
         })
     }
 
-    async changePassword(dto: ChangePasswordDto, user: JwtUser) {
+    async changePassword(dto: ChangePasswordDto, user: JwtUser, tag?: string) {
         const User = await this.userService.findBy({ id: user.id })
 
         if (!(await bcrypt.compare(dto.oldPassword, User.password))) throw new BadRequestException("Passwords not match")
+
+        if (User.isEmailVerify) {
+            const checkObject = await this.emailService.findTagByUserId(User.id)
+
+            if (!checkObject) {
+                const urlTag = v4()
+
+                await this.emailService.createTag({ userId: User.id, urlTag })
+
+                await this.emailService.sendEmail({
+                    to: User.email,
+                    subject: "Reset password",
+                    text: "Reset your password",
+                    templateObject: {
+                        action: "Reset password",
+                        name: User.username,
+                        url: `${this.configService.get("API_CLIENT_URL")}/reset-password/?urlTag=${urlTag}`
+                    }
+                })
+
+                return "Send email to reset"
+            }
+
+            if (!tag) throw new BadRequestException("No verify tag")
+
+            if (checkObject.urlTag !== tag) throw new BadRequestException("Tags not match")
+
+            await this.emailService.deleteTagByUserId(User.id)
+        }
 
         await this.userService.update({ password: await bcrypt.hash(dto.newPassword, 3) }, user.id)
 
