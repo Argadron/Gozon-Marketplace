@@ -12,6 +12,8 @@ import { UsersService } from '../users/users.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { EmailService } from '../email/email.service';
 import { v4 } from 'uuid'
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { checkMinsTimeFromDateToCurrent } from '@helpers/date';
 
 @Injectable()
 export class AuthService {
@@ -210,34 +212,104 @@ export class AuthService {
         if (User.isEmailVerify) {
             const checkObject = await this.emailService.findTagByUserId(User.id)
 
-            if (!checkObject) {
+            if (!tag) {
                 const urlTag = v4()
-
-                await this.emailService.createTag({ userId: User.id, urlTag })
-
-                await this.emailService.sendEmail({
+                const emailOptions = {
                     to: User.email,
-                    subject: "Reset password",
-                    text: "Reset your password",
+                    subject: "Change password",
+                    text: "Change your password",
                     templateObject: {
-                        action: "Reset password",
+                        action: "Change password",
                         name: User.username,
-                        url: `${this.configService.get("API_CLIENT_URL")}/reset-password/?urlTag=${urlTag}`
+                        url: `${this.configService.get("API_CLIENT_URL")}/change-password?urlTag=${urlTag}`
                     }
-                })
+                }
+                const tagOptions = {
+                    userId: User.id,
+                    urlTag
+                }
 
-                return "Send email to reset"
+                if (checkObject) {
+                    if (checkMinsTimeFromDateToCurrent(checkObject.createdAt, 5)) {
+                        await this.emailService.deleteTagByUserId(User.id)
+                        await this.emailService.sendEmailWithCreateTag(emailOptions, tagOptions)
+                    }
+                    else {
+                        throw new ConflictException("Already send email (lt 5 mins from last)")
+                    }
+                }
+                else {
+                    await this.emailService.sendEmailWithCreateTag(emailOptions, tagOptions)
+                }
+
+                return "Send email to change password"
             }
+            else {
+                if (!checkObject) throw new NotFoundException("Tag not found")
 
-            if (!tag) throw new BadRequestException("No verify tag")
-
-            if (checkObject.urlTag !== tag) throw new BadRequestException("Tags not match")
-
-            await this.emailService.deleteTagByUserId(User.id)
+                if (checkObject.urlTag !== tag) throw new BadRequestException("Tags not match")
+        
+                await this.emailService.deleteTagByUserId(User.id)
+            }
         }
 
         await this.userService.update({ password: await bcrypt.hash(dto.newPassword, 3) }, user.id)
 
         return "Password changed"
+    }
+
+    async resetPassword(dto: ResetPasswordDto, urlTag?: string) {
+        const User = await this.userService.findBy({ username: dto.username })
+
+        if (!User) throw new NotFoundException("User not found")
+
+        if (!User.isEmailVerify) throw new BadRequestException("Cannot reset password: User not has verified email")// не запустит
+
+        const emailMessage = await this.emailService.findTagByUserId(User.id)
+
+        if (!urlTag) {
+            const tag = v4()
+            const emailOptions = {
+                to: User.email,
+                subject: "Reset password",
+                text: "Reset your password",
+                templateObject: {
+                    action: "Reset password",
+                    name: User.username,
+                    url: `${this.configService.get("API_CLIENT_URL")}/reset-password?urlTag=${tag}`
+                }
+            }
+            const tagOptions = {
+                userId: User.id,
+                urlTag: tag
+            }
+    
+            if (emailMessage) {
+                if (checkMinsTimeFromDateToCurrent(emailMessage.createdAt, 5)) {
+                    await this.emailService.deleteTagByUserId(User.id)
+                    await this.emailService.sendEmailWithCreateTag(emailOptions, tagOptions)
+                } 
+                else {
+                    throw new ConflictException("Already send email (lt 5 mins from last)")
+                }
+            }
+            else {
+                await this.emailService.sendEmailWithCreateTag(emailOptions, tagOptions)
+            }
+    
+            return "Send email to reset password"
+        }
+        else {
+            if (!emailMessage) throw new NotFoundException("Tag not found")
+
+            if (emailMessage.urlTag !== urlTag) throw new BadRequestException("Tags not match")
+
+            if (!dto.newPassword) throw new BadRequestException("Validataion failed: newPassword is required")
+
+            await this.userService.update({ password: await bcrypt.hash(dto.newPassword, 3) }, User.id)
+            await this.emailService.deleteTagByUserId(User.id)
+
+            return "Password reseted"
+        }
     }
 }

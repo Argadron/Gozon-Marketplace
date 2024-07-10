@@ -25,7 +25,8 @@
       "@filters/*":["./src/common/filters/*"],
       "@guards/*":["./src/auth/guards/*"],
       "@decorators/*":["./src/auth/decorators/*"],
-      "@swagger/*":["./src/swagger/*"]
+      "@swagger/*":["./src/swagger/*"],
+      "@helpers/*":["./src/helpers/*"]
     }
   }
 }

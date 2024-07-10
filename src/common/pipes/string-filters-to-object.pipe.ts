@@ -1,5 +1,5 @@
 import { ArgumentMetadata, Injectable, PipeTransform } from "@nestjs/common";
-import { ObjectTypeParser } from "../../helpers/objectTypeParser";
+import { ObjectTypeParser } from "@helpers/objectTypeParser";
 
 /**
  * Parse query filters to object

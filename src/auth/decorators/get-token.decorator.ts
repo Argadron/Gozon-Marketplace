@@ -1,6 +1,6 @@
 import { ExecutionContext, createParamDecorator } from "@nestjs/common";
 import { Request } from "express";
-import config from '../../config/constants'
+import config from '@config/constants'
 
 const constants = config()
 

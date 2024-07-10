@@ -1,5 +1,5 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, InternalServerErrorException} from "@nestjs/common";
-import logger from "../../helpers/logger";
+import logger from "@helpers/logger";
 import { Response } from "express";
 
 @Catch(Error, InternalServerErrorException)

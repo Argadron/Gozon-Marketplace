@@ -4,12 +4,13 @@ import { AuthDto } from './dto/auth.dto';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiResponse, ApiOperation, ApiBearerAuth, ApiTags, ApiCookieAuth, ApiQuery } from '@nestjs/swagger';
-import { SwaggerBadRequest, SwaggerJwtUser, SwaggerConflictMessage, SwaggerOK, SwaggerForbiddenException, SwaggerUnauthorizedException, SwaggerNotFound } from '@swagger/apiResponse.interfaces';
+import { SwaggerBadRequest, SwaggerJwtUser, SwaggerConflictMessage, SwaggerOK, SwaggerForbiddenException, SwaggerUnauthorizedException, SwaggerNotFound, SwaggerCreated } from '@swagger/apiResponse.interfaces';
 import { Token } from './decorators/get-token.decorator';
 import { User } from './decorators/get-user.decorator';
 import { JwtUser } from './interfaces';
 import { JwtGuard } from './guards/jwt.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth')
 @ApiTags("Auth Controller")
@@ -71,11 +72,26 @@ export class AuthController {
   @ApiResponse({ status: 400, description: "Validation failed /Bad password", type: SwaggerBadRequest })
   @ApiResponse({ status: 401, description: "Token Invalid/Unauthorized", type: SwaggerUnauthorizedException })
   @ApiResponse({ status: 404, description: "Reset tag not found", type: SwaggerNotFound })
-  @ApiQuery({ name: "urlTag", required: false, type: String, description: "Add tag if reset password from email" })
+  @ApiResponse({ status: 409, description: "Already send email to change password (lt 5 mins from last)" })
+  @ApiQuery({ name: "urlTag", required: false, type: String, description: "Add tag if change password from email" })
   @ApiBearerAuth()
   @UseGuards(JwtGuard)
   @UsePipes(new ValidationPipe())
   async changePassword(@Body() dto: ChangePasswordDto, @User() user: JwtUser, @Query("urlTag") tag?: string) {
     return await this.authService.changePassword(dto, user, tag)
+  }
+
+  @Post("/resetPassword")
+  @ApiOperation({ summary: "Reset user password" })
+  @ApiResponse({ status: 201, description: "Message to reset password send to email success", type: SwaggerCreated })
+  @ApiResponse({ status: 400, description: "Validation failed/User not has valid email/Tags not match", type: SwaggerBadRequest })
+  @ApiResponse({ status: 401, description: "Token Invalid/Unauthorized", type: SwaggerUnauthorizedException })
+  @ApiResponse({ status: 404, description: "User not found", type: SwaggerNotFound })
+  @ApiResponse({ status: 409, description: "Already send email to reset password (lt 5 min from last)", type: SwaggerConflictMessage })
+  @ApiQuery({ name: "urlTag", required: false, type: String, description: "Add tag if reset password from email" })
+  @ApiBearerAuth()
+  @UsePipes(new ValidationPipe())
+  async resetPassword(@Body() dto: ResetPasswordDto, @Query("urlTag") urlTag?: string) {
+    return await this.authService.resetPassword(dto, urlTag)
   }
 }

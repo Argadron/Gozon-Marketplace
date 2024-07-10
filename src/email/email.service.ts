@@ -5,7 +5,7 @@ import { CreateTag, EmailOptions } from "./interfaces";
 import * as fs from 'fs'
 import * as path from 'path'
 import { v4 } from 'uuid'
-import templater from '../helpers/templater'
+import templater from '@helpers/templater'
 import { JwtUser } from "../auth/interfaces";
 import { UsersService } from "../users/users.service";
 import { PrismaService } from "../prisma.service";
@@ -105,5 +105,10 @@ export class EmailService {
         return await this.prismaService.emailConfirms.create({
             data
         })
+    }
+
+    async sendEmailWithCreateTag(emailOptions: EmailOptions, tagOptions: CreateTag) {
+        await this.sendEmail(emailOptions)
+        await this.createTag(tagOptions)
     }
 }

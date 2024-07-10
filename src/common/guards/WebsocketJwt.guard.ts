@@ -2,7 +2,7 @@ import { ExecutionContext, Injectable, UnauthorizedException, UseFilters } from 
 import { JwtService } from "@nestjs/jwt";
 import { Observable } from "rxjs";
 import { Socket } from 'socket.io'
-import { WebSocketExecption } from "../filters/websockets-execeptions.filter";
+import { WebSocketExecption } from "@filters/websockets-execeptions.filter";
 import { JwtUser } from "../../auth/interfaces";
 
 @Injectable()
