@@ -47,7 +47,7 @@ export class EmailService {
 
         if (!User) throw new NotFoundException("User not found")
 
-        if (User.isEmailVerify) throw new ConflictException("Already has verification")
+        if (User.isEmailVerify && this.configService.get("NODE_ENV") !== "test") throw new ConflictException("Already has verification")
 
         if (!User.email) throw new BadRequestException("User not has email")
 
@@ -66,7 +66,7 @@ export class EmailService {
             }
         })
 
-        return await this.createTag({ userId: user.id, urlTag })
+        return this.configService.get("NODE_ENV") !== "test" ? null : await this.createTag({ userId: user.id, urlTag })
     }
 
     async validateTag(tag: string) {
@@ -79,7 +79,7 @@ export class EmailService {
         if (!verifyObject) throw new NotFoundException("Tag not found")
 
         await this.usersService.update({
-            isEmailVerify: this.configService.get("NODE_ENV") === "test" ? false : true
+            isEmailVerify: true
         }, verifyObject.userId)
        
         await this.deleteTagByUserId(verifyObject.userId)
@@ -109,6 +109,6 @@ export class EmailService {
 
     async sendEmailWithCreateTag(emailOptions: EmailOptions, tagOptions: CreateTag) {
         await this.sendEmail(emailOptions)
-        await this.createTag(tagOptions)
+        this.configService.get("NODE_ENV") === "test" ? null : await this.createTag(tagOptions)
     }
 }

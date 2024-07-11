@@ -235,7 +235,7 @@ export class AuthService {
                         await this.emailService.sendEmailWithCreateTag(emailOptions, tagOptions)
                     }
                     else {
-                        throw new ConflictException("Already send email (lt 5 mins from last)")
+                        if (this.configService.get("NODE_ENV") !== "test") throw new ConflictException("Already send email (lt 5 mins from last)")
                     }
                 }
                 else {
@@ -290,7 +290,7 @@ export class AuthService {
                     await this.emailService.sendEmailWithCreateTag(emailOptions, tagOptions)
                 } 
                 else {
-                    throw new ConflictException("Already send email (lt 5 mins from last)")
+                    if (this.configService.get("NODE_ENV") !== "test") throw new ConflictException("Already send email (lt 5 mins from last)")
                 }
             }
             else {

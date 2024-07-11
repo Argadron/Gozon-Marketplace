@@ -5,16 +5,15 @@ import * as request from 'supertest';
 import 'dotenv/config'
 import { AdminGuard } from '../src/auth/guards/admin.guard';
 import { RoleEnum } from '@prisma/client';
-import { AlertsService } from '../src/alerts/alerts.service';
 import { PrismaService } from '../src/prisma.service';
 import { ConfigService } from '@nestjs/config';
-import { AuthService } from '../src/auth/auth.service';
 import { FileService } from '../src/file.service';
 import { UsersService } from '../src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtGuard } from '../src/auth/guards/jwt.guard'
 import { UsersController } from '../src/users/users.controller';
 import prismaTestClient from '../src/prisma-client.forTest'
+import { AlertsModule } from '../src/alerts/alerts.module';
 
 const prisma = prismaTestClient()
 
@@ -51,8 +50,9 @@ describe("UsersController (E2E)", () => {
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
+            imports: [AlertsModule],
             controllers: [UsersController],
-            providers: [PrismaService, AlertsService, AuthService, ConfigService, FileService, UsersService, JwtService]
+            providers: [PrismaService, ConfigService, FileService, UsersService]
         }).overrideGuard(AdminGuard).useValue({
             canActivate: (ctx: ExecutionContext) => {
                 const request: Request = ctx.switchToHttp().getRequest()

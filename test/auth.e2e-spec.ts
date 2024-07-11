@@ -1,6 +1,5 @@
 import { ExecutionContext, INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
-import { AuthModule } from '../src/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { PrismaService } from '../src/prisma.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -12,6 +11,9 @@ import prismaTestClient from '../src/prisma-client.forTest'
 import { JwtGuard } from '../src/auth/guards/jwt.guard';
 import { RoleEnum } from '@prisma/client';
 import { EmailModule } from '../src/email/email.module'
+import { UsersModule } from '../src/users/users.module';
+import { AuthService } from '../src/auth/auth.service';
+import { AuthModule } from '../src/auth/auth.module';
 
 const prisma = prismaTestClient()
 
@@ -27,6 +29,10 @@ describe("AuthController (E2E)", () => {
         oldPassword: "123123123",
         newPassword: "123123123"
       }
+      const testResetPassword = {
+        username: "Argadron1",
+        newPassword: "123123123"
+      }
 
     function setAuthorizationRefresh(req: Request, res: Response, next: Function) {
         req.headers.authorization = `Bearer ${process.env.TOKEN}`
@@ -36,18 +42,20 @@ describe("AuthController (E2E)", () => {
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [AuthModule, JwtModule.register({
+            imports: [JwtModule.register({
                 secret: "secret"
-            }), ConfigModule.forRoot(), EmailModule],
-            providers: [PrismaService, ConfigService, FileService]
+            }), ConfigModule.forRoot(), EmailModule, UsersModule, AuthModule],
+            providers: [PrismaService, ConfigService, FileService, AuthService]
         }).overrideGuard(JwtGuard).useValue({
-            canActivate: (ctx: ExecutionContext) => {
+            canActivate: async (ctx: ExecutionContext) => {
               const request: Request = ctx.switchToHttp().getRequest()
       
               request.user = {
                 id: 3,
                 role: RoleEnum.ADMIN
               }
+
+              if (await prisma.emailConfirms.findUnique({ where: { userId: 3 } })) await prisma.emailConfirms.delete({ where: { userId: 3 } })
       
               return true
             }
@@ -86,6 +94,13 @@ describe("AuthController (E2E)", () => {
       .put("/api/auth/changepassword")
       .send(testChangePassword)
       .expect(200)
+    })
+
+    it("/api/auth/resetPassword (POST) (Проверка сброса пароля)", async () => {
+      return request(app.getHttpServer())
+      .post("/api/auth/resetPassword")
+      .send(testResetPassword)
+      .expect(201)
     })
 
     afterAll(async () => {

@@ -38,13 +38,15 @@ describe("EmailController (E2E)", () => {
             controllers: [EmailController],
             providers: [EmailService, PrismaService, ConfigService, JwtService]
         }).overrideGuard(JwtGuard).useValue({
-            canActivate: (ctx: ExecutionContext) => {
+            canActivate: async (ctx: ExecutionContext) => {
               const request: Request = ctx.switchToHttp().getRequest()
       
               request.user = {
                 id: 64,
                 role: RoleEnum.SELLER
               }
+
+              if (await prisma.emailConfirms.findUnique({ where: { userId: 64 } })) await prisma.emailConfirms.delete({ where: { userId: 64 } })
       
               return true
             }
@@ -70,11 +72,6 @@ describe("EmailController (E2E)", () => {
     })
 
     afterAll(async () => {
-        await prisma.emailConfirms.delete({
-            where: {
-                userId: 64
-            }
-        })
         await app.close()
     })
 })

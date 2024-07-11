@@ -14,6 +14,7 @@ import { RoleEnum } from '@prisma/client';
 import { ExecutionContext } from '@nestjs/common';
 import { JwtGuard } from './guards/jwt.guard';
 import { EmailService } from '../email/email.service'
+import { v4 } from 'uuid'
 
 const prisma = prismaTestClient()
 
@@ -33,6 +34,10 @@ describe('AuthController', () => {
     oldPassword: "123123123",
     newPassword: "123123123"
   }
+  const testResetPassword = {
+    username: "Argadron1",
+    newPassword: "123123123"
+  }
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -42,13 +47,15 @@ describe('AuthController', () => {
       controllers: [AuthController],
       providers: [AuthService, PrismaService, ConfigService, FileService, AlertsService, UsersService, EmailService],
     }).overrideGuard(JwtGuard).useValue({
-      canActivate: (ctx: ExecutionContext) => {
+      canActivate: async (ctx: ExecutionContext) => {
         const request: Request = ctx.switchToHttp().getRequest()
 
         request.user = {
           id: 3,
           role: RoleEnum.ADMIN
         }
+
+        if (await prisma.emailConfirms.findUnique({ where: { userId: 3 } })) await prisma.emailConfirms.delete({ where: { userId: 3 } })
 
         return true
       }
@@ -75,6 +82,10 @@ describe('AuthController', () => {
 
   it("Проверка изменения пароля на аккауте", async () => {
     expect((await controller.changePassword(testChangePassword, testJwtUser)).length).toBeDefined()
+  })
+
+  it("Проверка сброса пароля на аккаунте", async () => {
+    expect((await controller.resetPassword(testResetPassword)).length).toBeDefined()
   })
 
   afterAll(async () => {
