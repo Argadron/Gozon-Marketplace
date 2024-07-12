@@ -1,16 +1,24 @@
 import { ExecutionContext, INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing'
-import { BasketModule } from '../src/basket/basket.module';
 import { BasketService } from '../src/basket/basket.service';
 import { PrismaService } from '../src/prisma.service';
 import * as request from 'supertest'
 import { RoleEnum } from '@prisma/client';
-import { AuthModule } from '../src/auth/auth.module';
 import { JwtGuard } from '../src/auth/guards/jwt.guard';
 import { Request } from 'express';
 import { ProductsModule } from '../src/products/products.module';
-import { CategoriesModule } from '../src/categories/categories.module';
-import { CategoriesService } from '../src/categories/categories.service';
+import { PaymentsModule } from '../src/payments/payments.module';
+import { BasketController } from '../src/basket/basket.controller';
+import prismaTestClient from '../src/prisma-client.forTest'
+import stripeTestClient from '../src/stripe.forTest'
+import { v4 } from 'uuid';
+import { StripeModule } from '../src/stripe/stripe.module';
+import config from '@config/constants'
+import { ConfigService } from '@nestjs/config'
+
+const prisma = prismaTestClient()
+const stripe = stripeTestClient()
+const constants = config()
 
 describe("BasketController (E2E)", () => {
     let app: INestApplication;
@@ -18,11 +26,26 @@ describe("BasketController (E2E)", () => {
         productId: 1,
         productCount: 1
       }
+      const testValidate = {
+        sessionId: "",
+        urlTag: ""
+     }
+   
+     beforeAll(async () => {
+       const order = await prisma.orders.create({
+         data: { userId: 32, productsInfo: [JSON.stringify({ productId: 1, sellerId: 64, quantity: 1 })], urlTag: v4()}
+       })
+       const { id } = await stripe.checkout.sessions.create({ line_items: [{ price_data: { unit_amount: 5000, currency: "usd", product_data: { name: "тест" } }, quantity: 1 }], success_url: "http://localhost:3000", cancel_url: "http://localhost:3000", mode: "payment", currency: "usd" })
+   
+       testValidate.sessionId = id 
+       testValidate.urlTag = order.urlTag
+     })
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [BasketModule, AuthModule, ProductsModule, CategoriesModule],
-            providers: [BasketService, PrismaService, CategoriesService]
+            imports: [ProductsModule, PaymentsModule, StripeModule.forRoot(constants.STRIPE_API_KEY, { apiVersion: "2024-06-20" })],
+            controllers: [BasketController],
+            providers: [BasketService, PrismaService, ConfigService]
         }).overrideGuard(JwtGuard).useValue({
             canActivate: (ctx: ExecutionContext) => {
                 const request: Request = ctx.switchToHttp().getRequest()
@@ -49,6 +72,19 @@ describe("BasketController (E2E)", () => {
         .expect(200)
     })
 
+    it("/api/basket/createOrder (POST) (Проверка оформления заказа)", async () => {
+        return request(app.getHttpServer())
+        .post("/api/basket/createOrder")
+        .expect(201)
+    })
+
+    it("/api/basket/validateOrder (POST) (Проверка валидации заказа)", async () => {
+        return request(app.getHttpServer())
+        .post("/api/basket/validateOrder")
+        .send(testValidate)
+        .expect(403)
+    })
+
     it("/api/basket/deleteProduct/1 (DELETE) (Проверка удаления товара из корзины)", async () => {
         return request(app.getHttpServer())
         .delete("/api/basket/deleteProduct/1")
@@ -56,6 +92,12 @@ describe("BasketController (E2E)", () => {
     })
 
     afterAll(async () => {
+        await prisma.orders.delete({
+            where: {
+                userId: 3
+            }
+        })
+
         await app.close()
     })
 })

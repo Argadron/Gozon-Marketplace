@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, ParseIntPipe, Param, UseGuards } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AdminGuard } from '@guards/admin.guard';
@@ -26,7 +26,7 @@ export class PaymentsController {
   @ApiResponse({ status: 401, description: "Token Invalid/Unauthorized", type: SwaggerUnauthorizedException })
   @ApiResponse({ status: 403, description: "Your role not have access to this action", type: SwaggerForbiddenException })
   @ApiResponse({ status: 404, description: "Payment not found", type: SwaggerNotFound })
-  async delete(@Query("id", ParseIntPipe) id: number) {
+  async delete(@Param("id", ParseIntPipe) id: number) {
     return await this.paymentsService.delete(id)
   }
 }
