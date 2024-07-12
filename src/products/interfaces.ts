@@ -30,4 +30,8 @@ export interface UpdateData {
     readonly rate?: number;
 
     readonly reportsCount?: number;
+
+    readonly count?: number;
+
+    readonly isSold?: boolean;
 }

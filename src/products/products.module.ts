@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { ProductsController } from './products.controller';
-import { AuthModule } from '../auth/auth.module';
 import { PrismaService } from '../prisma.service';
 import { ObjectStringToIntPipe } from '@pipes/object-string-to-int.pipe';
 import { FileService } from '../file.service';
@@ -11,7 +10,7 @@ import { StringToArrayPipe } from '@pipes/string-to-array-pipe';
 import { CategoriesModule } from '../categories/categories.module';
 
 @Module({
-  imports: [AuthModule, CategoriesModule],
+  imports: [CategoriesModule],
   controllers: [ProductsController],
   providers: [ProductsService, PrismaService, ObjectStringToIntPipe, FileService, ConfigService, StringFiltersToObject, StringToArrayPipe],
   exports: [ObjectStringToIntPipe, StringFiltersToObject, ProductsService]

@@ -2,10 +2,11 @@ import { Body, Controller, Delete, HttpCode, Param, ParseIntPipe, Post, UseGuard
 import { BasketService } from './basket.service';
 import { JwtGuard } from '@guards/jwt.guard';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { SwaggerBadRequest, SwaggerConflictMessage, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
+import { SwaggerBadRequest, SwaggerConflictMessage, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
 import { AddProductDto } from './dto/add-product.dto';
 import { User } from '@decorators/get-user.decorator';
 import { JwtUser } from '../auth/interfaces';
+import { ValidateOrderDto } from './dto/validate-order.dto';
 
 @Controller('basket')
 @UseGuards(JwtGuard)
@@ -36,5 +37,29 @@ export class BasketController {
   @ApiBearerAuth()
   async deleteProduct(@Param("id", ParseIntPipe) id: number, @User() user: JwtUser) {
     return await this.basketService.deleteProduct(id, user)
+  }
+
+  @Post("/createOrder")
+  @ApiOperation({ summary: "Create a order from user basket" })
+  @ApiResponse({ status: 201, description: "Return checkout url and sessionId", type: SwaggerCreated })
+  @ApiResponse({ status: 400, description: "User not has products on basket", type: SwaggerBadRequest })
+  @ApiResponse({ status: 401, description: "Token Invalid/Unauthorized", type: SwaggerUnauthorizedException })
+  @ApiResponse({ status: 409, description: "User alreadhy has order", type: SwaggerConflictMessage })
+  @ApiBearerAuth()
+  async createOrder(@User() user: JwtUser) {
+    return await this.basketService.createOrder(user)
+  }
+
+  @Post("/validateOrder")
+  @ApiOperation({ summary: "Validation order and create payment request to sellers" })
+  @ApiResponse({ status: 201, description: "Payment request created", type: SwaggerCreated })
+  @ApiResponse({ status: 400, description: "Validation failed", type: SwaggerBadRequest })
+  @ApiResponse({ status: 401, description: "Token Invalid/Unauthorized", type: SwaggerUnauthorizedException })
+  @ApiResponse({ status: 403, description: "This is not your order", type: SwaggerForbiddenException })
+  @ApiResponse({ status: 404, description: "Order/Session not found", type: SwaggerNotFound })
+  @ApiBearerAuth()
+  @UsePipes(new ValidationPipe())
+  async validateOrder(@Body() dto: ValidateOrderDto, @User() user: JwtUser) {
+    return await this.basketService.validateOrder(dto, user)
   }
 }

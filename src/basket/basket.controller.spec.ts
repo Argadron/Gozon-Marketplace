@@ -7,11 +7,8 @@ import { Request } from 'express';
 import { RoleEnum } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { ProductsModule } from '../products/products.module';
-import { ProductsService } from '../products/products.service';
-import { FileService } from '../file.service';
-import { ConfigService } from '@nestjs/config';
 import prismaTestClient from '../prisma-client.forTest'
-import { CategoriesService } from '../categories/categories.service';
+import { PaymentsModule } from '../payments/payments.module';
 
 const prisma = prismaTestClient()
 
@@ -48,8 +45,9 @@ describe('BasketController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [BasketController, ProductsModule],
-      providers: [BasketService, PrismaService, ProductsService, FileService, ConfigService, CategoriesService],
+      imports: [ProductsModule, PaymentsModule],
+      controllers: [BasketController],
+      providers: [BasketService, PrismaService],
     }).overrideGuard(JwtGuard).useValue({
       canActivate: (ctx: ExecutionContext) => {
         const request: Request = ctx.switchToHttp().getRequest()

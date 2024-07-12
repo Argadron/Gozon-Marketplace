@@ -34,6 +34,7 @@ model User {
   sellerRequirement SellerRequirement?
   refreshToken Tokens?
   emailConfirmRequest EmailConfirms?
+  order Orders?
   reports Report[]
   alerts Alert[]
   chats Chat[]
@@ -200,6 +201,28 @@ model EmailConfirms {
   updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
 
   @@map("email_confirms")
+}
+
+model Orders {
+  id Int @id @default(autoincrement())
+  urlTag String @map("url_tag")
+  productsInfo Json[] @map("products_info")
+  userId Int @unique
+  user User? @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
+
+  @@map("orders")
+}
+
+model Payments {
+  id Int @id @default(autoincrement())
+  payUserId Int @map("pay_user_id")
+  amount Int @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
+
+  @@map("payments")
 }
 
 enum RoleEnum {
