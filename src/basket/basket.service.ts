@@ -66,7 +66,7 @@ export class BasketService {
             }
         })
 
-        if (!basket) throw new BadRequestException("User not has products on basket!")
+        if (!basket || basket?.length === 0) throw new BadRequestException("User not has products on basket!")
 
         const checkOrder = await this.prismaService.orders.findUnique({
             where: {
