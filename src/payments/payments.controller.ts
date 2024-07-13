@@ -3,10 +3,11 @@ import { PaymentsService } from './payments.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AdminGuard } from '@guards/admin.guard';
 import { SwaggerBadRequest, SwaggerForbiddenException, SwaggerNoContent, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
+import { JwtGuard } from '@guards/jwt.guard';
 
 @Controller('payments')
 @ApiTags("Payments Controller")
-@UseGuards(AdminGuard)
+@UseGuards(JwtGuard, AdminGuard)
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
