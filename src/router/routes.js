@@ -1,4 +1,4 @@
-import { components } from 'vuetify/dist/vuetify-labs.js'
+
 
 const routes = [
   {
@@ -10,7 +10,9 @@ const routes = [
       { path: 'user', component:()=> import('pages/user.vue')},
       { path: 'login', component:()=> import('pages/login.vue')},
       { path: 'product', component:()=> import('pages/product.vue')},
-      { path: 'admin', component:()=>import('pages/admin.vue')}
+      { path: 'admin', component:()=>import('pages/admin.vue')},
+      { path: 'reset-password', component:()=>import('pages/resetPassword.vue')},
+      { path: 'changePassword', component:()=>import('pages/changePassword.vue')},
     ]
   },
 
