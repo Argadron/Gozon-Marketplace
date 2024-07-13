@@ -17,6 +17,7 @@ import { EmailService } from './email/email.service';
 import { StripeModule } from './stripe/stripe.module';
 import { PaymentsModule } from './payments/payments.module';
 import config from '@config/constants'
+import { TelegramModule } from './telegram/telegram.module';
 
 const constants = config()
 
@@ -24,7 +25,8 @@ const constants = config()
   imports: [AuthModule, ConfigModule.forRoot({
     isGlobal: true
   }), UsersModule, ProductsModule, SellerRequirementsModule, AlertsModule, BasketModule, ReviewsModule,
-  ReportsModule, CategoriesModule, ChatModule, EmailModule, StripeModule.forRoot(constants.STRIPE_API_KEY, { apiVersion: "2024-06-20" }), PaymentsModule],
+  ReportsModule, CategoriesModule, ChatModule, EmailModule, StripeModule.forRoot(constants.STRIPE_API_KEY, { apiVersion: "2024-06-20" }), 
+  PaymentsModule, TelegramModule],
   controllers: [AppController],
   providers: [AppService, EmailService],
 })

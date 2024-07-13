@@ -14,6 +14,7 @@ import { EmailModule } from '../src/email/email.module'
 import { UsersModule } from '../src/users/users.module';
 import { AuthService } from '../src/auth/auth.service';
 import { AuthModule } from '../src/auth/auth.module';
+import { TelegramModule } from '../src/telegram/telegram.module';
 
 const prisma = prismaTestClient()
 
@@ -44,7 +45,7 @@ describe("AuthController (E2E)", () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [JwtModule.register({
                 secret: "secret"
-            }), ConfigModule.forRoot(), EmailModule, UsersModule, AuthModule],
+            }), ConfigModule.forRoot(), EmailModule, UsersModule, AuthModule, TelegramModule],
             providers: [PrismaService, ConfigService, FileService, AuthService]
         }).overrideGuard(JwtGuard).useValue({
             canActivate: async (ctx: ExecutionContext) => {

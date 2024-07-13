@@ -7,13 +7,15 @@ import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { JwtUser, Tokens } from './interfaces';
 import { FileService } from '../file.service';
-import { RoleEnum } from '@prisma/client';
+import { RoleEnum, twoFactorAuthEnum } from '@prisma/client';
 import { UsersService } from '../users/users.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { EmailService } from '../email/email.service';
 import { v4 } from 'uuid'
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { checkMinsTimeFromDateToCurrent } from '@helpers/date';
+import { EnableTwoFactorDto } from './dto/enable-two-factor.dto';
+import { TelegramService } from '../telegram/telegram.service';
 
 @Injectable()
 export class AuthService {
@@ -22,7 +24,8 @@ export class AuthService {
                 private readonly configService: ConfigService,
                 private readonly fileService: FileService,
                 private readonly userService: UsersService,
-                private readonly emailService: EmailService
+                private readonly emailService: EmailService,
+                private readonly telegramService: TelegramService
     ) {}
 
     private async generateTokens(id: number, role: RoleEnum) {

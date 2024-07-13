@@ -11,6 +11,7 @@ import { JwtUser } from './interfaces';
 import { JwtGuard } from './guards/jwt.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { EnableTwoFactorDto } from './dto/enable-two-factor.dto';
 
 @Controller('auth')
 @ApiTags("Auth Controller")
@@ -93,5 +94,18 @@ export class AuthController {
   @UsePipes(new ValidationPipe())
   async resetPassword(@Body() dto: ResetPasswordDto, @Query("urlTag") urlTag?: string) {
     return await this.authService.resetPassword(dto, urlTag)
+  }
+
+  @Post("/enableTwoFactorAuth")
+  @ApiOperation({ summary: "Enable twofactor auth on user account" })
+  @ApiResponse({ status: 201, description: "Send email/Getted telegram link to enable auth", type: SwaggerCreated })
+  @ApiResponse({ status: 400, description: "Validation failed/Not has email/telegram", type: SwaggerBadRequest })
+  @ApiResponse({ status: 409, description: "User already has twoFactor", type: SwaggerConflictMessage })
+  @ApiBearerAuth()
+  @UsePipes(new ValidationPipe())
+  @UseGuards(JwtGuard)
+  async enableTwoFactor(@Body() dto: EnableTwoFactorDto, @User() user: JwtUser) {
+    // дописать
+    return 0
   }
 }

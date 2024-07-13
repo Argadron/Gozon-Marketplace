@@ -12,6 +12,7 @@ import { SellerGuard } from './guards/seller.guard';
 import { AdminGuard } from './guards/admin.guard';
 import { UsersModule } from '../users/users.module';
 import { EmailModule } from '../email/email.module';
+import { TelegramModule } from '../telegram/telegram.module';
 
 const constants = config()
 
@@ -19,7 +20,7 @@ const constants = config()
   imports: [JwtModule.register({
       global: true,
       secret: constants.JWT_SECRET
-  }), UsersModule, EmailModule],
+  }), UsersModule, EmailModule, TelegramModule],
   controllers: [AuthController],
   providers: [AuthService, PrismaService, ConfigService, FileService, JwtGuard, LocalStrategy, AdminGuard, SellerGuard],
   exports: [JwtGuard, LocalStrategy, AdminGuard, SellerGuard]

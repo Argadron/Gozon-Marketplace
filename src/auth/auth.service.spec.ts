@@ -13,7 +13,7 @@ import { RoleEnum } from '@prisma/client';
 import { JwtGuard } from './guards/jwt.guard';
 import { ExecutionContext } from '@nestjs/common';
 import { EmailService } from '../email/email.service'
-import { v4 } from 'uuid'
+import { TelegramModule } from '../telegram/telegram.module';
 
 const prisma = prismaTestClient()
 
@@ -42,7 +42,7 @@ describe('AuthService', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [JwtModule.register({
         secret: "secret"
-    }), ConfigModule.forRoot()],
+    }), ConfigModule.forRoot(), TelegramModule],
       providers: [AuthService, PrismaService, ConfigService, FileService, UsersService, AlertsService, EmailService],
     }).overrideGuard(JwtGuard).useValue({
       canActivate: async (ctx: ExecutionContext) => {

@@ -22,9 +22,11 @@ model User {
   password String
   isBanned Boolean @default(false) @map("is_banned")
   isEmailVerify Boolean @default(false) @map("is_email_verify")
+  isTelegramVerify Boolean @default(false) @map("is_telegram_verify")
   role RoleEnum @default(USER)
   profilePhoto String @map("profile_photo")
   blackList Int[] @default([]) @map("black_list")
+  twoFactorAuth twoFactorAuthEnum @default(NONE)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
 
@@ -35,6 +37,7 @@ model User {
   refreshToken Tokens?
   emailConfirmRequest EmailConfirms?
   order Orders?
+  telegram Telegram?
   reports Report[]
   alerts Alert[]
   chats Chat[]
@@ -109,15 +112,14 @@ model SellerRequirement {
   @@map("seller_requirement")
 }
 
-model Telegram {
+model TelegramAuth {
   id Int @id @default(autoincrement())
+  authToken String @map("auth_token") @unique
   userId Int @unique
-  telegramId Int @unique @map("telegram_id")
-  telegramUsername String? @map("telegram_username")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
 
-  @@map("telegram")
+  @@map("telegram_auth")
 }
 
 model Tokens {
@@ -225,8 +227,25 @@ model Payments {
   @@map("payments")
 }
 
+model Telegram {
+  id Int @id @default(autoincrement())
+  telegramId Int @unique @map("telegram_id")
+  userId Int @unique @map("user_id")
+  user User? @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
+
+  @@map("telegram")
+}
+
 enum RoleEnum {
   ADMIN
   SELLER
   USER
+}
+
+enum twoFactorAuthEnum {
+  NONE
+  TELEGRAM 
+  EMAIL
 }

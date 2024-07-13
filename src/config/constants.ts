@@ -8,5 +8,6 @@ export default () => ({
     JWT_SECRET: process.env.JWT_SECRET ?? "secret",
     API_VERSION: process.env.API_VERSION ?? "1.0",
     REFRESH_TOKEN_COOKIE_NAME: process.env.REFRESH_TOKEN_COOKIE_NAME ?? "refreshToken",
-    STRIPE_API_KEY: process.env.STRIPE_API_KEY
+    STRIPE_API_KEY: process.env.STRIPE_API_KEY,
+    TELEGRAM_API_KEY: process.env.TELEGRAM_API_KEY
 })
