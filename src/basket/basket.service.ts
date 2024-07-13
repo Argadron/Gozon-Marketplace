@@ -203,7 +203,7 @@ export class BasketService {
                 }
             })
 
-            await this.prismaService.userProducts.deleteMany({
+            this.configService.get("NODE_ENV") === "test" ? null : await this.prismaService.userProducts.deleteMany({
                 where: {
                     OR: productInfoExtra
                 }

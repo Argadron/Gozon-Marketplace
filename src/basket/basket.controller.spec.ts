@@ -41,6 +41,10 @@ describe('BasketController', () => {
     id: 32,
     role: RoleEnum.USER
   }
+  const testJwtSeller = {
+    id: 64,
+    role: RoleEnum.SELLER
+  }
   const testValidate = {
      sessionId: "",
      urlTag: ""
@@ -48,14 +52,13 @@ describe('BasketController', () => {
 
   beforeAll(async () => {
     const product = await prisma.product.create({ data: { ...testNewProduct, productPhoto: "default.png", sellerId: 64 } }) 
-
-    const { productId } = await prisma.userProducts.create({ data: { productId: product.id, productCount: 1, userId: 32 } })
+    
+    const { productId } = await prisma.userProducts.create({ data: { userId: 32, productId: product.id } })
 
     basketId = productId
 
-
     const order = await prisma.orders.create({
-      data: { userId: 32, productsInfo: [JSON.stringify({ productId, sellerId: 64, quantity: 1 })], urlTag: v4()}
+      data: { userId: 64, productsInfo: [JSON.stringify({ productId: 1, sellerId: 64, quantity: 1 })], urlTag: v4()}
     })
     const { id } = await stripe.checkout.sessions.create({ line_items: [{ price_data: { unit_amount: 5000, currency: "usd", product_data: { name: "тест" } }, quantity: 1 }], success_url: "http://localhost:3000", cancel_url: "http://localhost:3000", mode: "payment", currency: "usd" })
 
@@ -93,7 +96,7 @@ describe('BasketController', () => {
   })
 
   it("Проверка верификации заказа", async () => {
-    expect((await controller.validateOrder(testValidate, testJwtUser)).length).toBeDefined()
+    expect((await controller.validateOrder(testValidate, testJwtSeller)).length).toBeDefined()
   })
 
   it("Проверка удаления товара из корзины", async () => {
@@ -101,11 +104,18 @@ describe('BasketController', () => {
   })
 
   afterAll(async () => {
-    await prisma.userProducts.deleteMany({ where: { productId: 1, userId: 3 } })
-
-    await prisma.orders.delete({
+    await prisma.userProducts.deleteMany({
       where: {
         userId: 3
+      }
+    })
+
+    await prisma.orders.deleteMany({
+      where: {
+        OR: [
+          { userId: 3 },
+          { userId: 64 }
+        ]
       }
     })
   })

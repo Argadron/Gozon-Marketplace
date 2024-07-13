@@ -92,9 +92,12 @@ describe("BasketController (E2E)", () => {
     })
 
     afterAll(async () => {
-        await prisma.orders.delete({
+        await prisma.orders.deleteMany({
             where: {
-                userId: 3
+                OR: [
+                    { userId: 3 },
+                    { userId: 32 }
+                ]
             }
         })
 
