@@ -57,20 +57,3 @@ export async function terminateSession(telegramId: number) {
 export async function sessionsCleaner() {
     return await fs.promises.writeFile(sessionPath, JSON.stringify({ sessions: [] }))
 }
-
-export function parseQuery(query: string) {
-    const params = query.replace("/start ", "").split("+")
-
-    const returnObject = {}
-
-    for (let i in params) {
-        const elem = params[i]
-
-        const key = elem.split("=")[0]
-        const value = elem.split("=")[1]
-
-        returnObject[key] = value
-    }
-
-    return returnObject
-}

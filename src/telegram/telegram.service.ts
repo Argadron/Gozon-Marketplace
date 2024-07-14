@@ -30,8 +30,7 @@ export class TelegramService {
         if (User.isTelegramVerify) return false
 
         await this.usersService.update({
-            isTelegramVerify: true,
-            twoFactorAuth: twoFactorAuthEnum.TELEGRAM
+            isTelegramVerify: true
         }, User.id)
         await this.prismaService.telegram.create({
             data: {
@@ -155,6 +154,14 @@ export class TelegramService {
         return await this.prismaService.telegram.findUnique({
             where: {
                 userId
+            }
+        })
+    }
+
+    async findUserIdByTag(tag: string) {
+        return await this.prismaService.telegramAuth.findUnique({
+            where: {
+                authToken: tag
             }
         })
     }

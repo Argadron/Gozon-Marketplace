@@ -36,7 +36,8 @@ export class AuthController {
     type: AuthDto
   })
   @ApiResponse({ status: 403, description: "User are banned", type: SwaggerForbiddenException })
-  @ApiResponse({ status: 409, description: "Already send twoAuth code (lt 5 mins from last)" })
+  @ApiResponse({ status: 404, description: "Tag not found", type: SwaggerNotFound })
+  @ApiResponse({ status: 409, description: "Already send twoAuth code (lt 5 mins from last)", type: SwaggerConflictMessage })
   @ApiOperation({ summary: "Login user" })
   @ApiQuery({ name: "authTag", required: false, description: "Add a two factor auth tag if he is need." })
   @HttpCode(200)

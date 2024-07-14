@@ -116,9 +116,9 @@ export class AuthService {
     async login(res: Response, dto: Partial<AuthDto>, authTag?: string) {
         const type = dto.email || dto.username || dto.phone
 
-        if (!type) throw new BadRequestException("Missing one of 3 login methods")
+        if (!type && !authTag) throw new BadRequestException("Missing one of 3 login methods")
 
-        const User = await this.userService.findBy({ 
+        let User = await this.userService.findBy({ 
             OR: [
                 {
                     username: type
@@ -132,9 +132,25 @@ export class AuthService {
             ]
         })
 
+        if (!User && authTag) {
+            let checkId: number;
+
+            const checkTagIsEmail = await this.emailService.findUserIdByTag(authTag)
+            const checkTagIsTelegram = await this.telegramService.findUserIdByTag(authTag)
+
+            checkTagIsEmail ? checkId = checkTagIsEmail.userId : null
+            checkTagIsTelegram ? checkId = checkTagIsTelegram.userId : null
+ 
+            if (!checkId) throw new NotFoundException("Tag not found")
+
+            User = await this.userService.findBy({ id: checkId })
+        }
+
         if (!User) throw new NotFoundException("Bad password or username")
 
-        if (!await bcrypt.compare(dto.password, User.password)) throw new BadRequestException("Bad password or username")
+        if (dto.password && authTag) throw new BadRequestException("Please, use only 1 login method (authTag - dto)")
+
+        if ((!await bcrypt.compare(dto?.password ? dto.password : "", User.password)) && !authTag) throw new BadRequestException("Bad password or username")
 
         if (!await this.prismaService.tokens.findUnique({
             where: {
@@ -145,10 +161,9 @@ export class AuthService {
         if (User.isBanned) throw new ForbiddenException("User are banned")
 
         if (User.twoFactorAuth !== twoFactorAuthEnum.NONE) {
+            const verifyCode = v4()
 
             if (User.twoFactorAuth === twoFactorAuthEnum.TELEGRAM) {
-                const verifyCode = v4()
-
                 const telegramUser = await this.telegramService.findTelegramIdByUserId(User.id)
 
                 if (!telegramUser) throw new NotFoundException("User not found (telegram id)")
@@ -183,7 +198,49 @@ export class AuthService {
                     await this.telegramService.deleteAuthTagByUserId(User.id)
                 }
             }
-            
+            else if (User.twoFactorAuth === twoFactorAuthEnum.EMAIL) {
+                const check = await this.emailService.findTagByUserId(User.id)
+                const emailOptions = {
+                    subject: "TwoFactorAuth confirm login",
+                    to: User.email,
+                    text: "TwoFactorAuth confirm",
+                    templateObject: {
+                        action: "confirm login",
+                        name: User.username,
+                        url: `${this.configService.get("API_CLIENT_URL")}/two-auth-email?urlTag=${verifyCode}`
+                    }
+                }
+                const tagOptions = {
+                    userId: User.id, 
+                    urlTag: verifyCode
+                }
+
+                if (!authTag) {
+                    if (check) {
+                        if (checkMinsTimeFromDateToCurrent(check.createdAt, 5)) {
+                            await this.emailService.deleteTagByUserId(User.id)
+                            await this.emailService.sendEmailWithCreateTag(emailOptions, tagOptions)
+                        }
+                        else {
+                            throw new ConflictException("Already send email (lt 5 mins from last)")
+                        }
+                    }
+                    else {
+                        await this.emailService.sendEmailWithCreateTag(emailOptions, tagOptions)
+                    }
+
+                    return "Send email with confirm login url"
+                }
+                else {
+                   const findTag = await this.emailService.findTagByUserId(User.id)
+
+                   if (!findTag) throw new NotFoundException("Tag not found")
+
+                    if (findTag.urlTag !== authTag) throw new BadRequestException("Tags not match")
+
+                    await this.emailService.deleteTagByUserId(User.id)
+                }
+            }
         }
 
         const { access, refresh } = await this.generateTokens(User.id, User.role)

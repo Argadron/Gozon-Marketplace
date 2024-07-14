@@ -9,6 +9,8 @@ import templater from '@helpers/templater'
 import { JwtUser } from "../auth/interfaces";
 import { UsersService } from "../users/users.service";
 import { PrismaService } from "../prisma.service";
+import { checkMinsTimeFromDateToCurrent } from "@helpers/date";
+import { twoFactorAuthEnum } from "@prisma/client";
 
 @Injectable()
 export class EmailService {
@@ -110,5 +112,70 @@ export class EmailService {
     async sendEmailWithCreateTag(emailOptions: EmailOptions, tagOptions: CreateTag) {
         await this.sendEmail(emailOptions)
         this.configService.get("NODE_ENV") === "test" ? null : await this.createTag(tagOptions)
+    }
+
+    async twoFactorAuth(user: JwtUser, urlTag?: string) {
+        const check = await this.findTagByUserId(user.id)
+        const User = await this.usersService.findBy({ id: user.id })
+        const twoFactorCheck = User.twoFactorAuth === twoFactorAuthEnum.EMAIL ? "Disconnect":"Connect"
+
+        if (!User.isEmailVerify) throw new BadRequestException("User not has verified email")
+
+        if (User.twoFactorAuth === twoFactorAuthEnum.TELEGRAM) throw new BadRequestException("Already has two factor auth (Telegram)")
+
+        const authTag = v4()
+        const emailObject = {
+            subject: `${twoFactorCheck} twoFactorAuth`, 
+            to: User.email,
+            text: `twoFactorAuth`,
+            templateObject: {
+                action: `${twoFactorCheck} twoFactorAuth`,
+                name: User.username,
+                url: `${this.configService.get("API_CLIENT_URL")}/enable-email-twofactor?urlTag=${authTag}`
+            }
+        }
+        const tagObject = {
+            userId: User.id, 
+            urlTag: authTag
+        }
+
+        if (!urlTag) {
+            if (check) {
+                if (checkMinsTimeFromDateToCurrent(check.createdAt, 5)) {
+                    await this.deleteTagByUserId(user.id)
+                    await this.sendEmailWithCreateTag(emailObject, tagObject)
+                }
+                else {
+                    throw new ConflictException("Already send email (lt 5 mins from last)")
+                }
+            }
+            else {
+                await this.sendEmailWithCreateTag(emailObject, tagObject)
+            }
+
+            return `Send email to ${twoFactorCheck} twoFactorAuth`
+        }
+        else {
+            const findTag = await this.findTagByUserId(User.id)
+ 
+            if (!findTag) throw new NotFoundException("Tag not found")
+
+            if (findTag.urlTag !== urlTag) throw new BadRequestException("Tags not match")
+
+            await this.deleteTagByUserId(User.id)
+            await this.usersService.update({
+                twoFactorAuth: User.twoFactorAuth === twoFactorAuthEnum.EMAIL ? twoFactorAuthEnum.NONE : twoFactorAuthEnum.EMAIL
+            }, User.id)
+
+            return `Twofactorauth ${twoFactorCheck}`
+        }
+    }
+
+    async findUserIdByTag(urlTag: string) {
+        return await this.prismaService.emailConfirms.findUnique({
+            where: {
+                urlTag
+            }
+        })
     }
 }

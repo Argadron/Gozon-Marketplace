@@ -1,6 +1,6 @@
 import { Controller, Get, HttpCode, Post, Query, UseGuards } from "@nestjs/common";
 import { EmailService } from "./email.service";
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { JwtGuard } from "@guards/jwt.guard";
 import { SwaggerBadRequest, SwaggerConflictMessage, SwaggerCreated, SwaggerNoContent, SwaggerNotFound, SwaggerUnauthorizedException } from "@swagger/apiResponse.interfaces";
 import { JwtUser } from "../auth/interfaces";
@@ -34,5 +34,17 @@ export class EmailController {
     @HttpCode(204)
     async validateTag(@Query("urlTag") tag: string) {
       return await this.emailService.validateTag(tag)
+    }
+
+    @Post("/twoFactorAuth")
+    @ApiOperation({ summary: "Send email to activate/deactivate twoFacorAuth with email." })
+    @ApiResponse({ status: 201, description: "Email sended", type: SwaggerCreated })
+    @ApiResponse({ status: 400, description: "User not has valid email/Already has twofactorauth (telegram)", type: SwaggerBadRequest })
+    @ApiResponse({ status: 401, description: "Token Invalid/Unauthorized", type: SwaggerUnauthorizedException })
+    @ApiResponse({ status: 409, description: "Already send email (lt 5 mins from last)", type: SwaggerConflictMessage })
+    @ApiQuery({ name: "urlTag", required: false, description: "Add url tag if complete from email" })
+    @ApiBearerAuth()
+    async twoFactorAuth(@User() user: JwtUser, @Query("urlTag") urlTag?: string) {
+      return await this.emailService.twoFactorAuth(user, urlTag)
     }
 }

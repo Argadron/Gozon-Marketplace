@@ -25,7 +25,7 @@ export class TelegramUpdate {
     }
 
     @Start()
-    async start(@Ctx() ctx: Context, @Message("text") msg: string) {
+    async start(@Ctx() ctx: Context) {
         const user = await this.JwtChecker(ctx)
         await ctx.reply("Приветствую! Это оффициальный бот Gozon Marketplace! \n\n Выбери нужное действие:", buttons(user))
         await writeData({ telegramId: ctx.from.id, data: {} })
@@ -64,6 +64,7 @@ export class TelegramUpdate {
         }
 
         await ctx.reply("Вы успешно вышли из аккаунта!")
+        await this.start(ctx)
     }
 
     @Action(/security/)
@@ -105,6 +106,11 @@ export class TelegramUpdate {
         const data = await getData(telegramId)
 
         if (msg === "/connect" && !data.data.connect) {
+            if (await this.JwtChecker(ctx)) {
+                await ctx.reply("Авторизация уже пройдена")
+                return;
+            }
+            
             await ctx.reply("Введите логин от аккаунта:")
             await writeData({ telegramId, data: { ...data.data, connect: { stage: 1 } } })
             return;
@@ -128,6 +134,11 @@ export class TelegramUpdate {
             return;
         }
         else if (msg.indexOf("/connectKey") === 0) {
+            if (await this.JwtChecker(ctx)) {
+                await ctx.reply("Авторизация уже пройдена")
+                return;
+            }
+
             const key = msg.split(" ")[1]
 
             if (!key) {
