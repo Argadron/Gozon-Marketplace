@@ -1,26 +1,27 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { TelegramController } from './telegram.controller'
-import { TelegramUpdate } from './telegram.update';
-import { PrismaService } from '../prisma.service';
-import { TelegramService } from './telegram.service';
-import { ExecutionContext } from '@nestjs/common';
+import { TelegramController } from '../src/telegram/telegram.controller'
+import { TelegramUpdate } from '../src/telegram/telegram.update';
+import { PrismaService } from '../src//prisma.service';
+import { TelegramService } from '../src/telegram/telegram.service';
+import { ExecutionContext, INestApplication } from '@nestjs/common';
 import { JwtGuard } from '@guards/jwt.guard';
 import { RoleEnum } from '@prisma/client';
 import { Request } from 'express'
-import prismaTestClient from '../prisma-client.forTest'
-import { UsersModule } from '../users/users.module';
+import prismaTestClient from '../src/prisma-client.forTest'
+import * as request from 'supertest'
+import { UsersModule } from '../src/users/users.module'
 
 const prisma = prismaTestClient()
 
 describe("TelegramController", () => {
-    let controller: TelegramController;
+    let app: INestApplication;
     const testJwtUser = {
         id: 3,
         role: RoleEnum.ADMIN
     }
 
     beforeEach(async () => {
-        const module: TestingModule = await Test.createTestingModule({
+        const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [UsersModule],
             controllers: [TelegramController],
             providers: [TelegramUpdate, PrismaService, TelegramService]
@@ -37,11 +38,16 @@ describe("TelegramController", () => {
             }
           }).compile()
 
-        controller = module.get<TelegramController>(TelegramController)
+        app = moduleFixture.createNestApplication()
+        app.setGlobalPrefix("/api")
+
+        await app.init()
     })
 
-    it("Проверка запроса на создание секретного ключа активации", async () => {
-        expect((await controller.createConnect(testJwtUser)).id).toBeDefined()
+    it("/api/telegram/createConnect (POST) (Проверка запроса на создание секретного ключа активации)", async () => {
+        return request(app.getHttpServer())
+        .post("/api/telegram/createConnect")
+        .expect(201)
     })
 
     afterAll(async () => {
@@ -50,5 +56,7 @@ describe("TelegramController", () => {
                 userId: 3
             }
         })
+
+        await app.close()
     })
 })

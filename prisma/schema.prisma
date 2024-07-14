@@ -229,7 +229,7 @@ model Payments {
 
 model Telegram {
   id Int @id @default(autoincrement())
-  telegramId Int @unique @map("telegram_id")
+  telegramId BigInt @unique @map("telegram_id")
   userId Int @unique @map("user_id")
   user User? @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now()) @map("created_at")

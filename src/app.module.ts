@@ -13,7 +13,6 @@ import { ReportsModule } from './reports/reports.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ChatModule } from './chat/chat.module';
 import { EmailModule } from './email/email.module';
-import { EmailService } from './email/email.service';
 import { StripeModule } from './stripe/stripe.module';
 import { PaymentsModule } from './payments/payments.module';
 import config from '@config/constants'
@@ -26,8 +25,8 @@ const constants = config()
     isGlobal: true
   }), UsersModule, ProductsModule, SellerRequirementsModule, AlertsModule, BasketModule, ReviewsModule,
   ReportsModule, CategoriesModule, ChatModule, EmailModule, StripeModule.forRoot(constants.STRIPE_API_KEY, { apiVersion: "2024-06-20" }), 
-  PaymentsModule, TelegramModule],
+  PaymentsModule, TelegramModule.forRoot()],
   controllers: [AppController],
-  providers: [AppService, EmailService],
+  providers: [AppService],
 })
 export class AppModule {}
