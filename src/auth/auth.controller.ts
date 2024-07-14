@@ -11,7 +11,6 @@ import { JwtUser } from './interfaces';
 import { JwtGuard } from './guards/jwt.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { EnableTwoFactorDto } from './dto/enable-two-factor.dto';
 
 @Controller('auth')
 @ApiTags("Auth Controller")
@@ -37,10 +36,12 @@ export class AuthController {
     type: AuthDto
   })
   @ApiResponse({ status: 403, description: "User are banned", type: SwaggerForbiddenException })
+  @ApiResponse({ status: 409, description: "Already send twoAuth code (lt 5 mins from last)" })
   @ApiOperation({ summary: "Login user" })
+  @ApiQuery({ name: "authTag", required: false, description: "Add a two factor auth tag if he is need." })
   @HttpCode(200)
-  async login(@Res({ passthrough: true }) res: Response, @Body() dto: Partial<AuthDto>) {
-    return await this.authService.login(res, dto)
+  async login(@Res({ passthrough: true }) res: Response, @Body() dto: Partial<AuthDto>, @Query("authTag") authTag?: string) {
+    return await this.authService.login(res, dto, authTag)
   }
 
   @Get("/refresh")
@@ -94,18 +95,5 @@ export class AuthController {
   @UsePipes(new ValidationPipe())
   async resetPassword(@Body() dto: ResetPasswordDto, @Query("urlTag") urlTag?: string) {
     return await this.authService.resetPassword(dto, urlTag)
-  }
-
-  @Post("/enableTwoFactorAuth")
-  @ApiOperation({ summary: "Enable twofactor auth on user account" })
-  @ApiResponse({ status: 201, description: "Send email/Getted telegram link to enable auth", type: SwaggerCreated })
-  @ApiResponse({ status: 400, description: "Validation failed/Not has email/telegram", type: SwaggerBadRequest })
-  @ApiResponse({ status: 409, description: "User already has twoFactor", type: SwaggerConflictMessage })
-  @ApiBearerAuth()
-  @UsePipes(new ValidationPipe())
-  @UseGuards(JwtGuard)
-  async enableTwoFactor(@Body() dto: EnableTwoFactorDto, @User() user: JwtUser) {
-    // дописать
-    return 0
   }
 }

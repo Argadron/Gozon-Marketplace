@@ -1,8 +1,9 @@
 import { Action, Ctx, Message, On, Start, Update } from "nestjs-telegraf";
 import { Context } from "telegraf";
-import { buttons } from "./telegram.buttons";
-import { getData, init, parseQuery, terminateSession, writeData } from "./telegram.utils";
+import { buttons, profileButtons, securityButtons } from "./telegram.buttons";
+import { getData, init, terminateSession, writeData } from "./telegram.utils";
 import { TelegramService } from "./telegram.service";
+import { twoFactorAuthEnum } from "@prisma/client";
 
 @Update()
 export class TelegramUpdate {
@@ -26,18 +27,6 @@ export class TelegramUpdate {
     @Start()
     async start(@Ctx() ctx: Context, @Message("text") msg: string) {
         const user = await this.JwtChecker(ctx)
-        const query = parseQuery(msg)
-
-        if (query["auth"]) {
-            const created = await this.telegramService.enableTwoAuthFromQuery(query["auth"], ctx.from.id)
-
-            if (!created) {
-                await ctx.reply("Произошла ошибка при подключении двухфакторной авторизации. \n Возможно, она уже подключена.")
-                return;
-            }
-
-            await ctx.reply(`Вы успешно подключились к аккаунту ${created.username}`)
-        }
         await ctx.reply("Приветствую! Это оффициальный бот Gozon Marketplace! \n\n Выбери нужное действие:", buttons(user))
         await writeData({ telegramId: ctx.from.id, data: {} })
     }
@@ -58,7 +47,8 @@ export class TelegramUpdate {
 
         if (!user) return;
 
-        await ctx.reply(`Информация об аккаунте ${user.username}: \n Телефон: ${user.phone ? user.phone: "Не подключен"} \n Почта: ${user.email ? user.email: "Не подключена"} \n Роль: ${user.role}`)
+        await ctx.reply(`Информация об аккаунте ${user.username}: \n Телефон: ${user.phone ? user.phone: "Не подключен"} \n Почта: ${user.email ? user.email: "Не подключена"} \n Роль: ${user.role} \n Двухфакторная авторизация ${user.twoFactorAuth === twoFactorAuthEnum.NONE ? "выключена":"включена"}`,
+        profileButtons())
         return;
     }
 
@@ -74,6 +64,36 @@ export class TelegramUpdate {
         }
 
         await ctx.reply("Вы успешно вышли из аккаунта!")
+    }
+
+    @Action(/security/)
+    async security(@Ctx() ctx: Context) {
+        if (!await this.JwtChecker(ctx)) return;
+
+        await ctx.reply("Настрйоки безопасности аккаунта", securityButtons())
+    }
+
+    @Action(/menu/)
+    async menu(@Ctx() ctx: Context) {
+        await ctx.reply("Главное меню", buttons(await this.JwtChecker(ctx)))
+    }
+
+    @Action(/twoFactorAuth/)
+    async twoFactorAuth(@Ctx() ctx: Context) {
+        const User = await this.JwtChecker(ctx)
+
+        if (!User) return; 
+
+        const check = await this.telegramService.enableTwoFactorAuth(User)
+
+        if (!check) {
+            await ctx.reply("Ошибка при подключении двухфакторной авторизации!")
+            await this.menu(ctx)
+            return;
+        }
+        else {
+            await ctx.reply(`Двухфакторная авторизация успешно ${check.twoFactorAuth === twoFactorAuthEnum.TELEGRAM ? "включена":"отключена"}`)
+        }
     }
 
     @On("text")

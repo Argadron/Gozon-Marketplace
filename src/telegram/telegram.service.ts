@@ -2,15 +2,18 @@ import { ConflictException, Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma.service";
 import { UsersService } from "../users/users.service";
 import { twoFactorAuthEnum } from "@prisma/client";
-import { createAuthTag, CreateConnect } from "./interfaces";
+import { CreateConnect } from "./interfaces";
 import * as bcrypt from 'bcrypt'
 import { JwtUser } from "../auth/interfaces";
 import { v4 } from "uuid";
+import { InjectBot } from "nestjs-telegraf";
+import { Context, Telegraf } from "telegraf";
 
 @Injectable()
 export class TelegramService {
     constructor(private readonly prismaService: PrismaService,
-                private readonly usersService: UsersService
+                private readonly usersService: UsersService,
+                @InjectBot() private readonly bot: Telegraf<Context>
     ) {}
 
     private async getUserByTelegramId(telegramId: number) {
@@ -24,6 +27,8 @@ export class TelegramService {
     }
 
     private async connector(User: any, telegramId: number) {
+        if (User.isTelegramVerify) return false
+
         await this.usersService.update({
             isTelegramVerify: true,
             twoFactorAuth: twoFactorAuthEnum.TELEGRAM
@@ -39,26 +44,14 @@ export class TelegramService {
             id: User.id,
             role: User.role
         }
-    }
+    } 
 
-    async enableTwoAuthFromQuery(queryAuthToken: string, telegramId: number) {
-        const authObject = await this.prismaService.telegramAuth.findUnique({
-            where: {
-                authToken: queryAuthToken
-            }
-        })
-
-        if (!authObject) return undefined
-
-        await this.prismaService.telegramAuth.delete({
-            where: {
-                authToken: queryAuthToken
-            }
-        })
+    async enableTwoFactorAuth(User: any) {
+        if (!User.isTelegramVerify || User.twoFactorAuth === twoFactorAuthEnum.EMAIL) return false;
 
         return await this.usersService.update({
-            twoFactorAuth: twoFactorAuthEnum.TELEGRAM
-        }, authObject.userId)
+            twoFactorAuth: User.twoFactorAuth === twoFactorAuthEnum.TELEGRAM ? twoFactorAuthEnum.NONE : twoFactorAuthEnum.TELEGRAM
+        }, User.id)
     }
 
     async createUserConnect(data?: CreateConnect) {
@@ -147,5 +140,26 @@ export class TelegramService {
         })
         
         return await this.connector(User, telegramId)
+    }
+
+    async createAuthTagExternal(tag: string, userId: number) {
+        return await this.prismaService.telegramAuth.create({
+            data: {
+                userId,
+                authToken: tag
+            }
+        })
+    }
+
+    async findTelegramIdByUserId(userId: number) {
+        return await this.prismaService.telegram.findUnique({
+            where: {
+                userId
+            }
+        })
+    }
+
+    async sendMessage(telegramId: any, message: string) {
+        return await this.bot.telegram.sendMessage(telegramId.toString(), message)
     }
 }

@@ -1,6 +1,8 @@
 import { JwtUser } from "../auth/interfaces";
 import { Markup } from "telegraf";
 
+export const menu = Markup.button.callback("Главное меню", "menu")
+
 export function buttons(user?: JwtUser) {
     const buttons = []
 
@@ -10,6 +12,30 @@ export function buttons(user?: JwtUser) {
 
     return Markup.inlineKeyboard(
         buttons,
+        {
+            columns: 1
+        }
+    )
+}
+
+export function profileButtons() {
+    return Markup.inlineKeyboard(
+        [
+            Markup.button.callback("Безопасность", "security"),
+            menu
+        ],
+        {
+            columns: 1
+        }
+    )
+}
+
+export function securityButtons() {
+    return Markup.inlineKeyboard(
+        [
+            Markup.button.callback("Двухфакторная авторизация", "twoFactorAuth"),
+            menu
+        ],
         {
             columns: 1
         }

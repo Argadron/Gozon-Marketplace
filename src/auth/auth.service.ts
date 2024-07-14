@@ -14,7 +14,6 @@ import { EmailService } from '../email/email.service';
 import { v4 } from 'uuid'
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { checkMinsTimeFromDateToCurrent } from '@helpers/date';
-import { EnableTwoFactorDto } from './dto/enable-two-factor.dto';
 import { TelegramService } from '../telegram/telegram.service';
 
 @Injectable()
@@ -114,7 +113,7 @@ export class AuthService {
         return { access }
     }
 
-    async login(res: Response, dto: Partial<AuthDto>) {
+    async login(res: Response, dto: Partial<AuthDto>, authTag?: string) {
         const type = dto.email || dto.username || dto.phone
 
         if (!type) throw new BadRequestException("Missing one of 3 login methods")
@@ -144,6 +143,48 @@ export class AuthService {
         })) throw new BadRequestException("Refresh Token not found")
 
         if (User.isBanned) throw new ForbiddenException("User are banned")
+
+        if (User.twoFactorAuth !== twoFactorAuthEnum.NONE) {
+
+            if (User.twoFactorAuth === twoFactorAuthEnum.TELEGRAM) {
+                const verifyCode = v4()
+
+                const telegramUser = await this.telegramService.findTelegramIdByUserId(User.id)
+
+                if (!telegramUser) throw new NotFoundException("User not found (telegram id)")
+
+                const check = await this.telegramService.findAuthTagByUserId(User.id)
+
+                if (!authTag) {
+                    if (check) {
+                        if (checkMinsTimeFromDateToCurrent(check.createdAt, 5)) {
+                            await this.telegramService.deleteAuthTagByUserId(User.id)
+                            await this.telegramService.createAuthTagExternal(verifyCode, User.id)
+                            await this.telegramService.sendMessage(telegramUser.telegramId, `Ваш код двухфакторной аутентификации: ${verifyCode}`)
+                        }
+                        else {
+                            throw new ConflictException("Already has check code (lt 5 mins from last)")
+                        }
+                    }
+                    else {
+                        await this.telegramService.createAuthTagExternal(verifyCode, User.id)
+                        await this.telegramService.sendMessage(telegramUser.telegramId, `Ваш код двухфакторной аутентификации: ${verifyCode}`)
+                    }
+
+                    return "Send code to telegram"
+                }
+                else {
+                    const findTag = await this.telegramService.findAuthTagByUserId(User.id)
+
+                    if (!findTag) throw new NotFoundException("Authtag not found")
+
+                    if (findTag.authToken !== authTag) throw new BadRequestException("Tags not match")
+
+                    await this.telegramService.deleteAuthTagByUserId(User.id)
+                }
+            }
+            
+        }
 
         const { access, refresh } = await this.generateTokens(User.id, User.role)
 
