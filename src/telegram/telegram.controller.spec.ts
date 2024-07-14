@@ -9,6 +9,9 @@ import { RoleEnum } from '@prisma/client';
 import { Request } from 'express'
 import prismaTestClient from '../prisma-client.forTest'
 import { UsersModule } from '../users/users.module';
+import { TelegramModule } from './telegram.module';
+import { DEFAULT_BOT_NAME } from 'nestjs-telegraf';
+import { Context, Telegraf } from 'telegraf';
 
 const prisma = prismaTestClient()
 
@@ -17,13 +20,16 @@ describe("TelegramController", () => {
     const testJwtUser = {
         id: 3,
         role: RoleEnum.ADMIN
-    }
+    } 
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            imports: [UsersModule],
+            imports: [UsersModule, TelegramModule.forRoot()],
             controllers: [TelegramController],
-            providers: [TelegramUpdate, PrismaService, TelegramService]
+            providers: [TelegramUpdate, PrismaService, TelegramService, {
+                provide: DEFAULT_BOT_NAME,
+                useValue: Telegraf<Context>
+            }]
         }).overrideGuard(JwtGuard).useValue({
             canActivate: (ctx: ExecutionContext) => {
               const request: Request = ctx.switchToHttp().getRequest()

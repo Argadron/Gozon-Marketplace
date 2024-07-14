@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ReviewsController } from './reviews.controller';
 import { ReviewsService } from './reviews.service';
-import { AuthModule } from '../auth/auth.module';
 import { PrismaService } from '../prisma.service';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { ExecutionContext } from '@nestjs/common';
@@ -42,7 +41,7 @@ describe('ReviewsController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [AuthModule, ProductsModule],
+      imports: [ProductsModule],
       controllers: [ReviewsController],
       providers: [ReviewsService, PrismaService],
     }).overrideGuard(JwtGuard).useValue({

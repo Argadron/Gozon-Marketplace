@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ReportsController } from './reports.controller';
 import { ReportsService } from './reports.service';
 import { PrismaService } from '../prisma.service';
-import { AuthModule } from '../auth/auth.module';
 import { ProductsModule } from '../products/products.module';
 import { RoleEnum } from '@prisma/client';
 import { JwtGuard } from '../auth/guards/jwt.guard';
@@ -38,7 +37,7 @@ describe('ReportsController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [AuthModule, ProductsModule],
+      imports: [ProductsModule],
       controllers: [ReportsController],
       providers: [ReportsService, PrismaService],
     }).overrideGuard(JwtGuard).useValue({

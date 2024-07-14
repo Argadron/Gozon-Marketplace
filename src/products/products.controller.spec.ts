@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
 import { PrismaService } from '../prisma.service';
-import { AuthModule } from '../auth/auth.module';
 import { RoleEnum } from '@prisma/client';
 import { FileService } from '../file.service';
 import { ConfigService } from '@nestjs/config';
@@ -52,7 +51,6 @@ describe('ProductsController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [AuthModule],
       controllers: [ProductsController],
       providers: [ProductsService, PrismaService, FileService, ConfigService, StringToArrayPipe, CategoriesService],
     }).compile();

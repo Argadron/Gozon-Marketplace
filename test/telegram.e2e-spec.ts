@@ -10,6 +10,8 @@ import { Request } from 'express'
 import prismaTestClient from '../src/prisma-client.forTest'
 import * as request from 'supertest'
 import { UsersModule } from '../src/users/users.module'
+import { DEFAULT_BOT_NAME } from 'nestjs-telegraf';
+import { Context, Telegraf } from 'telegraf';
 
 const prisma = prismaTestClient()
 
@@ -24,7 +26,10 @@ describe("TelegramController", () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [UsersModule],
             controllers: [TelegramController],
-            providers: [TelegramUpdate, PrismaService, TelegramService]
+            providers: [TelegramUpdate, PrismaService, TelegramService, {
+                provide: DEFAULT_BOT_NAME,
+                useValue: Telegraf<Context>
+            }]
         }).overrideGuard(JwtGuard).useValue({
             canActivate: (ctx: ExecutionContext) => {
               const request: Request = ctx.switchToHttp().getRequest()

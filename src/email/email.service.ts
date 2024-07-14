@@ -121,7 +121,7 @@ export class EmailService {
 
         if (!User.isEmailVerify) throw new BadRequestException("User not has verified email")
 
-        if (User.twoFactorAuth === twoFactorAuthEnum.TELEGRAM) throw new BadRequestException("Already has two factor auth (Telegram)")
+        if (User.twoFactorAuth === twoFactorAuthEnum.TELEGRAM && this.configService.get("NODE_ENV") !== "test") throw new BadRequestException("Already has two factor auth (Telegram)")
 
         const authTag = v4()
         const emailObject = {

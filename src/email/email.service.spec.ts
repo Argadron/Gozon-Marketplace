@@ -6,8 +6,8 @@ import { PrismaService } from '../prisma.service';
 import { UsersModule } from '../users/users.module';
 import { RoleEnum } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
-import { AlertsModule } from '../alerts/alerts.module';
 import { v4 } from 'uuid'
+import { Telegraf, Context } from 'telegraf'
 
 const prisma = prismaTestClient()
 
@@ -29,8 +29,8 @@ describe("EmailService", () => {
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-          imports: [UsersModule, AlertsModule],
-          providers: [EmailService, ConfigService, PrismaService, JwtService],
+          imports: [UsersModule],
+          providers: [EmailService, ConfigService, PrismaService, Telegraf<Context>],
         }).compile();
     
         service = module.get<EmailService>(EmailService);
@@ -42,6 +42,10 @@ describe("EmailService", () => {
 
     it("Проверка валидации тега", async () => {
         expect((await service.validateTag(tag))).toBeUndefined()
+    })
+
+    it("Проверка отправки письма для включени/выключения двухфакторной аутентификации", async () => {
+        expect((await service.twoFactorAuth(testJwtUser)).length).toBeDefined()
     })
 
     afterAll(async () => {

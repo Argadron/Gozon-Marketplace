@@ -1,6 +1,5 @@
 import { ExecutionContext, INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
-import { AuthModule } from '../src/auth/auth.module';
 import { ProductsModule } from '../src/products/products.module';
 import { ReportsModule } from '../src/reports/reports.module';
 import { PrismaService } from '../src/prisma.service';
@@ -37,7 +36,7 @@ describe("ReportsController (E2E)", () => {
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [AuthModule, ProductsModule, ReportsModule],
+            imports: [ProductsModule, ReportsModule],
             providers: [PrismaService]
         }).overrideGuard(JwtGuard).useValue({
             canActivate: (ctx: ExecutionContext) => {

@@ -1,7 +1,5 @@
 import { ExecutionContext, INestApplication } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
-import { AuthModule } from '../src/auth/auth.module';
-import { ReviewsModule } from '../src/reviews/reviews.module';
 import { ReviewsService } from '../src/reviews/reviews.service';
 import { PrismaService } from '../src/prisma.service';
 import { JwtGuard } from '../src/auth/guards/jwt.guard';
@@ -39,7 +37,7 @@ describe("ReviewsController (E2E)", () => {
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [AuthModule, ReviewsModule, ProductsModule],
+            imports: [ProductsModule],
             controllers: [ReviewsController],
             providers: [ReviewsService, PrismaService]
         }).overrideGuard(JwtGuard).useValue({

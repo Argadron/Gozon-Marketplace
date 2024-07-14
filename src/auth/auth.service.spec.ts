@@ -14,6 +14,7 @@ import { JwtGuard } from './guards/jwt.guard';
 import { ExecutionContext } from '@nestjs/common';
 import { EmailService } from '../email/email.service'
 import { TelegramModule } from '../telegram/telegram.module';
+import { Context, Telegraf } from 'telegraf';
 
 const prisma = prismaTestClient()
 
@@ -43,7 +44,7 @@ describe('AuthService', () => {
       imports: [JwtModule.register({
         secret: "secret"
     }), ConfigModule.forRoot(), TelegramModule],
-      providers: [AuthService, PrismaService, ConfigService, FileService, UsersService, AlertsService, EmailService],
+      providers: [AuthService, PrismaService, ConfigService, FileService, UsersService, AlertsService, EmailService, Telegraf<Context>],
     }).overrideGuard(JwtGuard).useValue({
       canActivate: async (ctx: ExecutionContext) => {
         const request: Request = ctx.switchToHttp().getRequest()
@@ -67,7 +68,7 @@ describe('AuthService', () => {
   });
 
   it("Проверка логина юзера", async () => {
-    expect((await service.login(response, testNewUser)).access).toBeDefined()
+    expect((await service.login(response, testNewUser))).toBeDefined()
   })
 
   it("Проверка рефреша токенов", async () => {

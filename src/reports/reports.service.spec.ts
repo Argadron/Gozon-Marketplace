@@ -3,7 +3,6 @@ import { ReportsService } from './reports.service';
 import { RoleEnum } from '@prisma/client';
 import { ProductsModule } from '../products/products.module';
 import { PrismaService } from '../prisma.service';
-import { AuthModule } from '../auth/auth.module';
 import prismaTestClient from '../prisma-client.forTest'
 
 const prisma = prismaTestClient()
@@ -34,7 +33,7 @@ describe('ReportsService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [AuthModule, ProductsModule],
+      imports: [ProductsModule],
       providers: [ReportsService, PrismaService],
     }).compile();
 

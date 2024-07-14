@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { response } from 'express';
-import { AuthModule } from '../auth/auth.module';
 import { PrismaService } from '../prisma.service';
 import { FileService } from '../file.service'
 import { ConfigService } from '@nestjs/config';
@@ -43,7 +42,7 @@ describe('UsersService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [AuthModule, AlertsModule],
+      imports: [AlertsModule],
       providers: [UsersService, PrismaService, FileService, ConfigService],
     }).compile();
 

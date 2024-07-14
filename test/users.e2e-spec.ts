@@ -9,7 +9,6 @@ import { PrismaService } from '../src/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { FileService } from '../src/file.service';
 import { UsersService } from '../src/users/users.service';
-import { JwtService } from '@nestjs/jwt';
 import { JwtGuard } from '../src/auth/guards/jwt.guard'
 import { UsersController } from '../src/users/users.controller';
 import prismaTestClient from '../src/prisma-client.forTest'

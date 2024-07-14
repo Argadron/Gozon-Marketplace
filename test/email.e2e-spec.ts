@@ -11,7 +11,6 @@ import { JwtGuard } from '@guards/jwt.guard';
 import { Request } from 'express'
 import prismaTestClient from '../src/prisma-client.forTest'
 import { JwtService } from '@nestjs/jwt';
-import { AlertsModule } from '../src/alerts/alerts.module';
 import { v4 } from 'uuid'
 
 const prisma = prismaTestClient()
@@ -34,7 +33,7 @@ describe("EmailController (E2E)", () => {
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [UsersModule, AlertsModule],
+            imports: [UsersModule],
             controllers: [EmailController],
             providers: [EmailService, PrismaService, ConfigService, JwtService]
         }).overrideGuard(JwtGuard).useValue({
@@ -69,6 +68,12 @@ describe("EmailController (E2E)", () => {
         return request(app.getHttpServer())
         .get(`/api/email/verifyEmailConfirmTag/?urlTag=${tag}`)
         .expect(204)
+    })
+
+    it("/api/email/twoFactorAuth (POST) (Проверка отправки пиьсма для включения/выключения двухфакторной авторизации)", async () => {
+        return request(app.getHttpServer())
+        .post("/api/email/twoFactorAuth")
+        .expect(201)
     })
 
     afterAll(async () => {
