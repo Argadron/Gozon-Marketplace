@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CategoriesService } from './categories.service';
 import { PrismaService } from '../prisma.service';
 import prismaTestClient from '../prisma-client.forTest'
+import { UsersModule } from '../users/users.module';
 
 const prisma = prismaTestClient()
 
@@ -20,6 +21,7 @@ describe('CategoriesService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [UsersModule],
       providers: [CategoriesService, PrismaService],
     }).compile();
 

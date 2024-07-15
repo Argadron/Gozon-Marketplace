@@ -8,6 +8,7 @@ import { JwtGuard } from '../src/auth/guards/jwt.guard';
 import { Request } from 'express';
 import { RoleEnum } from '@prisma/client';
 import prismaTestClient from '../src/prisma-client.forTest'
+import { UsersModule } from '../src/users/users.module';
 
 const prisma = prismaTestClient()
 
@@ -26,7 +27,7 @@ describe("CategoriesController (E2E)", () => {
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [CategoriesModule],
+            imports: [CategoriesModule, UsersModule],
             providers: [PrismaService]
         }).overrideGuard(JwtGuard).useValue({
             canActivate: (ctx: ExecutionContext) => {

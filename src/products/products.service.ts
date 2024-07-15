@@ -1,4 +1,5 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { AllProductsDto } from './dto/all-products.dto';
@@ -7,6 +8,8 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { FileService } from '../file.service';
 import { Filters, UpdateData } from './interfaces';
 import { CategoriesService } from '../categories/categories.service';
+import { TelegramService } from '../telegram/telegram.service';
+import { UsersService } from '../users/users.service';
 import { JwtUser } from '../auth/interfaces';
 import { Response } from 'express';
 
@@ -14,7 +17,10 @@ import { Response } from 'express';
 export class ProductsService {
     constructor(private readonly prismaService: PrismaService,
                 private readonly fileService: FileService,
-                private readonly categoriesService: CategoriesService
+                private readonly categoriesService: CategoriesService,
+                private readonly telegramService: TelegramService,
+                private readonly usersService: UsersService,
+                private readonly configService: ConfigService
     ) {}
 
     private filterCreator(filters: Filters) {
@@ -138,13 +144,36 @@ export class ProductsService {
 
         delete dto.productPhoto
 
-        return await this.prismaService.product.create({
+        const product = await this.prismaService.product.create({
             data: {
                 ...dto, 
                 productPhoto: productPhoto ? productPhoto : "default.png",
                 sellerId: user.id,
             }
         })
+
+        const usersNeedToSengTelegramAlert = await this.usersService.findByMany({
+            watchingCategories: {
+                hasSome: dto.categories
+            },
+            isTelegramVerify: true
+        })
+
+        if (usersNeedToSengTelegramAlert.length !== 0) {
+            for (let i in usersNeedToSengTelegramAlert) {
+                const currentUser = usersNeedToSengTelegramAlert[i]
+    
+                const telegramUser = await this.telegramService.findTelegramIdByUserId(currentUser.id)
+    
+                if (!telegramUser) continue 
+
+                const url = `${this.configService.get("API_CLIENT_URL")}/product?id=${product.id}`
+    
+                await this.telegramService.sendMessage(telegramUser.telegramId, `Появился новый отслеживаемый товар: ${dto.name}! \n Просмотрите по ссылке: ${url}`)
+            }
+        }
+
+        return product
     }
 
     async update(dto: Partial<UpdateProductDto>, user: JwtUser, file: Express.Multer.File=undefined) {

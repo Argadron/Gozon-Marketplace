@@ -42,3 +42,16 @@ export function securityButtons() {
         }
     )
 }
+
+export function alertsButtons () {
+    return Markup.inlineKeyboard(
+        [
+            Markup.button.callback("Добавить категорию товаров в отслеживаемое", "addCategoryToWatch"),
+            Markup.button.callback("Удалить категорию товаров из отслеживаемой", "removeCategoryFromWatch"),
+            menu
+        ], 
+        {
+            columns: 2
+        }
+    )
+}

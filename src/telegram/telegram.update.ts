@@ -1,13 +1,16 @@
 import { twoFactorAuthEnum } from "@prisma/client";
-import { buttons, profileButtons, securityButtons } from "./telegram.buttons";
+import { alertsButtons, buttons, profileButtons, securityButtons } from "./telegram.buttons";
 import { getData, init, terminateSession, writeData } from "./telegram.utils";
 import { TelegramService } from "./telegram.service"
+import { CategoriesService } from "../categories/categories.service";
 import { Action, Ctx, Message, On, Start, Update } from "nestjs-telegraf";
-import { Context } from "telegraf";;
+import { Context } from "telegraf";
 
 @Update()
 export class TelegramUpdate {
-    constructor(private readonly telegramService: TelegramService) {
+    constructor(private readonly telegramService: TelegramService,
+                private readonly categoriesService: CategoriesService
+    ) {
         init()
     }
 
@@ -97,6 +100,53 @@ export class TelegramUpdate {
         }
     }
 
+    @Action(/alerts/)
+    async alerts(@Ctx() ctx: Context) {
+        const user = await this.JwtChecker(ctx)
+
+        if (!user) return;
+
+        if (user.watchingCategories.length === 0) {
+            await ctx.reply("У вас нет отслеживаемых категорий!", alertsButtons())
+            return;
+        }
+        else {
+            let reply = "Ваши отслеживаемые категории: \n";
+
+            for (let i in user.watchingCategories) {
+                reply += `${user.watchingCategories[i]} \n`
+            }
+
+            await ctx.reply(reply, alertsButtons())
+        }
+    }
+
+    @Action(/addCategoryToWatch/)
+    async addCategoryToWatch(@Ctx() ctx: Context) {
+        const User = await this.JwtChecker(ctx)
+        const telegramId = ctx.from.id
+
+        if (!User) return; 
+
+        const data = await getData(telegramId)
+
+        await ctx.reply("Введите название категории:")
+        await writeData({ telegramId, data: { ...data?.data, category: { type: "add" } } })
+    }
+
+    @Action(/removeCategoryFromWatch/)
+    async removeCategoryFromWatch(@Ctx() ctx: Context) {
+        const User = await this.JwtChecker(ctx)
+        const telegramId = ctx.from.id 
+
+        if (!User) return; 
+
+        const data = await getData(telegramId)
+
+        await ctx.reply("Введите название категории:")
+        await writeData({ telegramId, data: { ...data?.data, category: { type: "delete" } } })
+    }   
+
     @On("text")
     async text(@Ctx() ctx: Context, @Message("text") msg: string) {
         const telegramId = ctx.from.id
@@ -155,6 +205,44 @@ export class TelegramUpdate {
                 await ctx.reply("Аккаунт успешно подключен!")
             }
             return;
+        }
+        else if (data.data.category) {
+            const User = await this.JwtChecker(ctx)
+
+            if (!User) {
+                await ctx.reply("Ошибка при добавлении категории: Пользователь не найден!")
+                return;
+            }
+            
+            const type = data.data.category.type
+
+            await ctx.reply(`${type === "add" ? "Добавляем":"Удаляем"} категорию...`)
+
+            let check = false;
+
+            if (type === "add") {
+                const categoryAddInfo = await this.categoriesService.addToWatching(msg, User.id)
+
+                if (categoryAddInfo) check = true 
+            }
+            else if (type === "delete") {
+                const categoryRemoveInfo = await this.categoriesService.removeFromWatch(msg, User.id)
+
+                if (categoryRemoveInfo) check = true
+            }
+            else {
+                await ctx.reply("Произошла ошибка: неверный тип взаимодействия")
+                return;
+            }
+
+            if (check) {
+                await ctx.reply(`Категория успешно ${type === "add" ? "добавлена к отслеживаемым.":"удалена из отслеживаемых."}`)
+                return;
+            }
+            else {
+                await ctx.reply(`Произошла ошибка при ${type === "add" ? "добавлении":"удалении"} категории. Убедитесь, что такая категория существует.`)
+                return;
+            }
         }
         else {
             return 'Неизвестная команда'

@@ -60,6 +60,10 @@ export class UsersService {
         return await this.prismaService.user.findFirst({ where: find })
     }
 
+    async findByMany(find: Object) {
+        return await this.prismaService.user.findMany({ where: find })
+    }
+
     async getProfilePhoto(user: JwtUser, res: Response) {
         const { profilePhoto } = await this.getProfile(user.id)
 

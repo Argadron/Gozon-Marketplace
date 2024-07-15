@@ -12,6 +12,8 @@ import * as request from 'supertest'
 import { UsersModule } from '../src/users/users.module'
 import { DEFAULT_BOT_NAME } from 'nestjs-telegraf';
 import { Context, Telegraf } from 'telegraf';
+import { CategoriesModule } from '../src/categories/categories.module';
+import { TelegramModule } from '../src/telegram/telegram.module';
 
 const prisma = prismaTestClient()
 
@@ -24,7 +26,7 @@ describe("TelegramController", () => {
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [UsersModule],
+            imports: [UsersModule, CategoriesModule, TelegramModule],
             controllers: [TelegramController],
             providers: [TelegramUpdate, PrismaService, TelegramService, {
                 provide: DEFAULT_BOT_NAME,

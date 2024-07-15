@@ -8,6 +8,8 @@ import prismaTestClient from '../prisma-client.forTest'
 import { response } from 'express';
 import { StringToArrayPipe } from '../common/pipes/string-to-array-pipe';
 import { CategoriesService } from '../categories/categories.service';
+import { TelegramModule } from '../telegram/telegram.module';
+import { UsersModule } from '../users/users.module';
 
 const prisma = prismaTestClient()
 
@@ -51,6 +53,7 @@ describe('ProductsService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [TelegramModule, UsersModule],
       providers: [ProductsService, PrismaService, FileService, ConfigService, StringToArrayPipe, CategoriesService],
     }).compile();
 

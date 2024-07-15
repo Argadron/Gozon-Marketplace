@@ -8,6 +8,7 @@ import { ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
 import { RoleEnum } from '@prisma/client';
 import { AdminGuard } from '../auth/guards/admin.guard';
+import { UsersModule } from '../users/users.module';
 
 const prisma = prismaTestClient()
 
@@ -26,6 +27,7 @@ describe('CategoriesController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [UsersModule],
       controllers: [CategoriesController],
       providers: [CategoriesService, PrismaService],
     }).overrideGuard(JwtGuard).useValue({

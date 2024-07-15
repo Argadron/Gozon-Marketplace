@@ -26,6 +26,7 @@ model User {
   role RoleEnum @default(USER)
   profilePhoto String @map("profile_photo")
   blackList Int[] @default([]) @map("black_list")
+  watchingCategories String[] @default([]) @map("watching_categories")
   twoFactorAuth twoFactorAuthEnum @default(NONE) @map("two_factor_auth")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
