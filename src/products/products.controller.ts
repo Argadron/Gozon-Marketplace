@@ -1,29 +1,27 @@
 import { Controller, Get, Query, ValidationPipe, UsePipes, Param, ParseIntPipe, Post, UseGuards, Body, UploadedFile, Put, Res, Delete, UseInterceptors } from '@nestjs/common';
-import { ProductsService } from './products.service';
 import { ApiOperation, ApiResponse, ApiQuery, ApiBearerAuth, ApiTags, ApiBody } from '@nestjs/swagger';
-import { SwaggerBadRequest, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
-import { AllProductsDto } from './dto/all-products.dto';
-import { ObjectStringToIntPipe } from '@pipes/object-string-to-int.pipe';
-import { SellerGuard } from '@guards/seller.guard';
-import { CreateProductDto } from './dto/create-product.dto';
-import { JwtUser } from '../auth/interfaces';
-import { User } from '@decorators/get-user.decorator';
-import { JwtGuard } from '@guards/jwt.guard';
-import { StringFiltersToObject } from '@pipes/string-filters-to-object.pipe';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { JwtGuard } from '@guards/jwt.guard';
+import { SellerGuard } from '@guards/seller.guard';
 import { StringToArrayPipe } from '@pipes/string-to-array-pipe';
 import { OptionalValidatorPipe } from '@pipes/optional-validator.pipe';
 import { EmptyStringDeletorPipe } from '@pipes/empty-string-deletor.pipe';
 import { ExcessPlantsValidatorPipe } from '@pipes/excess-plants-validator.pipe';
+import { ObjectStringToIntPipe } from '@pipes/object-string-to-int.pipe';
+import { StringFiltersToObject } from '@pipes/string-filters-to-object.pipe';
+import { User } from '@decorators/get-user.decorator';
+import { SwaggerBadRequest, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
+import { AllProductsDto } from './dto/all-products.dto';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductsService } from './products.service';
+import { JwtUser } from '../auth/interfaces';
+import { Response } from 'express';
 
 @Controller('products')
 @ApiTags("Products Controller")
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService,
-              private readonly stringToArrayPipe: StringToArrayPipe
-  ) {}
+  constructor(private readonly productsService: ProductsService) {}
 
   @Get("/all")
   @UsePipes(new ValidationPipe())

@@ -1,13 +1,13 @@
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
-import { JwtUser } from '../auth/interfaces';
-import { FileService } from '../file.service';
-import { Response } from 'express';
-import { UpdateUserStatusDto } from './dto/update-user-status.dto';
-import { AlertsService } from '../alerts/alerts.service';
-import { CreateUser } from './interfaces';
 import { RoleEnum } from '@prisma/client';
 import { AddBlackListDto } from './dto/add-blacklist-dto';
+import { UpdateUserStatusDto } from './dto/update-user-status.dto';
+import { PrismaService } from '../prisma.service';
+import { FileService } from '../file.service';
+import { AlertsService } from '../alerts/alerts.service';
+import { CreateUser } from './interfaces';
+import { JwtUser } from '../auth/interfaces';
+import { Response } from 'express';
 
 @Injectable()
 export class UsersService {

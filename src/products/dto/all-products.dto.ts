@@ -1,7 +1,7 @@
+import { ApiProperty } from "@nestjs/swagger";
+import { Filters } from "../interfaces";
 import { Transform } from "class-transformer";
 import { IsNumber, IsOptional, IsString, Min } from "class-validator";
-import { Filters } from "../interfaces";
-import { ApiProperty } from "@nestjs/swagger";
 
 export class AllProductsDto {
     @Transform(value => Number.parseInt(value.value))

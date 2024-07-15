@@ -1,5 +1,4 @@
 import { DynamicModule, Module, OnModuleDestroy } from "@nestjs/common";
-import { DEFAULT_BOT_NAME, TelegrafModule } from "nestjs-telegraf";
 import config from '@config/constants'
 import { TelegramUpdate } from "./telegram.update";
 import { sessionsCleaner } from "./telegram.utils";
@@ -8,6 +7,7 @@ import { TelegramService } from "./telegram.service";
 import { UsersModule } from "../users/users.module";
 import { TelegramController } from "./telegram.controller";
 import { Context, Telegraf } from "telegraf";
+import { DEFAULT_BOT_NAME, TelegrafModule } from "nestjs-telegraf";
 
 const constants = config()
 

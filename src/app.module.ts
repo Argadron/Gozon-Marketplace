@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import config from '@config/constants'
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { ProductsModule } from './products/products.module';
 import { SellerRequirementsModule } from './seller-requirements/seller-requirements.module';
@@ -15,7 +16,6 @@ import { ChatModule } from './chat/chat.module';
 import { EmailModule } from './email/email.module';
 import { StripeModule } from './stripe/stripe.module';
 import { PaymentsModule } from './payments/payments.module';
-import config from '@config/constants'
 import { TelegramModule } from './telegram/telegram.module';
 
 const constants = config()

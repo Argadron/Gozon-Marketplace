@@ -1,16 +1,16 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { Transporter, createTransport } from "nodemailer";
+import templater from '@helpers/templater'
+import { checkMinsTimeFromDateToCurrent } from "@helpers/date";
+import { twoFactorAuthEnum } from "@prisma/client";
+import { UsersService } from "../users/users.service";
+import { PrismaService } from "../prisma.service";
 import { CreateTag, EmailOptions } from "./interfaces";
+import { JwtUser } from "../auth/interfaces";
 import * as fs from 'fs'
 import * as path from 'path'
 import { v4 } from 'uuid'
-import templater from '@helpers/templater'
-import { JwtUser } from "../auth/interfaces";
-import { UsersService } from "../users/users.service";
-import { PrismaService } from "../prisma.service";
-import { checkMinsTimeFromDateToCurrent } from "@helpers/date";
-import { twoFactorAuthEnum } from "@prisma/client";
+import { Transporter, createTransport } from "nodemailer";
 
 @Injectable()
 export class EmailService {

@@ -1,20 +1,20 @@
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
-import { PrismaService } from '../prisma.service'
-import { AuthDto } from './dto/auth.dto';
-import * as bcrypt from 'bcrypt'
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { Response } from 'express';
+import { checkMinsTimeFromDateToCurrent } from '@helpers/date';
+import { RoleEnum, twoFactorAuthEnum } from '@prisma/client';
+import { PrismaService } from '../prisma.service'
+import { AuthDto } from './dto/auth.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { JwtUser, Tokens } from './interfaces';
 import { FileService } from '../file.service';
-import { RoleEnum, twoFactorAuthEnum } from '@prisma/client';
 import { UsersService } from '../users/users.service';
-import { ChangePasswordDto } from './dto/change-password.dto';
 import { EmailService } from '../email/email.service';
-import { v4 } from 'uuid'
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { checkMinsTimeFromDateToCurrent } from '@helpers/date';
 import { TelegramService } from '../telegram/telegram.service';
+import * as bcrypt from 'bcrypt'
+import { v4 } from 'uuid'
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {

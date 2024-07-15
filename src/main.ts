@@ -1,10 +1,10 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import config from '@config/constants'
 import { GlobalLogger } from '@interceptors/globalLogger.interceptor';
-import * as cookieParser from 'cookie-parser'
 import { InternalExceptionsFilter } from '@filters/internal-exceptions.filter';
 import { SwaggerModuleLocal } from '@swagger/swagger.module';
+import config from '@config/constants'
+import { AppModule } from './app.module';
+import * as cookieParser from 'cookie-parser'
 
 const constants = config()
 

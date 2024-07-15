@@ -1,10 +1,10 @@
-import { JwtGuard } from "@guards/jwt.guard";
 import { Controller, Post, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { TelegramService } from "./telegram.service";
-import { SwaggerConflictMessage, SwaggerCreated, SwaggerUnauthorizedException } from "@swagger/apiResponse.interfaces";
-import { JwtUser } from "../auth/interfaces";
+import { JwtGuard } from "@guards/jwt.guard";
 import { User } from "@decorators/get-user.decorator";
+import { SwaggerConflictMessage, SwaggerCreated, SwaggerUnauthorizedException } from "@swagger/apiResponse.interfaces";
+import { TelegramService } from "./telegram.service";
+import { JwtUser } from "../auth/interfaces";
 
 @Controller("/telegram")
 @ApiTags("Telegram Controller")

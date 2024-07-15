@@ -1,10 +1,10 @@
 import { ConflictException, Injectable } from "@nestjs/common";
+import { twoFactorAuthEnum } from "@prisma/client";
 import { PrismaService } from "../prisma.service";
 import { UsersService } from "../users/users.service";
-import { twoFactorAuthEnum } from "@prisma/client";
 import { CreateConnect } from "./interfaces";
-import * as bcrypt from 'bcrypt'
 import { JwtUser } from "../auth/interfaces";
+import * as bcrypt from 'bcrypt'
 import { v4 } from "uuid";
 import { InjectBot } from "nestjs-telegraf";
 import { Context, Telegraf } from "telegraf";

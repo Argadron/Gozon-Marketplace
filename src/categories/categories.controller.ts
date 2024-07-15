@@ -1,10 +1,10 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
-import { CategoriesService } from './categories.service';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SwaggerBadRequest, SwaggerConflictMessage, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
 import { JwtGuard } from '@guards/jwt.guard';
 import { AdminGuard } from '@guards/admin.guard';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { CategoriesService } from './categories.service';
 
 @Controller('categories')
 @ApiTags("Categories Controller")

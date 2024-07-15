@@ -1,11 +1,11 @@
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
-import { CreateSellerRequirementDto } from './dto/create-seller-requirement.dto';
-import { JwtUser } from '../auth/interfaces';
 import { RoleEnum } from '@prisma/client';
 import { GetAllRequirementsDto } from './dto/get-all-requirements-query.dto';
 import { CloseSellerRequirementDto } from './dto/close-seller-requirement.dto';
+import { CreateSellerRequirementDto } from './dto/create-seller-requirement.dto';
 import { UsersService } from '../users/users.service';
+import { PrismaService } from '../prisma.service';
+import { JwtUser } from '../auth/interfaces';
 
 @Injectable()
 export class SellerRequirementsService {

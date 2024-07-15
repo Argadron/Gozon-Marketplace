@@ -1,14 +1,14 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { AllProductsDto } from './dto/all-products.dto';
 import { CreateProductDto } from './dto/create-product.dto';
-import { JwtUser } from '../auth/interfaces';
+import { UpdateProductDto } from './dto/update-product.dto';
 import { FileService } from '../file.service';
 import { Filters, UpdateData } from './interfaces';
-import { Prisma } from '@prisma/client';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { Response } from 'express';
 import { CategoriesService } from '../categories/categories.service';
+import { JwtUser } from '../auth/interfaces';
+import { Response } from 'express';
 
 @Injectable()
 export class ProductsService {

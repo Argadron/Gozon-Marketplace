@@ -1,15 +1,15 @@
 import { Body, Controller, Get, Post, Put, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
-import { SellerRequirementsService } from './seller-requirements.service';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { JwtUser } from '../auth/interfaces';
-import { SwaggerBadRequest, SwaggerConflictMessage, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
-import { CreateSellerRequirementDto } from './dto/create-seller-requirement.dto';
-import { User } from '@decorators/get-user.decorator';
 import { JwtGuard } from '@guards/jwt.guard';
 import { AdminGuard } from '@guards/admin.guard';
-import { GetAllRequirementsDto } from './dto/get-all-requirements-query.dto';
 import { ObjectStringToIntPipe } from '@pipes/object-string-to-int.pipe';
+import { User } from '@decorators/get-user.decorator';
+import { SwaggerBadRequest, SwaggerConflictMessage, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
+import { CreateSellerRequirementDto } from './dto/create-seller-requirement.dto';
+import { GetAllRequirementsDto } from './dto/get-all-requirements-query.dto';
 import { CloseSellerRequirementDto } from './dto/close-seller-requirement.dto';
+import { SellerRequirementsService } from './seller-requirements.service';
+import { JwtUser } from '../auth/interfaces';
 
 @Controller('seller-requirements')
 @ApiTags("Seller-Requirements Controller")

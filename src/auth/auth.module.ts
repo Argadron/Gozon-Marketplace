@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { SellerGuard } from './guards/seller.guard';
+import { AdminGuard } from './guards/admin.guard';
+import { JwtGuard } from './guards/jwt.guard';
+import { LocalStrategy } from './strategies/jwt.strategy';
+import config from '../config/constants'
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { PrismaService } from '../prisma.service'
-import { JwtModule } from '@nestjs/jwt';
-import config from '../config/constants'
-import { ConfigService } from '@nestjs/config';
 import { FileService } from '../file.service'
-import { JwtGuard } from './guards/jwt.guard';
-import { LocalStrategy } from './strategies/jwt.strategy';
-import { SellerGuard } from './guards/seller.guard';
-import { AdminGuard } from './guards/admin.guard';
 import { UsersModule } from '../users/users.module';
 import { EmailModule } from '../email/email.module';
 import { TelegramModule } from '../telegram/telegram.module';

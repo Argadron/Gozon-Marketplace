@@ -1,6 +1,6 @@
+import { Sessions, SessionWriteData } from './interfaces'
 import * as fs from 'fs'
 import * as path from 'path'
-import { Sessions, SessionWriteData } from './interfaces'
 
 const sessionPath = path.join(process.cwd(), `sessions.json`)
 

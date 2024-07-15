@@ -1,9 +1,9 @@
 import { Controller, Delete, Get, ParseIntPipe, Param, UseGuards } from '@nestjs/common';
-import { PaymentsService } from './payments.service';
 import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AdminGuard } from '@guards/admin.guard';
-import { SwaggerBadRequest, SwaggerForbiddenException, SwaggerNoContent, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
 import { JwtGuard } from '@guards/jwt.guard';
+import { SwaggerBadRequest, SwaggerForbiddenException, SwaggerNoContent, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
+import { PaymentsService } from './payments.service';
 
 @Controller('payments')
 @ApiTags("Payments Controller")

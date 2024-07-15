@@ -1,9 +1,9 @@
 import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { v4 } from 'uuid'
+import { ConfigService } from "@nestjs/config";
 import * as fs from 'fs'
 import * as path from 'path'
 import { Response } from "express";
-import { ConfigService } from "@nestjs/config";
+import { v4 } from 'uuid'
 
 @Injectable()
 export class FileService {

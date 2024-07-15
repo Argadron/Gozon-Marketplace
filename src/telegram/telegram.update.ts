@@ -1,9 +1,9 @@
-import { Action, Ctx, Message, On, Start, Update } from "nestjs-telegraf";
-import { Context } from "telegraf";
+import { twoFactorAuthEnum } from "@prisma/client";
 import { buttons, profileButtons, securityButtons } from "./telegram.buttons";
 import { getData, init, terminateSession, writeData } from "./telegram.utils";
-import { TelegramService } from "./telegram.service";
-import { twoFactorAuthEnum } from "@prisma/client";
+import { TelegramService } from "./telegram.service"
+import { Action, Ctx, Message, On, Start, Update } from "nestjs-telegraf";
+import { Context } from "telegraf";;
 
 @Update()
 export class TelegramUpdate {

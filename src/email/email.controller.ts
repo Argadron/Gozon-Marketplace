@@ -1,10 +1,10 @@
 import { Controller, Get, HttpCode, Post, Query, UseGuards } from "@nestjs/common";
-import { EmailService } from "./email.service";
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { JwtGuard } from "@guards/jwt.guard";
+import { User } from "@decorators/get-user.decorator";
 import { SwaggerBadRequest, SwaggerConflictMessage, SwaggerCreated, SwaggerNoContent, SwaggerNotFound, SwaggerUnauthorizedException } from "@swagger/apiResponse.interfaces";
 import { JwtUser } from "../auth/interfaces";
-import { User } from "@decorators/get-user.decorator";
+import { EmailService } from "./email.service";
 
 @Controller("/email")
 @ApiTags("Email Controller")

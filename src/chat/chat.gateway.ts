@@ -1,20 +1,20 @@
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { ChatService } from './chat.service';
-import config from '@config/constants'
 import { BadRequestException, ConflictException, ForbiddenException, NotFoundException, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import config from '@config/constants'
 import { WebSocketExecption } from '@filters/websockets-execeptions.filter';
-import { Server, Socket } from 'socket.io'
-import { NewChatDto } from './dto/new-chat.dto';
-import { UsersService } from '../users/users.service';
 import { WebsocketUser } from '@decorators/get-user-websocket.decorator';
 import { WebSocketJwtGuard } from '../common/guards/WebsocketJwt.guard';
-import { JwtUser } from '../auth/interfaces';
 import { NewMessageDto } from './dto/new-message.dto';
 import { ChatConnectDto } from './dto/chat-connect.dto';
 import { ChatDisconnectDto } from './dto/chat-disconnect.dto';
 import { EditMessageDto } from './dto/edit-message.dto';
 import { DeleteMessageDto } from './dto/delete-message.dto';
 import { DeleteChatDto } from './dto/delete-chat.dto';
+import { NewChatDto } from './dto/new-chat.dto';
+import { ChatService } from './chat.service';
+import { UsersService } from '../users/users.service';
+import { JwtUser } from '../auth/interfaces';
+import { Server, Socket } from 'socket.io'
 
 const constants = config()
 

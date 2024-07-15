@@ -9,6 +9,7 @@ export function buttons(user?: JwtUser) {
     user ? null : buttons.push(Markup.button.callback("Авторизация", "auth"))
     user ? buttons.push(Markup.button.callback("Профиль", "profile")) : null 
     user ? buttons.push(Markup.button.callback("Выйти из аккаунта", "logout")) : null
+    user ? buttons.push(Markup.button.callback("Уведомления", "alerts")) : null
 
     return Markup.inlineKeyboard(
         buttons,

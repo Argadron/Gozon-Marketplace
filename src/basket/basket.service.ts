@@ -1,14 +1,14 @@
 import { BadRequestException, ConflictException, ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
+import { ConfigService } from '@nestjs/config';
 import { AddProductDto } from './dto/add-product.dto';
+import { ValidateOrderDto } from './dto/validate-order.dto';
+import { PrismaService } from '../prisma.service';
 import { JwtUser } from '../auth/interfaces';
 import { ProductsService } from '../products/products.service';
 import { STRIPE_CLIENT } from '../stripe/constants';
+import { PaymentsService } from '../payments/payments.service';
 import Stripe from 'stripe';
 import { v4 } from 'uuid'
-import { ConfigService } from '@nestjs/config';
-import { ValidateOrderDto } from './dto/validate-order.dto';
-import { PaymentsService } from '../payments/payments.service';
 
 @Injectable()
 export class BasketService {

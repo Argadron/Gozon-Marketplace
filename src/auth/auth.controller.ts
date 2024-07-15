@@ -1,16 +1,16 @@
 import { Body, Controller, Get, HttpCode, Post, Put, Query, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { AuthDto } from './dto/auth.dto';
-import { Response } from 'express';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiResponse, ApiOperation, ApiBearerAuth, ApiTags, ApiCookieAuth, ApiQuery } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { SwaggerBadRequest, SwaggerJwtUser, SwaggerConflictMessage, SwaggerOK, SwaggerForbiddenException, SwaggerUnauthorizedException, SwaggerNotFound, SwaggerCreated } from '@swagger/apiResponse.interfaces';
+import { JwtGuard } from './guards/jwt.guard';
 import { Token } from './decorators/get-token.decorator';
 import { User } from './decorators/get-user.decorator';
 import { JwtUser } from './interfaces';
-import { JwtGuard } from './guards/jwt.guard';
+import { AuthService } from './auth.service';
+import { AuthDto } from './dto/auth.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { Response } from 'express';
 
 @Controller('auth')
 @ApiTags("Auth Controller")

@@ -1,15 +1,15 @@
 import { Body, Controller, Get, Post, Put, Res, UseGuards, UsePipes, ValidationPipe, HttpCode, Delete, Param } from '@nestjs/common';
-import { UsersService } from './users.service';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from '@guards/jwt.guard';
-import { User } from '@decorators/get-user.decorator';
-import { JwtUser } from '../auth/interfaces';
-import { SwaggerBadRequest, SwaggerConflictMessage, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
-import { Response } from 'express';
-import { UpdateUserStatusDto } from './dto/update-user-status.dto';
 import { AdminGuard } from '@guards/admin.guard';
+import { User } from '@decorators/get-user.decorator';
+import { SwaggerBadRequest, SwaggerConflictMessage, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
+import { UpdateUserStatusDto } from './dto/update-user-status.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { AddBlackListDto } from './dto/add-blacklist-dto';
+import { UsersService } from './users.service';
+import { JwtUser } from '../auth/interfaces';
+import { Response } from 'express';
 
 @UseGuards(JwtGuard)
 @Controller('users')
