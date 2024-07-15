@@ -8,7 +8,7 @@ import { UsersModule } from "../users/users.module";
 import { CategoriesModule } from "../categories/categories.module";
 import { TelegramController } from "./telegram.controller";
 import { Context, Telegraf } from "telegraf";
-import { TelegrafModule } from "nestjs-telegraf";
+import { DEFAULT_BOT_NAME, TelegrafModule } from "nestjs-telegraf";
 
 const constants = config()
 
@@ -17,6 +17,9 @@ const constants = config()
     controllers: [TelegramController],
     providers: [TelegramUpdate, PrismaService, TelegramService, {
         provide: constants.TELEGRAM_BOT_NAME,
+        useValue: Telegraf<Context>
+    }, {
+        provide: DEFAULT_BOT_NAME,
         useValue: Telegraf<Context>
     }],
     exports: [TelegramService, { provide: constants.TELEGRAM_BOT_NAME, useValue: Telegraf<Context> }]

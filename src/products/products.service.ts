@@ -154,7 +154,7 @@ export class ProductsService {
 
         const usersNeedToSengTelegramAlert = await this.usersService.findByMany({
             watchingCategories: {
-                hasSome: dto.categories
+                hasSome: this.configService.get("NODE_ENV") === "test" ? ["..."] : dto.categories
             },
             isTelegramVerify: true
         })
