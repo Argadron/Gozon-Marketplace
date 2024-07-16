@@ -6,7 +6,7 @@ import { PrismaService } from "../prisma.service";
 import { TelegramService } from "./telegram.service";
 import { UsersModule } from "../users/users.module";
 import { CategoriesModule } from "../categories/categories.module";
-import { AlertsModule } from "src/alerts/alerts.module";
+import { AlertsModule } from "../alerts/alerts.module";
 import { TelegramController } from "./telegram.controller";
 import { Context, Telegraf } from "telegraf";
 import { DEFAULT_BOT_NAME, TelegrafModule } from "nestjs-telegraf";
@@ -19,8 +19,11 @@ const constants = config()
     providers: [TelegramUpdate, PrismaService, TelegramService, {
         provide: constants.TELEGRAM_BOT_NAME,
         useValue: Telegraf<Context>
+    }, {
+        provide: DEFAULT_BOT_NAME,
+        useValue: Telegraf<Context>
     }],
-    exports: [TelegramService, { provide: constants.TELEGRAM_BOT_NAME, useValue: Telegraf<Context> }]
+    exports: [TelegramService, { provide: constants.TELEGRAM_BOT_NAME, useValue: Telegraf<Context> }, { provide: DEFAULT_BOT_NAME, useValue: Telegraf<Context> }]
 })
 export class TelegramModule implements OnModuleDestroy {
     onModuleDestroy() {

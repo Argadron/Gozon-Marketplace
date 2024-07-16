@@ -21,8 +21,11 @@ const prisma = prismaTestClient()
 describe("TelegramController", () => {
     let app: INestApplication;
     const testJwtUser = {
-        id: 3,
-        role: RoleEnum.ADMIN
+        id: 64,
+        role: RoleEnum.SELLER
+    } 
+    const testDisconnect = {
+        password: "123123123"
     }
 
     beforeEach(async () => {
@@ -38,8 +41,8 @@ describe("TelegramController", () => {
               const request: Request = ctx.switchToHttp().getRequest()
       
               request.user = {
-                id: 3,
-                role: RoleEnum.ADMIN
+                id: 64,
+                role: RoleEnum.SELLER
               }
       
               return true
@@ -58,10 +61,32 @@ describe("TelegramController", () => {
         .expect(201)
     })
 
+    it("/api/telegram/disconnect (DELETE) (Проверка дисконнекта аккаунта)", async () => {
+        return request(app.getHttpServer())
+        .delete("/api/telegram/disconnect")
+        .send(testDisconnect)
+        .expect(400)
+    })
+
     afterAll(async () => {
         await prisma.telegramAuth.delete({
             where: {
-                userId: 3
+                userId: 64
+            }
+        })
+        await prisma.user.update({
+            where: {
+                id: 64
+            },
+            data: {
+                isTelegramVerify: true
+            }
+        })
+
+        await prisma.telegram.create({
+            data: {
+                userId: 64,
+                telegramId: 5946037728
             }
         })
 

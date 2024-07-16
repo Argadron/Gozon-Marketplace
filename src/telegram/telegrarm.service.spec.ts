@@ -15,8 +15,11 @@ const prisma = prismaTestClient()
 describe("TelegramService", () => {
     let service: TelegramService;
     const testJwtUser = {
-        id: 3,
-        role: RoleEnum.ADMIN
+        id: 64,
+        role: RoleEnum.SELLER
+    } 
+    const testDisconnect = {
+        password: "123123123"
     }
 
     beforeEach(async () => {
@@ -35,10 +38,30 @@ describe("TelegramService", () => {
         expect((await service.createAuthTag(testJwtUser)).id).toBeDefined()
     })
 
+    it("Проверка запроса на дисконнет аккаунта", async () => {
+        expect((await service.disconnect(testDisconnect, testJwtUser))).toBeUndefined()
+    })
+
     afterAll(async () => {
         await prisma.telegramAuth.delete({
             where: {
                 userId: 3
+            }
+        })
+
+        await prisma.user.update({
+            where: {
+                id: 64
+            },
+            data: {
+                isTelegramVerify: true
+            }
+        })
+
+        await prisma.telegram.create({
+            data: {
+                userId: 64,
+                telegramId: 5946037728
             }
         })
     })

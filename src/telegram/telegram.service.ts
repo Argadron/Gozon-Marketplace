@@ -3,7 +3,7 @@ import { twoFactorAuthEnum } from "@prisma/client";
 import { DisconnectDto } from "./dto/disconnect.dto";
 import { PrismaService } from "../prisma.service";
 import { UsersService } from "../users/users.service";
-import { AlertsService } from "src/alerts/alerts.service";
+import { AlertsService } from "../alerts/alerts.service";
 import { CreateConnect } from "./interfaces";
 import { JwtUser } from "../auth/interfaces";
 import * as bcrypt from 'bcrypt'
