@@ -15,6 +15,7 @@ import { v4 } from 'uuid';
 import { StripeModule } from '../src/stripe/stripe.module';
 import config from '@config/constants'
 import { ConfigService } from '@nestjs/config'
+import { AlertsModule } from '../src/alerts/alerts.module';
 
 const prisma = prismaTestClient()
 const stripe = stripeTestClient()
@@ -43,7 +44,7 @@ describe("BasketController (E2E)", () => {
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [ProductsModule, PaymentsModule, StripeModule.forRoot(constants.STRIPE_API_KEY, { apiVersion: "2024-06-20" })],
+            imports: [ProductsModule, PaymentsModule, StripeModule.forRoot(constants.STRIPE_API_KEY, { apiVersion: "2024-06-20" }), AlertsModule],
             controllers: [BasketController],
             providers: [BasketService, PrismaService, ConfigService]
         }).overrideGuard(JwtGuard).useValue({

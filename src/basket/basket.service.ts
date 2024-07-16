@@ -7,6 +7,7 @@ import { JwtUser } from '../auth/interfaces';
 import { ProductsService } from '../products/products.service';
 import { STRIPE_CLIENT } from '../stripe/constants';
 import { PaymentsService } from '../payments/payments.service';
+import { AlertsService } from '../alerts/alerts.service';
 import Stripe from 'stripe';
 import { v4 } from 'uuid'
 
@@ -16,7 +17,8 @@ export class BasketService {
                 private readonly productService: ProductsService,
                 @Inject(STRIPE_CLIENT) private readonly stripe: Stripe,
                 @Inject(ConfigService) private readonly configService: ConfigService,
-                private readonly paymentsService: PaymentsService
+                private readonly paymentsService: PaymentsService,
+                private readonly alertsService: AlertsService
     ) {}
 
     async addProduct(dto: AddProductDto, user: JwtUser) {
@@ -190,11 +192,13 @@ export class BasketService {
 
             for (let e in productInfoExtra) {
                 const currentInfo = productInfoExtra[e]
-                const { count } = await this.productService.getById(currentInfo.productId)
+                const { count, sellerId, name } = await this.productService.getById(currentInfo.productId)
 
                 const updated = await this.productService.updateInertnal(currentInfo.productId, { count: count - currentInfo.productCount })
 
                 if (updated.count <= 0) await this.productService.updateInertnal(currentInfo.productId, { isSold: true })
+
+                await this.alertsService.sendInternal(sellerId, `Продан продукт ${name}! Их осталось в наличии: ${updated.count}`)
             }
 
             await this.prismaService.orders.delete({

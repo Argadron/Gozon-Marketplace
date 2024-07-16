@@ -60,6 +60,15 @@ export class AlertsService {
         }
     }
 
+    async sendInternal(userId: number, message: string) {
+        return await this.prismaService.alert.create({
+            data: {
+                userId,
+                description: message
+            }
+        })
+    }
+
     async deleteOne(id: number, user: JwtUser) {
         const alert = await this.prismaService.alert.findUnique({
             where: {
