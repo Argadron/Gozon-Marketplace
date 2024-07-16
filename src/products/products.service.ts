@@ -127,6 +127,9 @@ export class ProductsService {
                 reportsCount: {
                     gte: 1
                 }
+            },
+            include: {
+                reports: true
             }
         })
     }
