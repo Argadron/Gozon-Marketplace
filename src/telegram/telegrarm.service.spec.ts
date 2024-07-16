@@ -8,6 +8,7 @@ import { UsersModule } from '../users/users.module';
 import { Context, Telegraf } from "telegraf";
 import { DEFAULT_BOT_NAME } from 'nestjs-telegraf';
 import { CategoriesModule } from '../categories/categories.module';
+import { AlertsModule } from '../alerts/alerts.module';
 
 const prisma = prismaTestClient()
 
@@ -20,7 +21,7 @@ describe("TelegramService", () => {
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            imports: [UsersModule, CategoriesModule],
+            imports: [UsersModule, CategoriesModule, AlertsModule],
             providers: [TelegramUpdate, PrismaService, TelegramService, {
                 provide: DEFAULT_BOT_NAME,
                 useValue: Telegraf<Context>

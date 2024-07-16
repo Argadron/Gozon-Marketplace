@@ -1,7 +1,9 @@
-import { ConflictException, Injectable } from "@nestjs/common";
+import { BadRequestException, ConflictException, Injectable } from "@nestjs/common";
 import { twoFactorAuthEnum } from "@prisma/client";
+import { DisconnectDto } from "./dto/disconnect.dto";
 import { PrismaService } from "../prisma.service";
 import { UsersService } from "../users/users.service";
+import { AlertsService } from "src/alerts/alerts.service";
 import { CreateConnect } from "./interfaces";
 import { JwtUser } from "../auth/interfaces";
 import * as bcrypt from 'bcrypt'
@@ -13,7 +15,8 @@ import { Context, Telegraf } from "telegraf";
 export class TelegramService {
     constructor(private readonly prismaService: PrismaService,
                 private readonly usersService: UsersService,
-                @InjectBot() private readonly bot: Telegraf<Context>
+                @InjectBot() private readonly bot: Telegraf<Context>,
+                private readonly alertsService: AlertsService
     ) {}
 
     private async getUserByTelegramId(telegramId: number) {
@@ -45,6 +48,10 @@ export class TelegramService {
         }
     } 
 
+    private async sendSecurityAlert(userId: number, telegramId: number) {
+        return await this.alertsService.sendInternal(userId, `Уведомление безопасности: \n В аккаунт выполнен вход через Telegram. TelegramID: ${telegramId}`)
+    }
+
     async enableTwoFactorAuth(User: any) {
         if (!User.isTelegramVerify || User.twoFactorAuth === twoFactorAuthEnum.EMAIL) return false;
 
@@ -59,6 +66,8 @@ export class TelegramService {
         if (!User) return false 
 
         if (!await bcrypt.compare(data.password, User.password)) return false
+
+        await this.sendSecurityAlert(User.id, data.telegramId)
 
         return await this.connector(User, data.telegramId)
     }
@@ -138,6 +147,8 @@ export class TelegramService {
             }
         })
         
+        await this.sendSecurityAlert(User.id, telegramId)
+
         return await this.connector(User, telegramId)
     }
 
@@ -168,5 +179,28 @@ export class TelegramService {
 
     async sendMessage(telegramId: any, message: string) {
         return await this.bot.telegram.sendMessage(telegramId.toString(), message)
+    }
+
+    async disconnect(dto: DisconnectDto, user: JwtUser) {
+        const User = await this.usersService.findBy({ id: user.id })
+
+        if (!await bcrypt.compare(dto.password, User.password)) throw new BadRequestException("Passwords not match")
+
+        if (!User.isTelegramVerify) throw new BadRequestException("User not has connected verified telegram")
+
+        const { telegramId } = await this.findTelegramIdByUserId(User.id)
+
+        await this.sendMessage(telegramId, "Этот аккаунт был отключен через сайт.")
+
+        await this.usersService.update({
+            isTelegramVerify: false,
+            twoFactorAuth: User.twoFactorAuth === twoFactorAuthEnum.TELEGRAM ? twoFactorAuthEnum.NONE : User.twoFactorAuth
+        }, User.id)
+
+        await this.prismaService.telegram.delete({
+            where: {
+                userId: User.id
+            }
+        })
     }
 }
