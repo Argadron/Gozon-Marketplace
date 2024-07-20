@@ -74,7 +74,7 @@ export class TelegramUpdate {
     async security(@Ctx() ctx: Context) {
         if (!await this.JwtChecker(ctx)) return;
 
-        await ctx.reply("Настрйоки безопасности аккаунта", securityButtons())
+        await ctx.reply("Настройки безопасности аккаунта", securityButtons())
     }
 
     @Action(/menu/)
