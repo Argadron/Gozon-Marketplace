@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AddProductDto } from './dto/add-product.dto';
 import { ValidateOrderDto } from './dto/validate-order.dto';
@@ -10,6 +10,8 @@ import { PaymentsService } from '../payments/payments.service';
 import { AlertsService } from '../alerts/alerts.service';
 import Stripe from 'stripe';
 import { v4 } from 'uuid'
+import { Prisma } from '@prisma/client';
+import { DefaultArgs } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class BasketService {
@@ -151,7 +153,9 @@ export class BasketService {
             for (let elem of Order.productsInfo) {
                 const productInfo = JSON.parse(elem as string)
 
-                const { price } = await this.productService.getById(productInfo.productId)
+                const { price, isSold } = await this.productService.getById(productInfo.productId)
+
+                if (isSold) continue
 
                 const check = normalizedProductsInfo.find(elem => elem.productId === productInfo.productId)
 
@@ -166,6 +170,8 @@ export class BasketService {
 
                 productInfoExtra.push({ productId: productInfo.productId, productCount: productInfo.quantity })
             }
+
+            if (normalizedProductsInfo.length === 0) throw new BadRequestException("All products is solded")
 
             let paymentObject = {};
 
@@ -184,7 +190,7 @@ export class BasketService {
             }))
 
             for (let i in paymentObject) {
-                await this.paymentsService.create({
+                    await this.paymentsService.create({
                     payUserId: paymentObject[i].sellerId,
                     amount: paymentObject[i].amount
                 })
