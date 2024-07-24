@@ -7,13 +7,46 @@ import { v4 } from 'uuid'
 
 @Injectable()
 export class FileService {
-    private readonly allowedMimeTypes = [".png", ".jpg", ".svg"]
+    constructor(@Inject(ConfigService) private readonly configService: ConfigService) {
+        if (!fs.existsSync(path.join(process.cwd(), `uploads`, `default.png`))) this.init()
+    }
 
-    constructor(@Inject(ConfigService) private readonly configService: ConfigService) {}
+    private readonly allowedMimeTypes = [".png", ".jpg", ".svg"]
+    private readonly uploadsPath = path.join(process.cwd(), `uploads`)
+    private errorDefaultCounter = 0
+
+    private getRealPathAndCheckExsists(filePath: string) {
+        const realPath = path.join(process.cwd(), `uploads`, `${filePath}`)
+
+        if (!fs.existsSync(realPath)) throw new NotFoundException("File not exsists")
+
+        return realPath
+    }
+
+    private async init(flag=false) {
+        if (flag) {
+            if (!fs.existsSync(this.uploadsPath)) await fs.promises.mkdir(this.uploadsPath) 
+        }
+
+        try {
+            const defaultPng = (await fetch(`${this.configService.get(`API_CLIENT_URL`)}/public/default.png`)).body
+
+            await fs.promises.writeFile(`${this.uploadsPath}/default.png`, defaultPng as unknown as Buffer)
+        } catch(e) {
+            this.errorDefaultCounter += 1
+
+            if (this.errorDefaultCounter >= 5) {
+                console.error(`Fetch default.png error (gte 5). Please, restart app (killed)`)
+                process.exit(1)
+            }
+
+            setTimeout(async () => {
+                await this.init(true)
+            }, 5000)
+        }
+    }
 
     async downolad(file: Express.Multer.File): Promise<string> {
-        if (!fs.existsSync(path.join(process.cwd(), "uploads"))) fs.mkdirSync(path.join(process.cwd(), "uploads"))
-
         const fileName = v4()
         const filePath = path.join(process.cwd(), `uploads`, `${fileName + path.extname(file.originalname)}`)
 
@@ -23,9 +56,7 @@ export class FileService {
     } 
 
     get(res: Response, filePath: string) {
-        const realPath = path.join(process.cwd(), `uploads`, `${filePath}`)
-
-        if (!fs.existsSync(realPath)) throw new NotFoundException("File not found")
+        const realPath = this.getRealPathAndCheckExsists(filePath)
 
         const file = fs.createReadStream(realPath)
 
@@ -43,9 +74,7 @@ export class FileService {
 
         if (!this.validateFileType(filePath)) throw new BadRequestException("Cannot delete this file")
 
-        const realPath = path.join(process.cwd(), `uploads`, `${filePath}`)
-
-        if (!fs.existsSync(realPath)) throw new BadRequestException("File not exsists")
+        const realPath = this.getRealPathAndCheckExsists(filePath)
 
         await fs.promises.unlink(realPath)
     }
