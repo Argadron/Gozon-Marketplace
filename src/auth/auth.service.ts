@@ -43,12 +43,26 @@ export class AuthService {
         return { access, refresh }
     }
 
+    private getNumberJwtRefreshExpires(): number {
+        const defaultExp = 30 * 24 * 60 * 60 * 1000
+
+        const stringJwtRefreshExp = this.configService.get("JWT_REFRESH_EXPIRES")
+
+        if (!stringJwtRefreshExp) return defaultExp;
+
+        const numberJwtRefreshExp = parseInt(stringJwtRefreshExp.replace("d", ""))
+
+        if (isNaN(numberJwtRefreshExp)) return defaultExp; 
+
+        return numberJwtRefreshExp * 24 * 60 * 60 * 1000
+    }
+
     private sendRefreshToCookie(res: Response, token: string) {
         if (this.configService.get("NODE_ENV") === "test") return;
 
         res.cookie(this.configService.get("REFRESH_TOKEN_COOKIE_NAME"), token, {
             httpOnly: true,
-            maxAge: 30 * 24 * 60 * 60 * 1000,
+            maxAge: this.getNumberJwtRefreshExpires(),
             sameSite: this.configService.get("NODE_ENV") === "development" ? "none" : "lax",
             domain: `${this.configService.get("CLIENT_DOMAIN")}${this.configService.get("HOST")}`,
             secure: true
