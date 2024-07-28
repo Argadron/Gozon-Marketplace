@@ -22,7 +22,7 @@ export class OptionalValidatorPipe implements PipeTransform {
 
         value === undefined ? check = true : null
 
-        if (!check && !value?.role && !value.client) throw new BadRequestException(`One of optional plants must be writed: ${this.plants}`)
+        if (!check && !value?.role && !value?.client && !value?.buffer) throw new BadRequestException(`One of optional plants must be writed: ${this.plants}`)
 
         return value
     }

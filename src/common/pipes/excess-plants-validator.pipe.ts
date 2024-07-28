@@ -11,8 +11,8 @@ export class ExcessPlantsValidatorPipe implements PipeTransform {
     private type: any = {};
 
     transform(value: any, metadata: ArgumentMetadata) {
-        if (!this.type || typeof(value) !== "object" || value["role"]) return value; 
-    
+        if (!this.type || typeof(value) !== "object" || value["role"] || value["buffer"]) return value; 
+
         const keys = Object.keys(plainToInstance(this.type, {}))
        
         Object.keys(value).forEach(elem => {

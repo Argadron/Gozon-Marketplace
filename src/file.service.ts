@@ -8,15 +8,15 @@ import { v4 } from 'uuid'
 @Injectable()
 export class FileService {
     constructor(@Inject(ConfigService) private readonly configService: ConfigService) {
-        if (!fs.existsSync(process.cwd().includes("dist") ? path.join(process.cwd(), `..`, `uploads`, `default.png`) : path.join(this.uploadsPath, `default.png`))) this.init(true)
+        if (!fs.existsSync(this.uploadsPath)) this.init(true)
     }
 
     private readonly allowedMimeTypes = [".png", ".jpg", ".svg"]
-    private readonly uploadsPath = path.join(process.cwd(), `uploads`)
+    private readonly uploadsPath = process.cwd().includes("dist") ? path.join(process.cwd(), `..`, `uploads`) : path.join(process.cwd(), `uploads`)
     private errorDefaultCounter = 0
 
     private getRealPathAndCheckExsists(filePath: string) {
-        const realPath = path.join(process.cwd(), `uploads`, `${filePath}`)
+        const realPath = path.join(this.uploadsPath, filePath)
 
         if (!fs.existsSync(realPath)) throw new NotFoundException("File not exsists")
 
@@ -48,7 +48,7 @@ export class FileService {
 
     async downolad(file: Express.Multer.File): Promise<string> {
         const fileName = v4()
-        const filePath = path.join(process.cwd(), `uploads`, `${fileName + path.extname(file.originalname)}`)
+        const filePath = path.join(this.uploadsPath, `${fileName + path.extname(file.originalname)}`)
 
         await fs.promises.writeFile(filePath, file.buffer)
 
