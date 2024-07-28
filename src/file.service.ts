@@ -8,7 +8,7 @@ import { v4 } from 'uuid'
 @Injectable()
 export class FileService {
     constructor(@Inject(ConfigService) private readonly configService: ConfigService) {
-        if (!fs.existsSync(path.join(process.cwd(), `uploads`, `default.png`))) this.init()
+        if (!fs.existsSync(path.join(process.cwd(), `uploads`, `default.png`))) this.init(true)
     }
 
     private readonly allowedMimeTypes = [".png", ".jpg", ".svg"]
@@ -41,7 +41,7 @@ export class FileService {
             }
 
             setTimeout(async () => {
-                await this.init(true)
+                await this.init()
             }, 5000)
         }
     }
