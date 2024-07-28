@@ -8,7 +8,7 @@ import { v4 } from 'uuid'
 @Injectable()
 export class FileService {
     constructor(@Inject(ConfigService) private readonly configService: ConfigService) {
-        if (!fs.existsSync(path.join(process.cwd(), `uploads`, `default.png`))) this.init(true)
+        if (!fs.existsSync(process.cwd().includes("dist") ? path.join(process.cwd(), `..`, `uploads`, `default.png`) : path.join(this.uploadsPath, `default.png`))) this.init(true)
     }
 
     private readonly allowedMimeTypes = [".png", ".jpg", ".svg"]
