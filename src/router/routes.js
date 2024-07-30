@@ -13,6 +13,7 @@ const routes = [
       { path: 'admin', component:()=>import('pages/admin.vue')},
       { path: 'reset-password', component:()=>import('pages/resetPassword.vue')},
       { path: 'changePassword', component:()=>import('pages/changePassword.vue')},
+      { path: 'createProduct', component:()=>import('pages/createProduct.vue')},
     ]
   },
 

@@ -4,7 +4,7 @@
         <img src="src/assets/largelogo.png" alt="Логотип" class="logo">
         <h1 class="product-name">{{ product.name }}</h1>
         <div class="tags">
-          <span v-for="tag in product.tags" class="tag">{{ tag }}</span>
+          <span v-for="tag in product.categories" class="tag">{{ tag }}</span>
         </div>
       </header>
       <main class="product-main">
@@ -22,7 +22,8 @@
         <div class="tabs">
           <q-tabs v-model="tab" dense class="custom-tabs">
             <q-tab name="reviews" label="Отзывы" />
-            <q-tab name="reports" label="Жалобы" />
+
+            <q-tab class="reports" :style="tab==='reports'? 'background-color:red':''" name="reports" label="Жалобы" />
           </q-tabs>
           <q-tab-panels v-model="tab" animated>
             <q-tab-panel name="reviews">
@@ -168,6 +169,9 @@
     background-color: var(--q-primary);
     color: var(--q-dark);
   }
+  .reports{
+    transition: 500ms;
+  }
   </style>
   
 <script>
@@ -179,7 +183,7 @@ export default{
         return{
             product:ref(null),
             count:0,
-            tab:"reviews",
+            tab:ref("reviews"),
             isLoading:true,
             report:"",
             review:""

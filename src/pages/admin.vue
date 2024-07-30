@@ -15,7 +15,24 @@
             </q-tr>
         </template>
         <template v-slot:body="props">
-            <tableTr @accept="accept" v-bind:sellerRequirement="props.row"/>
+            <sellerRequirement @accept="accept" v-bind:sellerRequirement="props.row"/>
+        </template>
+    </q-table>
+</div>
+<div v-if="productsWithReport">
+    <q-table title="Продукты с жалобами" :rows="productsWithReport">
+        <template v-slot:header>
+            <q-tr>
+                <q-th colspan="1">ID продавца</q-th>
+                <q-th colspan="1">ID продукта</q-th>
+                <q-th colspan="1">Описание продукта</q-th>
+                <q-th>жалобы</q-th>
+                <q-th></q-th>
+                <q-th></q-th>
+            </q-tr>
+        </template>
+        <template v-slot:body="props">
+            <reportsTr @accept="accept" v-bind:product="props.row"/>
         </template>
     </q-table>
 </div>
@@ -24,20 +41,29 @@
 
 <script>
 import requester from "src/boot/requester"
-import tableTr from "./components/admin/sellerRequirement.vue"
+import sellerRequirement from "./components/admin/sellerRequirement.vue"
+import reportsTr from "./components/admin/reportsTr.vue"
 import {ref} from "vue"
 export default{
     components:{
-        tableTr
+        sellerRequirement, reportsTr
     },
     data(){
         return{
-            sellerRequirement:ref(null)
+            sellerRequirement:ref(null),
+            productsWithReport:ref(null)
         }
     },
     async created(){
-        this.sellerRequirement = await requester("GET",`seller-requirements/all?page=1&requirementsOnPage=50`)
+        await requester("GET",`seller-requirements/all?page=1&requirementsOnPage=50`).then(res=>{
+            this.sellerRequirement = res
+        })
         console.log(this.sellerRequirement)
+        await requester("GET",`products/only/reports`).then(res =>{
+            const normalArray = Object.values(res);
+            this.productsWithReport = normalArray;
+        })
+        console.log(this.productsWithReport)
         this.$forceUpdate()
     },
     methods:{
