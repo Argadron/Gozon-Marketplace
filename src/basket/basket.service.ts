@@ -1,6 +1,7 @@
 import { BadRequestException, ConflictException, ForbiddenException, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AddProductDto } from './dto/add-product.dto';
+import { UpdateProductCountDto } from './dto/update-product-count.dto';
 import { ValidateOrderDto } from './dto/validate-order.dto';
 import { PrismaService } from '../prisma.service';
 import { JwtUser } from '../auth/interfaces';
@@ -10,8 +11,6 @@ import { PaymentsService } from '../payments/payments.service';
 import { AlertsService } from '../alerts/alerts.service';
 import Stripe from 'stripe';
 import { v4 } from 'uuid'
-import { Prisma } from '@prisma/client';
-import { DefaultArgs } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class BasketService {
@@ -22,6 +21,29 @@ export class BasketService {
                 private readonly paymentsService: PaymentsService,
                 private readonly alertsService: AlertsService
     ) {}
+
+    /**
+     * This method find product on user basket and check two parameters:
+     * 1: product exsists
+     * 2: product userId === userId
+     * @param productId 
+     * @param userId 
+     * @returns product
+     */
+    private async getProductOnBasketByIdOrThrow(productId: number, userId: number) {
+        const product = await this.prismaService.userProducts.findFirst({
+            where: {
+                userId,
+                productId
+            }
+        })
+
+        if (!product) throw new NotFoundException("Product not found on basket")
+
+        if (product.userId !== userId) throw new ForbiddenException("This is not your product")
+
+        return product
+    }
 
     async addProduct(dto: AddProductDto, user: JwtUser) {
         const product = await this.productService.getById(dto.productId)
@@ -41,21 +63,30 @@ export class BasketService {
     }
 
     async deleteProduct(id: number, user: JwtUser) {
-        const product = await this.prismaService.userProducts.findFirst({
-            where: {
-                userId: user.id,
-                productId: id
-            }
-        })
-
-        if (!product) throw new NotFoundException("Product not found on basket")
-
-        if (product.userId !== user.id) throw new ForbiddenException("This is not your product")
+        await this.getProductOnBasketByIdOrThrow(id, user.id)
 
         return await this.prismaService.userProducts.deleteMany({
             where: {
                 productId: id,
                 userId: user.id
+            }
+        })
+    }
+
+    async updateProductCount(id: number, dto: UpdateProductCountDto, user: JwtUser) {
+        await this.getProductOnBasketByIdOrThrow(id, user.id)
+
+        const product = await this.productService.getById(id)
+
+        if (product.count < dto.count) throw new BadRequestException("New count gt product count")
+
+        return await this.prismaService.userProducts.updateMany({
+            where: {
+                productId: id,
+                userId: user.id
+            },
+            data: {
+                productCount: dto.count
             }
         })
     }
