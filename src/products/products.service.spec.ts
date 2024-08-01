@@ -80,6 +80,10 @@ describe('ProductsService', () => {
     expect((await service.getWithReports()).length).toBeDefined()
   })
 
+  it("Проверка поиска продукта (имя содержит...)", async () => {
+    expect((await service.searchProduct("продукт")).length > 0).toBeDefined()
+  })
+
   it("Проверка создания продукта", async () => {
     expect((await service.create(testNewProduct, testSeller)).name).toBeDefined()
   })

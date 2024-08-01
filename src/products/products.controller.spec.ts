@@ -81,6 +81,10 @@ describe('ProductsController', () => {
     expect((await controller.getPhotoById(1, response))).toBeDefined()
   })
 
+  it("Проверка поиска продукта (имя содержит...)", async () => {
+    expect((await controller.searchProduct("продукт")).length > 0).toBeDefined()
+  })
+
   it("Проверка создания продукта", async () => {
     expect((await controller.createProduct(testNewProduct, testSeller)).name).toBeDefined()
   })
