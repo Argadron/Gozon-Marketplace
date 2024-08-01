@@ -31,6 +31,9 @@ describe("BasketController (E2E)", () => {
         sessionId: "",
         urlTag: ""
      }
+     const testUpdateProductCount = {
+        count: 2
+     }
    
      beforeAll(async () => {
        const order = await prisma.orders.create({
@@ -70,6 +73,13 @@ describe("BasketController (E2E)", () => {
         return request(app.getHttpServer())
         .post("/api/basket/addProduct")
         .send(testAddProduct)
+        .expect(200)
+    })
+
+    it("/api/basket/updateProductCount/${id} (PUT) (Проверка обновления количества товара в корзине)", async () => {
+        return request(app.getHttpServer())
+        .put(`/api/basket/updateProductCount/${testAddProduct.productId}`)
+        .send(testUpdateProductCount)
         .expect(200)
     })
 

@@ -50,6 +50,9 @@ describe('BasketController', () => {
      sessionId: "",
      urlTag: ""
   }
+  const testUpdateCount = {
+    count: 2
+  }
 
   beforeAll(async () => {
     const product = await prisma.product.create({ data: { ...testNewProduct, productPhoto: "default.png", sellerId: 64 } }) 
@@ -91,6 +94,10 @@ describe('BasketController', () => {
   it('Проверка добавления товара в корзину', async () => {
     expect((await controller.addProduct(testAddProduct, testJwtUser)).createdAt).toBeDefined();
   });
+
+  it("Проверка обновления количества товара в корзине", async () => {
+    expect((await controller.updateProductCount(testAddProduct.productId, testUpdateCount, testJwtUser)).count).toBeDefined()
+  })
 
   it("Проверка формирования заказа", async () => {
     expect((await controller.createOrder(testJwtUser)).sessionId).toBeDefined()
