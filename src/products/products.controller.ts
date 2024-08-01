@@ -62,6 +62,14 @@ export class ProductsController {
     return await this.productsService.getPhotoById(id, res)
   }
 
+  @Get(`/search/name`)
+  @ApiOperation({ summary: "Get product by search string name" })
+  @ApiResponse({ status: 200, description: "Products searched", type: SwaggerOK })
+  @ApiResponse({ status: 404, description: "Product(s) not found", type: SwaggerNotFound })
+  async searchProduct(@Query("query") search: string) {
+    return await this.productsService.searchProduct(search)
+  }
+
   @Post("/newProduct")
   @ApiOperation({ summary: "Create new product" })
   @ApiResponse({ status: 201, description: "Product created successfly", type: SwaggerCreated })

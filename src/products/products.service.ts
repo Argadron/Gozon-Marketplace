@@ -121,6 +121,20 @@ export class ProductsService {
         return this.fileService.get(res, product.productPhoto)
     }
 
+    async searchProduct(query: string) {
+        const returnObject = await this.prismaService.product.findMany({
+            where: {
+                name: {
+                    contains: query
+                }
+            }
+        })
+
+        if (returnObject.length === 0) throw new BadRequestException("Product(s) not found")
+
+        return returnObject
+    }
+
     async getWithReports() {
         return await this.prismaService.product.findMany({
             where: {
