@@ -5,6 +5,7 @@ import { PrismaService } from '../prisma.service';
 import { AllProductsDto } from './dto/all-products.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { SearchProductDto } from './dto/search-product.dto';
 import { FileService } from '../file.service';
 import { Filters, UpdateData } from './interfaces';
 import { CategoriesService } from '../categories/categories.service';
@@ -71,13 +72,24 @@ export class ProductsService {
         return product
     }
 
+    /**
+     * This method calculate product(s) pages with filter
+     * @param filter - A object with filters. Example: { name: "product" }
+     * @returns number
+     */
+    private async calcProductPages(filter: Object) {
+        return Math.floor(await this.prismaService.product.count({ where: filter })/50)
+    }
+
     async getAll(query: AllProductsDto) {
         const filters: Filters = query["filter"]
+        const sortedFilters = filters ? this.filterCreator(filters) : []
+
         const result = await this.prismaService.product.findMany({
             skip: (query.page - 1)*query.productOnPage,
             take: query.productOnPage,
             where: {
-                AND: filters ? this.filterCreator(filters) : []
+                AND: sortedFilters 
             },
             include: {
                 reviews: true,
@@ -88,7 +100,7 @@ export class ProductsService {
             }
         })
         
-        const pages = Math.floor(await this.prismaService.product.count()/50)
+        const pages = await this.calcProductPages({ AND: sortedFilters })
 
         return { result, pages: pages === 0 ? 1:pages }
     }
@@ -121,18 +133,26 @@ export class ProductsService {
         return this.fileService.get(res, product.productPhoto)
     }
 
-    async searchProduct(query: string) {
+    async searchProduct(query: SearchProductDto) {
         const returnObject = await this.prismaService.product.findMany({
+            skip: (query.page - 1)*query.productOnPage,
+            take: query.productOnPage,
             where: {
                 name: {
-                    contains: query
+                    contains: query.name
                 }
+            },
+            include: {
+                reports: true,
+                reviews: true
             }
         })
 
-        if (returnObject.length === 0) throw new BadRequestException("Product(s) not found")
+        if (returnObject.length === 0) throw new NotFoundException("Product(s) not found")
 
-        return returnObject
+        const pages = await this.calcProductPages({ name: { contains: query.name } })
+
+        return { result: returnObject, pages: pages === 0 ? 1 : pages }
     }
 
     async getWithReports() {

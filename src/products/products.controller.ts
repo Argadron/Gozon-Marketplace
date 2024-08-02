@@ -14,6 +14,7 @@ import { SwaggerBadRequest, SwaggerCreated, SwaggerForbiddenException, SwaggerNo
 import { AllProductsDto } from './dto/all-products.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { SearchProductDto } from './dto/search-product.dto';
 import { ProductsService } from './products.service';
 import { JwtUser } from '../auth/interfaces';
 import { Response } from 'express';
@@ -66,7 +67,7 @@ export class ProductsController {
   @ApiOperation({ summary: "Get product by search string name" })
   @ApiResponse({ status: 200, description: "Products searched", type: SwaggerOK })
   @ApiResponse({ status: 404, description: "Product(s) not found", type: SwaggerNotFound })
-  async searchProduct(@Query("query") search: string) {
+  async searchProduct(@Query(ObjectStringToIntPipe) search: SearchProductDto) {
     return await this.productsService.searchProduct(search)
   }
 
