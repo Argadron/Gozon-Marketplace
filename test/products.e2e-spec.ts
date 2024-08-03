@@ -101,9 +101,9 @@ describe("ProductsController (E2E)", () => {
         .expect(200)
     })
 
-    it("/api/products/search/name?query=продукт (GET) (Проверка поиска продукта по названию (имя содержит...)", async () => {
+    it("/api/products/search/name?page=1&productsOnPage=1&name=продукт (GET) (Проверка поиска продукта по названию (имя содержит...)", async () => {
         return request(app.getHttpServer())
-        .get("/api/products/searchProduct/?query=продукт")
+        .get("/api/products/search/name?page=1&productsOnPage=1&name=продукт")
         .expect(200)
     })
 

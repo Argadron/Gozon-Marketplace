@@ -43,6 +43,11 @@ describe('ProductsService', () => {
     id: 1,
     count: 8
   }
+  const testProductSearh = {
+    page: 1,
+    productsOnPage: 1,
+    name: "продукт"
+  }
   let productId: number;
   
   beforeAll(async () => {
@@ -81,7 +86,7 @@ describe('ProductsService', () => {
   })
 
   it("Проверка поиска продукта (имя содержит...)", async () => {
-    expect((await service.searchProduct("продукт")).length > 0).toBeDefined()
+    expect((await service.searchProduct(testProductSearh)).length > 0).toBeDefined()
   })
 
   it("Проверка создания продукта", async () => {

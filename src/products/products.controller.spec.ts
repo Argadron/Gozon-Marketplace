@@ -44,6 +44,11 @@ describe('ProductsController', () => {
     id: 64,
     role: RoleEnum.SELLER
   }
+  const testProductSearh = {
+    page: 1,
+    productsOnPage: 1,
+    name: "продукт"
+  }
   let productId: number;
   
   beforeAll(async () => {
@@ -82,7 +87,7 @@ describe('ProductsController', () => {
   })
 
   it("Проверка поиска продукта (имя содержит...)", async () => {
-    expect((await controller.searchProduct("продукт")).length > 0).toBeDefined()
+    expect((await controller.searchProduct(testProductSearh)).length > 0).toBeDefined()
   })
 
   it("Проверка создания продукта", async () => {
