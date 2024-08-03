@@ -45,7 +45,7 @@ describe('ProductsService', () => {
   }
   const testProductSearh = {
     page: 1,
-    productsOnPage: 1,
+    productOnPage: 1,
     name: "продукт"
   }
   let productId: number;
@@ -86,7 +86,7 @@ describe('ProductsService', () => {
   })
 
   it("Проверка поиска продукта (имя содержит...)", async () => {
-    expect((await service.searchProduct(testProductSearh)).length > 0).toBeDefined()
+    expect((await service.searchProduct(testProductSearh)).result).toBeDefined()
   })
 
   it("Проверка создания продукта", async () => {
