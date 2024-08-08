@@ -55,7 +55,7 @@ describe('ChatService', () => {
   })
 
   it("Проверка удаления чата", async () => {
-    expect((await service.deleteChat(chatId)))
+    expect((await service.deleteChat(chatId))).toBeDefined()
   })
 
   afterAll(async () => {
