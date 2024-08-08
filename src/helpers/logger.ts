@@ -25,7 +25,7 @@ class LoggerHelper {
         const url = request.url
         const body = JSON.stringify(request.body) || null 
       
-        const log = `[${hours}:${mins}] [${type}] [${url}] request Body: ${debugMode ? body : body?.length > 2 ? true: false}\n` 
+        const log = `[${hours}:${mins}] [${type ? type : "TELEGRAM"}] [${url ? url : "TELEGRAM"}] request Body: ${debugMode ? body : body?.length > 2 ? true: false}\n` 
       
         Logger.log(log)
     }
