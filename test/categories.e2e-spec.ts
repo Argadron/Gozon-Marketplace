@@ -3,12 +3,12 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { CategoriesModule } from '../src/categories/categories.module';
 import { PrismaService } from '../src/prisma.service';
 import * as request from 'supertest'
-import { AdminGuard } from '../src/auth/guards/admin.guard';
 import { JwtGuard } from '../src/auth/guards/jwt.guard';
 import { Request } from 'express';
 import { RoleEnum } from '@prisma/client';
 import prismaTestClient from '../src/prisma-client.forTest'
 import { UsersModule } from '../src/users/users.module';
+import { RolesGuard } from '@guards/roles.guard';
 
 const prisma = prismaTestClient()
 
@@ -40,7 +40,7 @@ describe("CategoriesController (E2E)", () => {
       
               return true
             }
-          }).overrideGuard(AdminGuard).useValue({
+          }).overrideGuard(RolesGuard).useValue({
             canActivate: (ctx: ExecutionContext) => {
               const request: Request = ctx.switchToHttp().getRequest()
       

@@ -8,11 +8,11 @@ import { RoleEnum } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import { JwtGuard } from '../src/auth/guards/jwt.guard';
 import { Request } from 'express';
-import { SellerGuard } from '../src/auth/guards/seller.guard';
 import prismaTestClient from '../src/prisma-client.forTest'
 import { CategoriesService } from '../src/categories/categories.service';
 import { UsersModule } from '../src/users/users.module';
 import { TelegramModule } from '../src/telegram/telegram.module';
+import { RolesGuard } from '@guards/roles.guard';
 
 const prisma = prismaTestClient()
 
@@ -52,7 +52,7 @@ describe("ProductsController (E2E)", () => {
                 }
                 return true
             }
-        }).overrideGuard(SellerGuard).useValue({
+        }).overrideGuard(RolesGuard).useValue({
             canActivate: (ctx: ExecutionContext) => {
                 const request: Request = ctx.switchToHttp().getRequest()
 

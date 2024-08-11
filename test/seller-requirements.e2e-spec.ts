@@ -7,8 +7,8 @@ import * as request from 'supertest';
 import { JwtGuard } from '../src/auth/guards/jwt.guard';
 import { Request } from 'express';
 import { SellerRequirementsModule } from '../src/seller-requirements/seller-requirements.module';
-import { AdminGuard } from '../src/auth/guards/admin.guard';
 import { UsersModule } from '../src/users/users.module';
+import { RolesGuard } from '@guards/roles.guard';
 
 describe("Seller-requirementsController (E2E)", () => {
     let app: INestApplication;
@@ -41,7 +41,7 @@ describe("Seller-requirementsController (E2E)", () => {
 
                 return true
             }
-        }).overrideGuard(AdminGuard).useValue({
+        }).overrideGuard(RolesGuard).useValue({
             canActivate: (ctx: ExecutionContext) => {
                 const request: Request = ctx.switchToHttp().getRequest()
 

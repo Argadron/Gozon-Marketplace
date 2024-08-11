@@ -5,10 +5,10 @@ import { JwtGuard } from '@guards/jwt.guard';
 import { PrismaService } from '../src/prisma.service';
 import { PaymentsService } from '../src/payments/payments.service';
 import { RoleEnum } from '@prisma/client';
-import { AdminGuard } from '@guards/admin.guard';
 import { Request } from 'express';
 import * as request from 'supertest'
 import prismaTestClient from '../src/prisma-client.forTest'
+import { RolesGuard } from '@guards/roles.guard';
 
 const prisma = prismaTestClient()
 
@@ -37,7 +37,7 @@ describe("PaymentsController (E2E)", () => {
       
               return true
             }
-          }).overrideGuard(AdminGuard).useValue({
+          }).overrideGuard(RolesGuard).useValue({
             canActivate: (ctx: ExecutionContext) => {
               const request: Request = ctx.switchToHttp().getRequest()
       

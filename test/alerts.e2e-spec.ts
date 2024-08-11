@@ -5,9 +5,9 @@ import { AuthModule } from '../src/auth/auth.module';
 import { JwtGuard } from '../src/auth/guards/jwt.guard';
 import { RoleEnum } from '@prisma/client';
 import { Request } from 'express'
-import { AdminGuard } from '../src/auth/guards/admin.guard';
 import * as request from 'supertest'
 import prismaTestClient from '../src/prisma-client.forTest'
+import { RolesGuard } from '@guards/roles.guard';
 
 const prisma = prismaTestClient()
 
@@ -39,7 +39,7 @@ describe("AlertsController (E2E)", () => {
         
                 return true
               }
-        }).overrideGuard(AdminGuard).useValue({
+        }).overrideGuard(RolesGuard).useValue({
             canActivate: (ctx: ExecutionContext) => {
                 const request: Request = ctx.switchToHttp().getRequest()
         

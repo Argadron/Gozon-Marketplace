@@ -8,9 +8,9 @@ import { PrismaService } from '../prisma.service';
 import { FileService } from '../file.service'
 import { ConfigService } from '@nestjs/config';
 import { RoleEnum } from '@prisma/client';
-import { AdminGuard } from '../auth/guards/admin.guard';
 import { AlertsModule } from '../alerts/alerts.module';
 import prismaTestClient from '../prisma-client.forTest'
+import { RolesGuard } from '@guards/roles.guard';
 
 const prisma = prismaTestClient()
 
@@ -59,7 +59,7 @@ describe('UsersController', () => {
 
         return true
       }
-    }).overrideGuard(AdminGuard).useValue({
+    }).overrideGuard(RolesGuard).useValue({
       canActivate: (ctx: ExecutionContext) => {
         const req: Request = ctx.switchToHttp().getRequest()
 

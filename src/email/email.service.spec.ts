@@ -5,7 +5,6 @@ import prismaTestClient from '../prisma-client.forTest'
 import { PrismaService } from '../prisma.service';
 import { UsersModule } from '../users/users.module';
 import { RoleEnum } from '@prisma/client';
-import { JwtService } from '@nestjs/jwt';
 import { v4 } from 'uuid'
 import { Telegraf, Context } from 'telegraf'
 

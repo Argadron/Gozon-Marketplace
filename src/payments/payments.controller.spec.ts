@@ -6,8 +6,8 @@ import { JwtGuard } from '@guards/jwt.guard';
 import { ExecutionContext } from '@nestjs/common';
 import { RoleEnum } from '@prisma/client';
 import { Request } from 'express';
-import { AdminGuard } from '@guards/admin.guard';
 import prismaTestClient from '../prisma-client.forTest'
+import { RolesGuard } from '@guards/roles.guard';
 
 const prisma = prismaTestClient()
 
@@ -36,7 +36,7 @@ describe('PaymentsController', () => {
 
         return true
       }
-    }).overrideGuard(AdminGuard).useValue({
+    }).overrideGuard(RolesGuard).useValue({
       canActivate: (ctx: ExecutionContext) => {
         const request: Request = ctx.switchToHttp().getRequest()
 

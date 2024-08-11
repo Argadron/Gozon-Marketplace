@@ -3,7 +3,6 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { Request, Response } from 'express';
 import * as request from 'supertest';
 import 'dotenv/config'
-import { AdminGuard } from '../src/auth/guards/admin.guard';
 import { RoleEnum } from '@prisma/client';
 import { PrismaService } from '../src/prisma.service';
 import { ConfigService } from '@nestjs/config';
@@ -13,6 +12,7 @@ import { JwtGuard } from '../src/auth/guards/jwt.guard'
 import { UsersController } from '../src/users/users.controller';
 import prismaTestClient from '../src/prisma-client.forTest'
 import { AlertsModule } from '../src/alerts/alerts.module';
+import { RolesGuard } from '@guards/roles.guard';
 
 const prisma = prismaTestClient()
 
@@ -52,7 +52,7 @@ describe("UsersController (E2E)", () => {
             imports: [AlertsModule],
             controllers: [UsersController],
             providers: [PrismaService, ConfigService, FileService, UsersService]
-        }).overrideGuard(AdminGuard).useValue({
+        }).overrideGuard(RolesGuard).useValue({
             canActivate: (ctx: ExecutionContext) => {
                 const request: Request = ctx.switchToHttp().getRequest()
 
