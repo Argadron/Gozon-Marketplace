@@ -1,7 +1,8 @@
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { BadRequestException, UseFilters, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
-import { AdminGuard } from "@guards/admin.guard";
 import { WebSocketJwtGuard } from "../common/guards/WebsocketJwt.guard";
+import { RolesGuard } from "@guards/roles.guard";
+import { Roles } from "@decorators/roles.decorator";
 import { WebSocketExecption } from "@filters/websockets-execeptions.filter";
 import { OptionalValidatorPipe } from "@pipes/optional-validator.pipe";
 import config from '@config/constants'
@@ -22,7 +23,8 @@ export class AlertsGateWay {
 
     @SubscribeMessage("sendAlert")
     @UsePipes(new OptionalValidatorPipe().check(["username", "isGlobal"]), new ValidationPipe())
-    @UseGuards(AdminGuard)
+    @UseGuards(RolesGuard)
+    @Roles("ADMIN")
     async alert(@ConnectedSocket() client: Socket, @MessageBody() payload: SendAlertDto) {
        if (payload.isGlobal) return this.server.emit("alert", payload.description)
 

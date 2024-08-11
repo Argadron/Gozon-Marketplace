@@ -1,8 +1,7 @@
 import { Controller, Get, Query, ValidationPipe, UsePipes, Param, ParseIntPipe, Post, UseGuards, Body, UploadedFile, Put, Res, Delete, UseInterceptors } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiQuery, ApiBearerAuth, ApiTags, ApiBody } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { JwtGuard } from '@guards/jwt.guard';
-import { SellerGuard } from '@guards/seller.guard';
+import { RolesGuard } from '@guards/roles.guard';
 import { StringToArrayPipe } from '@pipes/string-to-array-pipe';
 import { OptionalValidatorPipe } from '@pipes/optional-validator.pipe';
 import { EmptyStringDeletorPipe } from '@pipes/empty-string-deletor.pipe';
@@ -10,6 +9,8 @@ import { ExcessPlantsValidatorPipe } from '@pipes/excess-plants-validator.pipe';
 import { ObjectStringToIntPipe } from '@pipes/object-string-to-int.pipe';
 import { StringFiltersToObject } from '@pipes/string-filters-to-object.pipe';
 import { User } from '@decorators/get-user.decorator';
+import { Auth } from '@decorators/auth.decorator';
+import { Roles } from '@decorators/roles.decorator';
 import { SwaggerBadRequest, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
 import { AllProductsDto } from './dto/all-products.dto';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -78,7 +79,9 @@ export class ProductsController {
   @ApiResponse({ status: 401, description: "Token invalid/Unauhorized", type: SwaggerUnauthorizedException })
   @ApiResponse({ status: 403, description: "Your role not allowed to this action", type: SwaggerForbiddenException })
   @ApiBearerAuth()
-  @UseGuards(JwtGuard, SellerGuard)
+  @Auth()
+  @UseGuards(RolesGuard)
+  @Roles("SELLER")
   @UsePipes(ObjectStringToIntPipe,new StringToArrayPipe().Include(["tags", "categories"]), new ValidationPipe())
   @UseInterceptors(FileInterceptor("file"))
   async createProduct(@Body() dto: CreateProductDto, @User() user: JwtUser, @UploadedFile() file: Express.Multer.File=undefined) {
@@ -93,7 +96,9 @@ export class ProductsController {
   @ApiResponse({ status: 403, description: "Your role not have access to this action", type: SwaggerForbiddenException })
   @ApiBearerAuth()
   @ApiBody({ type: UpdateProductDto })
-  @UseGuards(JwtGuard, SellerGuard)
+  @Auth()
+  @UseGuards(RolesGuard)
+  @Roles("SELLER")
   @UseInterceptors(FileInterceptor("file"))
   @UsePipes(ObjectStringToIntPipe, new StringToArrayPipe().Include(["tags", "categories"]), new EmptyStringDeletorPipe(),
   new OptionalValidatorPipe().check(["name", "description", "price", "count", "tags", "categories"]),new ValidationPipe(),
@@ -109,7 +114,9 @@ export class ProductsController {
   @ApiResponse({ status: 401, description: "Token Invalid/Unauthorized", type: SwaggerUnauthorizedException })
   @ApiResponse({ status: 403, description: "Your role not have access to this action", type: SwaggerForbiddenException })
   @ApiBearerAuth()
-  @UseGuards(JwtGuard, SellerGuard)
+  @Auth()
+  @UseGuards(RolesGuard)
+  @Roles("SELLER")
   async deleteProduct(@Param("id", ParseIntPipe) id: number, @User() user: JwtUser) {
     return await this.productsService.delete(id, user)
   }

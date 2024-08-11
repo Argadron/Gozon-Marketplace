@@ -1,10 +1,10 @@
-import { Body, Controller, Get, HttpCode, Post, Put, Query, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Put, Query, Res, UnauthorizedException, UploadedFile, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiOperation, ApiBearerAuth, ApiTags, ApiCookieAuth, ApiQuery } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { SwaggerBadRequest, SwaggerJwtUser, SwaggerConflictMessage, SwaggerOK, SwaggerForbiddenException, SwaggerUnauthorizedException, SwaggerNotFound, SwaggerCreated } from '@swagger/apiResponse.interfaces';
-import { JwtGuard } from './guards/jwt.guard';
 import { Token } from './decorators/get-token.decorator';
 import { User } from './decorators/get-user.decorator';
+import { Auth } from '@decorators/auth.decorator';
 import { JwtUser } from './interfaces';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
@@ -64,7 +64,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: "Logout success", type: SwaggerOK })
   @ApiResponse({ status: 401, description: "Token Invalid/Unauthorized", type: SwaggerUnauthorizedException })
   @ApiBearerAuth()
-  @UseGuards(JwtGuard)
+  @Auth()
   async logout(@User() user: JwtUser, @Res({ passthrough: true }) res: Response) {
     return await this.authService.logout(user, res)
   }
@@ -78,7 +78,7 @@ export class AuthController {
   @ApiResponse({ status: 409, description: "Already send email to change password (lt 5 mins from last)" })
   @ApiQuery({ name: "urlTag", required: false, type: String, description: "Add tag if change password from email" })
   @ApiBearerAuth()
-  @UseGuards(JwtGuard)
+  @Auth()
   @UsePipes(new ValidationPipe())
   async changePassword(@Body() dto: ChangePasswordDto, @User() user: JwtUser, @Query("urlTag") tag?: string) {
     return await this.authService.changePassword(dto, user, tag)

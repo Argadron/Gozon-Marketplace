@@ -1,23 +1,22 @@
 import { Body, Controller, Delete, Param, ParseIntPipe, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SwaggerBadRequest, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
-import { JwtGuard } from '@guards/jwt.guard';
-import { AdminGuard } from '@guards/admin.guard';
+import { RolesGuard } from '@guards/roles.guard';
+import { Roles } from '@decorators/roles.decorator';
 import { User } from '@decorators/get-user.decorator';
+import { Auth } from '@decorators/auth.decorator';
 import { OptionalValidatorPipe } from '@pipes/optional-validator.pipe';
 import { SendAlertDto } from './dto/send-alert.dto';
 import { AlertsService } from './alerts.service';
 import { JwtUser } from '../auth/interfaces';
 
-
 @Controller('alerts')
-@UseGuards(JwtGuard)
+@Auth()
 @ApiTags("Alert Controller")
 export class AlertsController {
   constructor(private readonly alertsService: AlertsService) {}
   
   @Post("/send")
-  @UseGuards(AdminGuard)
   @ApiOperation({ summary: "Send a alerts to users" })
   @ApiResponse({ status: 201, description: "Alert sended", type: SwaggerCreated })
   @ApiResponse({ status: 400, description: "Validation failed", type: SwaggerBadRequest })
@@ -26,6 +25,8 @@ export class AlertsController {
   @ApiResponse({ status: 404, description: "User not found", type: SwaggerNotFound })
   @ApiBearerAuth()
   @UsePipes(new OptionalValidatorPipe().check(["username", "isGlobal"]),new ValidationPipe())
+  @UseGuards(RolesGuard)
+  @Roles("ADMIN")
   async send(@Body() dto: SendAlertDto) {
     return await this.alertsService.send(dto)
   }

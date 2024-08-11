@@ -1,13 +1,16 @@
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
-import { RoleEnum } from "@prisma/client";
+import { Reflector } from "@nestjs/core";
 import { Request } from "express";
 import { Observable } from "rxjs";
 
 @Injectable()
-export class AdminGuard implements CanActivate {
+export class RolesGuard implements CanActivate {
+    constructor(private readonly reflector: Reflector) {}
+
     canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
         const request: Request = context.switchToHttp().getRequest()
+        const roles: string[] = this.reflector.get("ROLES", context.getHandler())
 
-        return request.user["role"] === RoleEnum.ADMIN
+        return roles.includes(request.user["role"]) ? true : false
     }
 }

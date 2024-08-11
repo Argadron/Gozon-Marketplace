@@ -1,8 +1,9 @@
 import { Body, Controller, Get, Post, Put, Res, UseGuards, UsePipes, ValidationPipe, HttpCode, Delete, Param } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { JwtGuard } from '@guards/jwt.guard';
-import { AdminGuard } from '@guards/admin.guard';
 import { User } from '@decorators/get-user.decorator';
+import { Auth } from '@decorators/auth.decorator';
+import { Roles } from '@decorators/roles.decorator';
+import { RolesGuard } from '@guards/roles.guard';
 import { SwaggerBadRequest, SwaggerConflictMessage, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
 import { UpdateUserStatusDto } from './dto/update-user-status.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
@@ -11,7 +12,7 @@ import { UsersService } from './users.service';
 import { JwtUser } from '../auth/interfaces';
 import { Response } from 'express';
 
-@UseGuards(JwtGuard)
+@Auth()
 @Controller('users')
 @ApiTags("Users Controller")
 export class UsersController {
@@ -47,7 +48,8 @@ export class UsersController {
   @ApiResponse({ status: 401, description: "Token Invalid/Unauthorized", type: SwaggerUnauthorizedException })
   @ApiResponse({ status: 403, description: "Your role not have access to this action", type: SwaggerForbiddenException })
   @ApiBearerAuth()
-  @UseGuards(AdminGuard)
+  @UseGuards(RolesGuard)
+  @Roles("ADMIN")
   async setUserBanStatus(@Body() dto: UpdateUserStatusDto, @User() user: JwtUser) {
     return await this.usersService.setUserBanStatus(dto, user)
   }
@@ -61,7 +63,8 @@ export class UsersController {
   @ApiResponse({ status: 403, description: "Your role not have access to this action", type: SwaggerForbiddenException })
   @ApiResponse({ status: 404, description: "User not found", type: SwaggerNotFound })
   @ApiBearerAuth()
-  @UseGuards(AdminGuard)
+  @UseGuards(RolesGuard)
+  @Roles("ADMIN")
   async setUserRole(@Body() dto: UpdateUserRoleDto) {
     return await this.usersService.setUserRole(dto.role, dto.username)
   }

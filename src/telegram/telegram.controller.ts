@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, HttpCode, Post, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Delete, HttpCode, Post, UsePipes, ValidationPipe } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { JwtGuard } from "@guards/jwt.guard";
 import { User } from "@decorators/get-user.decorator";
+import { Auth } from "@decorators/auth.decorator";
 import { SwaggerBadRequest, SwaggerConflictMessage, SwaggerCreated, SwaggerNoContent, SwaggerUnauthorizedException } from "@swagger/apiResponse.interfaces";
 import { DisconnectDto } from "./dto/disconnect.dto";
 import { TelegramService } from "./telegram.service";
@@ -9,7 +9,7 @@ import { JwtUser } from "../auth/interfaces";
 
 @Controller("/telegram")
 @ApiTags("Telegram Controller")
-@UseGuards(JwtGuard)
+@Auth()
 export class TelegramController {
     constructor (private readonly telegramService: TelegramService) {}
 

@@ -1,8 +1,9 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SwaggerBadRequest, SwaggerConflictMessage, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
-import { JwtGuard } from '@guards/jwt.guard';
-import { AdminGuard } from '@guards/admin.guard';
+import { RolesGuard } from '@guards/roles.guard';
+import { Auth } from '@decorators/auth.decorator';
+import { Roles } from '@decorators/roles.decorator';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { CategoriesService } from './categories.service';
 
@@ -26,7 +27,9 @@ export class CategoriesController {
   @ApiResponse({ status: 403, description: "Your role not have access to this action", type: SwaggerForbiddenException })
   @ApiResponse({ status: 409, description: "Category with this name already exsists", type: SwaggerConflictMessage })
   @ApiBearerAuth()
-  @UseGuards(JwtGuard, AdminGuard)
+  @Auth()
+  @UseGuards(RolesGuard)
+  @Roles("ADMIN")
   @UsePipes(new ValidationPipe())
   async create(@Body() dto: CreateCategoryDto) {
     return await this.categoriesService.create(dto)
@@ -39,7 +42,9 @@ export class CategoriesController {
   @ApiResponse({ status: 403, description: "Your role not have access to this action", type: SwaggerForbiddenException })
   @ApiResponse({ status: 404, description: "Category not found", type: SwaggerNotFound })
   @ApiBearerAuth()
-  @UseGuards(JwtGuard, AdminGuard)
+  @Auth()
+  @UseGuards(RolesGuard)
+  @Roles("ADMIN")
   async delete(@Param("id", ParseIntPipe) id: number) {
     return await this.categoriesService.delete(id)
   }

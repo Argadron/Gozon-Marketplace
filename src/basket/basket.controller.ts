@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, HttpCode, Param, ParseIntPipe, Post, Put, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, HttpCode, Param, ParseIntPipe, Post, Put, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { JwtGuard } from '@guards/jwt.guard';
 import { User } from '@decorators/get-user.decorator';
+import { Auth } from '@decorators/auth.decorator';
 import { SwaggerBadRequest, SwaggerConflictMessage, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
 import { AddProductDto } from './dto/add-product.dto';
 import { ValidateOrderDto } from './dto/validate-order.dto';
@@ -10,7 +10,7 @@ import { BasketService } from './basket.service';
 import { JwtUser } from '../auth/interfaces';
 
 @Controller('basket')
-@UseGuards(JwtGuard)
+@Auth()
 @ApiTags("Basket Controller")
 export class BasketController {
   constructor(private readonly basketService: BasketService) {}

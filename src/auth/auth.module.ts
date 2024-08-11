@@ -1,9 +1,6 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { SellerGuard } from './guards/seller.guard';
-import { AdminGuard } from './guards/admin.guard';
-import { JwtGuard } from './guards/jwt.guard';
 import { LocalStrategy } from './strategies/jwt.strategy';
 import config from '../config/constants'
 import { AuthService } from './auth.service';
@@ -22,7 +19,7 @@ const constants = config()
       secret: constants.JWT_SECRET
   }), UsersModule, EmailModule, TelegramModule],
   controllers: [AuthController],
-  providers: [AuthService, PrismaService, ConfigService, FileService, JwtGuard, LocalStrategy, AdminGuard, SellerGuard],
-  exports: [JwtGuard, LocalStrategy, AdminGuard, SellerGuard]
+  providers: [AuthService, PrismaService, ConfigService, FileService, LocalStrategy],
+  exports: [LocalStrategy]
 })
 export class AuthModule {}

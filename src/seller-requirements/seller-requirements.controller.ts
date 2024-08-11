@@ -1,9 +1,10 @@
 import { Body, Controller, Get, Post, Put, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { JwtGuard } from '@guards/jwt.guard';
-import { AdminGuard } from '@guards/admin.guard';
+import { RolesGuard } from '@guards/roles.guard';
 import { ObjectStringToIntPipe } from '@pipes/object-string-to-int.pipe';
 import { User } from '@decorators/get-user.decorator';
+import { Auth } from '@decorators/auth.decorator';
+import { Roles } from '@decorators/roles.decorator';
 import { SwaggerBadRequest, SwaggerConflictMessage, SwaggerCreated, SwaggerForbiddenException, SwaggerNotFound, SwaggerOK, SwaggerUnauthorizedException } from '@swagger/apiResponse.interfaces';
 import { CreateSellerRequirementDto } from './dto/create-seller-requirement.dto';
 import { GetAllRequirementsDto } from './dto/get-all-requirements-query.dto';
@@ -25,7 +26,7 @@ export class SellerRequirementsController {
   @ApiResponse({ status: 400, description: "Validation failed", type: SwaggerBadRequest })
   @ApiResponse({ status: 409, description: "You already has a seller requirement", type: SwaggerConflictMessage })
   @ApiBearerAuth()
-  @UseGuards(JwtGuard)
+  @Auth()
   async createSellerRequiremenet(@Body() dto: CreateSellerRequirementDto, @User() user: JwtUser) {
     return await this.sellerRequirementsService.createSellerRequirement(dto, user)
   }
@@ -39,7 +40,9 @@ export class SellerRequirementsController {
   @ApiQuery({ name: "requirementsOnPage" })
   @ApiBearerAuth()
   @UsePipes(new ValidationPipe())
-  @UseGuards(JwtGuard, AdminGuard)
+  @Auth()
+  @UseGuards(RolesGuard)
+  @Roles("ADMIN")
   async getAll(@Query(ObjectStringToIntPipe) query: GetAllRequirementsDto) {
     return await this.sellerRequirementsService.getAll(query)
   }
@@ -54,7 +57,9 @@ export class SellerRequirementsController {
   @ApiResponse({ status: 409, description: "User already has seller role", type: SwaggerConflictMessage })
   @ApiBearerAuth()
   @UsePipes(new ValidationPipe())
-  @UseGuards(JwtGuard, AdminGuard)
+  @Auth()
+  @UseGuards(RolesGuard)
+  @Roles("ADMIN")
   async close(@Body() dto: CloseSellerRequirementDto) {
     return await this.sellerRequirementsService.close(dto)
   }
