@@ -18,7 +18,7 @@ export class EmailController {
     @ApiResponse({ status: 400, description: "User not has email", type: SwaggerBadRequest })
     @ApiResponse({ status: 401, description: "Token Invalid/Unauthorized", type: SwaggerUnauthorizedException })
     @ApiResponse({ status: 404, description: "User not found", type: SwaggerNotFound })
-    @ApiResponse({ status: 409, description: "Email already sended / User already has verification", type: SwaggerConflictMessage })
+    @ApiResponse({ status: 409, description: "Email already sended (lt 5 mins from last) / User already has verification", type: SwaggerConflictMessage })
     @ApiBearerAuth()
     async createVerification(@User() user: JwtUser) {
         return await this.emailService.createVerification(user)

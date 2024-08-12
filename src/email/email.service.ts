@@ -53,7 +53,20 @@ export class EmailService {
 
         if (!User.email) throw new BadRequestException("User not has email")
 
-        if (await this.findTagByUserId(User.id)) throw new ConflictException("Already has email")
+        const check = await this.findTagByUserId(User.id)
+
+        if (check) {
+            if (!checkMinsTimeFromDateToCurrent(check.createdAt, 5)) {
+                throw new ConflictException("Already send email (lt 5 mins from last)")
+            }
+            else {
+                await this.prismaService.emailConfirms.delete({
+                    where: {
+                        userId: User.id
+                    }
+                })
+            }
+        }
 
         const urlTag = v4()
 
