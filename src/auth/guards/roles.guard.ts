@@ -1,19 +1,29 @@
-import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
+import { JwtService } from "@nestjs/jwt";
+import { JwtUser } from "../interfaces";
 import { Request } from "express";
+import { ExtractJwt } from "passport-jwt";
 import { Observable } from "rxjs";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-    constructor(private readonly reflector: Reflector) {}
+    constructor(private readonly reflector: Reflector,
+                private readonly jwtService: JwtService
+    ) {}
 
     canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-        const request: Request = context.switchToHttp().getRequest()
+        try {
+            const request: Request = context.switchToHttp().getRequest()
+            const user = this.jwtService.verify<JwtUser>(ExtractJwt.fromAuthHeaderAsBearerToken()(request))
 
-        if (!request.user) return false;
+            if (!user) throw new UnauthorizedException();
 
-        const roles: string[] = this.reflector.get("ROLES", context.getHandler())
+            const roles: string[] = this.reflector.get("ROLES", context.getHandler())
 
-        return roles.includes(request.user["role"]) ? true : false
+            return roles.includes(user.role) ? true : false
+        } catch(e) {
+            throw new UnauthorizedException()
+        }   
     }
 }
