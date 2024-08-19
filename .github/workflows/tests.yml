@@ -14,6 +14,8 @@ jobs:
           uses: actions/setup-node@v3
           with: 
             node-version: ${{ matrix.node-version }}
+        - name: Setup environment variables
+          run: echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
         - name: Install dependencies
           run: npm install
         - name: Run tests
