@@ -33,7 +33,7 @@ jobs:
         - name: Install dependencies
           run: npm install
         - name: Prisma db
-          run: prisma db push
+          run: npx prisma db push
         - name: Run tests
           run: npm run test 
         - name: Run end-to-end tests
