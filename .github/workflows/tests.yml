@@ -7,16 +7,17 @@ jobs:
      runs-on: ubuntu-latest
      strategy:
        matrix: 
-         node-varsion: [ 18.10.0 ]
+         node-version: [ 18.10.0 ]
      steps: 
         - uses: actions/checkout@v3
         - name: Starting Node.js version ${{ matrix.node-version }}
-           - uses: actions/setup-node@v3
-           - run: echo Node.js installed 
+           uses: actions/setup-node@v3
+           with: 
+              node-version: ${{ matrix.node-version }}
+           run: echo Node.js installed 
         - name: Installing dependencies
-           - run: npm install
+           run: npm install
         - name: Staring testing 
-           - run: npm run test 
+           run: npm run test 
         - name: Starting e2e testing
-           - run: npm run test:e2e
-        
+           run: npm run test:e2e
