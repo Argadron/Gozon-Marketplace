@@ -10,13 +10,13 @@ jobs:
          node-version: [ 18.x ]
      steps: 
         - uses: actions/checkout@v3
-        - name: Setting up Node.js
-           uses: actions/setup-node@v3
-           with: 
-              node-version: ${{ matrix.node-version }}
-        - name: Installing dependencies
-           run: npm install
-        - name: Running tests 
-           run: npm run test 
-        - name: Running end-to-end tests
-           run: npm run test:e2e 
+        - name: Setup Node.js environment
+          uses: actions/setup-node@v3
+          with: 
+            node-version: ${{ matrix.node-version }}
+        - name: Install dependencies
+          run: npm install
+        - name: Run tests
+          run: npm run test 
+        - name: Run end-to-end tests
+          run: npm run test:e2e 
