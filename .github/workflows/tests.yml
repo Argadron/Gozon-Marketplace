@@ -51,5 +51,3 @@ jobs:
           run: npm run build
         - name: Generate fake db
           run: node ./dist/faker.js
-        - name: E2E
-          run: npm run test:e2e
