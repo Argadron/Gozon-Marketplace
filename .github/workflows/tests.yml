@@ -32,6 +32,10 @@ jobs:
             echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
         - name: Install dependencies
           run: npm install
+        - name: Building
+          run: npm run build
+        - name: Generate fake db
+          run: node ./dist/faker.js
         - name: Prisma db
           run: npx prisma db push
         - name: Run tests
