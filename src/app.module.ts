@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import config from '@config/constants'
 import { AppController } from './app.controller';
@@ -17,20 +18,16 @@ import { EmailModule } from './email/email.module';
 import { StripeModule } from './stripe/stripe.module';
 import { PaymentsModule } from './payments/payments.module';
 import { TelegramModule } from './telegram/telegram.module';
-import { JwtModule } from '@nestjs/jwt';
 
 const constants = config()
 
 @Module({
-  imports: [JwtModule.register({
-    global: true,
-    secret: constants.JWT_SECRET
-  }), AuthModule, ConfigModule.forRoot({
+  imports: [AuthModule, ConfigModule.forRoot({
     isGlobal: true
   }), UsersModule, ProductsModule, SellerRequirementsModule, AlertsModule, BasketModule, ReviewsModule,
   ReportsModule, CategoriesModule, ChatModule, EmailModule, StripeModule.forRoot(constants.STRIPE_API_KEY, { apiVersion: "2024-06-20" }), 
   PaymentsModule, TelegramModule.forRoot()],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, JwtService],
 })
 export class AppModule {}
