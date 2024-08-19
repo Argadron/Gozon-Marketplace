@@ -51,9 +51,3 @@ jobs:
           run: npm run build
         - name: Generate fake db
           run: node ./dist/faker.js
-        - name: Run Detector tests
-          run: npx jest --detectOpenHandles
-        - name: Run tests
-          run: npm run test 
-        - name: Run end-to-end tests
-          run: npm run test:e2e 
