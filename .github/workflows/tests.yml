@@ -32,6 +32,8 @@ jobs:
             echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
         - name: Install dependencies
           run: npm install
+        - name: Prisma db
+          run: prisma db push
         - name: Run tests
           run: npm run test 
         - name: Run end-to-end tests
