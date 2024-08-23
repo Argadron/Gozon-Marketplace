@@ -19,7 +19,7 @@ const constants = config()
       secret: constants.JWT_SECRET
   }), UsersModule, EmailModule, TelegramModule],
   controllers: [AuthController],
-  providers: [AuthService, PrismaService, ConfigService, FileService, LocalStrategy, JwtService],
-  exports: [LocalStrategy]
+  providers: [AuthService, PrismaService, ConfigService, FileService, LocalStrategy],
+  exports: [LocalStrategy, AuthService]
 })
 export class AuthModule {}

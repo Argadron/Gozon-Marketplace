@@ -43,6 +43,7 @@ model User {
   alerts Alert[]
   chats Chat[]
   messages Message[]
+  sharedBaskets SharedBasket[]
 
   @@map("user")
 }
@@ -237,6 +238,18 @@ model Telegram {
   updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
 
   @@map("telegram")
+}
+
+model SharedBasket {
+  id Int @id @default(autoincrement())
+  url String @unique
+  productsInfo Json[]
+  userId Int @map("user_id")
+  user User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at") @updatedAt
+  @@map("shared_basket")
 }
 
 enum RoleEnum {

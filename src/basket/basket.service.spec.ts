@@ -11,6 +11,8 @@ import { StripeModule } from '../stripe/stripe.module';
 import config from '@config/constants'
 import { ConfigService } from '@nestjs/config'
 import { AlertsModule } from '../alerts/alerts.module';
+import { AuthModule } from '../auth/auth.module';
+import { request } from 'express';
 
 const prisma = prismaTestClient()
 const stripe = stripeTestClient()
@@ -45,6 +47,7 @@ describe('BasketService', () => {
  const testUpdateCount = {
     count: 2
  }
+ let testSharedBasketTag: string;
 
  beforeAll(async () => {
    const product = await prisma.product.create({ data: { ...testNewProduct, productPhoto: "default.png", sellerId: 64 } }) 
@@ -60,11 +63,17 @@ describe('BasketService', () => {
 
    testValidate.sessionId = id 
    testValidate.urlTag = order.urlTag
+
+   const testSharedBasket = await prisma.sharedBasket.create({
+    data: { userId: 32, url: v4(), productsInfo: [JSON.stringify({ productId: 1, sellerId: 64, quantity: 1 })] }
+  })
+
+  testSharedBasketTag = testSharedBasket.url
  })
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [ProductsModule, PaymentsModule, StripeModule.forRoot(constants.STRIPE_API_KEY, { apiVersion: "2024-06-20" }), AlertsModule],
+      imports: [ProductsModule, PaymentsModule, StripeModule.forRoot(constants.STRIPE_API_KEY, { apiVersion: "2024-06-20" }), AlertsModule, AuthModule],
       providers: [BasketService, PrismaService, ConfigService]
     }).compile();
 
@@ -91,6 +100,22 @@ describe('BasketService', () => {
     expect((await service.deleteProduct(basketId, testJwtDeletor)).count).toBeDefined()
   })
 
+  it("Проверка создания общедоступной корзины", async () => {
+    expect((await service.copyBasket(testJwtUser)).length).toBeDefined()
+  })
+
+  it("Проверка получения общедоступной корзины", async () => {
+    expect((await service.getCopiedBasket(testSharedBasketTag, request)).admin).toBeDefined()
+  })
+
+  it("Проверка замены своей корзины на общедоступную", async () => {
+    expect((await service.replaceBasket(testJwtUser, testSharedBasketTag))).toBeUndefined()
+  })
+
+  it("Проверка удаления общедоступной корзины", async () => {
+    expect((await service.deleteCopy(testJwtUser, testSharedBasketTag))).toBeUndefined()
+  })
+
   afterAll(async () => {
     await prisma.userProducts.deleteMany({
       where: {
@@ -104,6 +129,12 @@ describe('BasketService', () => {
           { userId: 3 },
           { userId: 32 }
         ]
+      }
+    })
+
+    await prisma.sharedBasket.deleteMany({
+      where: {
+        userId: 32
       }
     })
   })

@@ -83,6 +83,15 @@ export class AuthService {
         }
     }
 
+    async verifyJwtExternal(token: string): Promise<JwtUser> {
+        try {
+            return await this.jwtService.verifyAsync(token)
+        } catch(e) {
+            console.error(e)
+            throw new UnauthorizedException("Token Invalid")
+        }
+    }
+
     async register(res: Response, dto: AuthDto, file: Express.Multer.File=null): Promise<Tokens> {
         const User = await this.userService.findBy({ 
             OR: [

@@ -16,6 +16,7 @@ import { StripeModule } from '../src/stripe/stripe.module';
 import config from '@config/constants'
 import { ConfigService } from '@nestjs/config'
 import { AlertsModule } from '../src/alerts/alerts.module';
+import { AuthModule } from '../src/auth/auth.module';
 
 const prisma = prismaTestClient()
 const stripe = stripeTestClient()
@@ -34,6 +35,7 @@ describe("BasketController (E2E)", () => {
      const testUpdateProductCount = {
         count: 2
      }
+     let testSharedBasketTag: string;
    
      beforeAll(async () => {
        const order = await prisma.orders.create({
@@ -43,11 +45,17 @@ describe("BasketController (E2E)", () => {
    
        testValidate.sessionId = id 
        testValidate.urlTag = order.urlTag
+
+       const testSharedBasket = await prisma.sharedBasket.create({
+        data: { userId: 32, url: v4(), productsInfo: [JSON.stringify({ productId: 1, sellerId: 64, quantity: 1 })] }
+      })
+  
+      testSharedBasketTag = testSharedBasket.url
      })
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [ProductsModule, PaymentsModule, StripeModule.forRoot(constants.STRIPE_API_KEY, { apiVersion: "2024-06-20" }), AlertsModule],
+            imports: [ProductsModule, PaymentsModule, StripeModule.forRoot(constants.STRIPE_API_KEY, { apiVersion: "2024-06-20" }), AlertsModule, AuthModule],
             controllers: [BasketController],
             providers: [BasketService, PrismaService, ConfigService]
         }).overrideGuard(JwtGuard).useValue({
@@ -102,6 +110,30 @@ describe("BasketController (E2E)", () => {
         .expect(200)
     })
 
+    it("/api/basket/copyBasket (POST) (Проверка создания копии корзины)", async () => {
+        return request(app.getHttpServer())
+        .post("/api/basket/copyBasket")
+        .expect(201)
+    })
+
+    it("/api/basket/sharedBasket?urlTag=<urlTag> (GET) (Проверка получения общедоступной корзины)", async () => {
+        return request(app.getHttpServer())
+        .get(`/api/basket/sharedBasket?urlTag=${testSharedBasketTag}`)
+        .expect(200)
+    })
+
+    it("/api/basket/replaceBasket?urlTag=<urlTag> (PUT) (Проверка замены своей корзины на общедоступную)", async () => {
+        return request(app.getHttpServer())
+        .put(`/api/basket/replaceBasket?urlTag=${testSharedBasketTag}`)
+        .expect(204)
+    })
+
+    it("/api/basket/deleteCopy?urlTag=<urlTag>", async () => {
+        return request(app.getHttpServer())
+        .delete(`/api/basket/deleteCopy?urlTag=${testSharedBasketTag}`)
+        .expect(204)
+    })
+
     afterAll(async () => {
         await prisma.orders.deleteMany({
             where: {
@@ -111,6 +143,12 @@ describe("BasketController (E2E)", () => {
                 ]
             }
         })
+
+        await prisma.sharedBasket.deleteMany({
+            where: {
+              userId: 32
+            }
+          })
 
         await app.close()
     })

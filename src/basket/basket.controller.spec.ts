@@ -3,7 +3,7 @@ import { BasketController } from './basket.controller';
 import { BasketService } from './basket.service';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { ExecutionContext } from '@nestjs/common';
-import { Request } from 'express';
+import { request, Request } from 'express';
 import { RoleEnum } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { ProductsModule } from '../products/products.module';
@@ -15,6 +15,7 @@ import { StripeModule } from '../stripe/stripe.module';
 import config from '@config/constants'
 import { ConfigService } from '@nestjs/config'
 import { AlertsModule } from '../alerts/alerts.module';
+import { AuthModule } from '../auth/auth.module';
 
 const prisma = prismaTestClient()
 const stripe = stripeTestClient()
@@ -53,6 +54,7 @@ describe('BasketController', () => {
   const testUpdateCount = {
     count: 2
   }
+  let testSharedBasketTag: string;
 
   beforeAll(async () => {
     const product = await prisma.product.create({ data: { ...testNewProduct, productPhoto: "default.png", sellerId: 64 } }) 
@@ -68,11 +70,17 @@ describe('BasketController', () => {
 
     testValidate.sessionId = id 
     testValidate.urlTag = order.urlTag
+
+    const testSharedBasket = await prisma.sharedBasket.create({
+      data: { userId: 32, url: v4(), productsInfo: [JSON.stringify({ productId: 1, sellerId: 64, quantity: 1 })] }
+    })
+
+    testSharedBasketTag = testSharedBasket.url
   })
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [ProductsModule, PaymentsModule, StripeModule.forRoot(constants.STRIPE_API_KEY, { apiVersion: "2024-06-20" }), AlertsModule],
+      imports: [ProductsModule, PaymentsModule, StripeModule.forRoot(constants.STRIPE_API_KEY, { apiVersion: "2024-06-20" }), AlertsModule, AuthModule],
       controllers: [BasketController],
       providers: [BasketService, PrismaService, ConfigService],
     }).overrideGuard(JwtGuard).useValue({
@@ -111,6 +119,22 @@ describe('BasketController', () => {
     expect((await controller.deleteProduct(basketId, testJwtDeletor)).count).toBeDefined()
   })
 
+  it("Проверка создания общедоступной корзины", async () => {
+    expect((await controller.copyBasket(testJwtUser)).length).toBeDefined()
+  })
+
+  it("Проверка получения общедоступной корзины", async () => {
+    expect((await controller.getCopiedBasket(testSharedBasketTag, request)).admin).toBeDefined()
+  })
+
+  it("Проверка замены своей корзины на общедоступную", async () => {
+    expect((await controller.replaceBasket(testJwtUser, testSharedBasketTag))).toBeUndefined()
+  })
+
+  it("Проверка удаления общедоступной корзины", async () => {
+    expect((await controller.deleteCopy(testJwtUser, testSharedBasketTag))).toBeUndefined()
+  })
+
   afterAll(async () => {
     await prisma.userProducts.deleteMany({
       where: {
@@ -124,6 +148,12 @@ describe('BasketController', () => {
           { userId: 3 },
           { userId: 64 }
         ]
+      }
+    })
+
+    await prisma.sharedBasket.deleteMany({
+      where: {
+        userId: 32
       }
     })
   })

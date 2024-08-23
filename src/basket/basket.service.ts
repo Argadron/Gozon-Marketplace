@@ -6,11 +6,13 @@ import { ValidateOrderDto } from './dto/validate-order.dto';
 import { PrismaService } from '../prisma.service';
 import { JwtUser } from '../auth/interfaces';
 import { ProductsService } from '../products/products.service';
+import { AuthService } from '../auth/auth.service';
 import { STRIPE_CLIENT } from '../stripe/constants';
 import { PaymentsService } from '../payments/payments.service';
 import { AlertsService } from '../alerts/alerts.service';
 import Stripe from 'stripe';
 import { v4 } from 'uuid'
+import { Request } from 'express';
 
 @Injectable()
 export class BasketService {
@@ -19,7 +21,8 @@ export class BasketService {
                 @Inject(STRIPE_CLIENT) private readonly stripe: Stripe,
                 @Inject(ConfigService) private readonly configService: ConfigService,
                 private readonly paymentsService: PaymentsService,
-                private readonly alertsService: AlertsService
+                private readonly alertsService: AlertsService,
+                private readonly authService: AuthService
     ) {}
 
     /**
@@ -43,6 +46,29 @@ export class BasketService {
         if (product.userId !== userId) throw new ForbiddenException("This is not your product")
 
         return product
+    }
+
+    private async getUserBasket(userId: number) {
+        return await this.prismaService.userProducts.findMany({
+            where: {
+                userId: userId
+            },
+            include: {
+                product: true
+            }
+        })
+    }
+
+    private async getSharedBaksetOrThrow(url: string) {
+        const sharedBasket = await this.prismaService.sharedBasket.findUnique({
+            where: {
+                url
+            }
+        })
+
+        if (!sharedBasket) throw new NotFoundException("Basket not found")
+
+        return sharedBasket
     }
 
     async addProduct(dto: AddProductDto, user: JwtUser) {
@@ -92,14 +118,7 @@ export class BasketService {
     }
 
     async createOrder(user: JwtUser) {
-        const basket = await this.prismaService.userProducts.findMany({
-            where: {
-                userId: user.id
-            },
-            include: {
-                product: true
-            }
-        })
+        const basket = await this.getUserBasket(user.id)
 
         if (!basket || basket?.length === 0) throw new BadRequestException("User not has products on basket!")
 
@@ -255,5 +274,88 @@ export class BasketService {
         else {
             return "Not paid"
         }
+    }
+
+    async copyBasket(user: JwtUser) {
+        const basket = await this.getUserBasket(user.id)
+
+        if (basket.length === 0) throw new BadRequestException("Basket is empty")
+
+        const url = v4()
+        const productsInfo = []
+
+        basket.forEach(elem => {
+            productsInfo.push({
+                productId: elem.productId,
+                productName: elem.product.name,
+                productCount: elem.productCount
+            })
+        })
+
+        await this.prismaService.sharedBasket.create({
+            data: {
+                userId: user.id, 
+                url,
+                productsInfo
+            }
+        })
+
+        return `${this.configService.get("API_CLIENT_URL")}/sharedBaket/${url}`
+    }
+
+    async getCopiedBasket(url: string, req: Request) {
+        const sharedBasket = await this.getSharedBaksetOrThrow(url)
+
+        const token = req.headers.authorization
+        let user: any;
+
+        if (token) {
+            user = await this.authService.verifyJwtExternal(token.split(" ")[1])
+        }
+
+        return {
+            basket: sharedBasket,
+            admin: user?.id === sharedBasket.userId ? true : false
+        }
+    }
+
+    async deleteCopy(user: JwtUser, url: string) {
+        const sharedBasket = await this.getSharedBaksetOrThrow(url)
+
+        if (sharedBasket.userId !== user.id) throw new ForbiddenException("This is not your shared basket")
+
+        await this.prismaService.sharedBasket.delete({
+            where: {
+                url
+            }
+        })
+
+        return undefined
+    }
+
+    async replaceBasket(user: JwtUser, url: string) {
+        const sharedBasket = await this.getSharedBaksetOrThrow(url)
+
+        const newBasket = sharedBasket.productsInfo.map((elem) => {
+            const basketElem = JSON.parse(JSON.stringify(elem as any))
+
+            return {
+                productId: basketElem.productId, 
+                productCount: basketElem.productCount,
+                userId: user.id
+            }
+        })
+        
+        await this.prismaService.userProducts.deleteMany({
+            where: {
+                userId: user.id
+            }
+        })
+
+        await this.prismaService.userProducts.createMany({
+            data: newBasket
+        })
+
+        return undefined
     }
 }
